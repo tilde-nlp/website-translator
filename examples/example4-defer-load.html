@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <!-- Enter correct source code path -->
+        <script src="widget.js" defer></script>
+    </head>
+    <body>
+        <div class="website-translator"></div>
+        
+        <script>
+            window.onload = function(){
+                // Configure
+                WebsiteTranslator.Options.api.clientId = 'x-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+
+                // ...
+
+                // Initialize and run translations
+                WebsiteTranslator.Initialize()
+            }
+        </script>
+    </body>
+</html>

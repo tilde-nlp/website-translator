@@ -1,0 +1,35 @@
+tmt-wtw-txt-s{
+    background: greenyellow;
+    height: 12px;
+    width: 12px;
+    display: inline-block;
+    margin:1px;
+}
+tmt-wtw-txt-e{
+    background: green;
+    height: 12px;
+    width: 12px;
+    display: inline-block;
+    margin:1px;
+}
+tmt-wtw-raw-txt{
+    background:#28a7452b;
+    min-width: 5px;
+    min-height: 5px;
+}
+
+html{
+    color:grey;
+}
+
+[translate="yes"]{
+    color:limegreen;
+}
+
+[translate="no"] {
+    color: crimson;
+}
+
+.notranslate, [translate="no"], [lang="xxx"]{
+    color:crimson;
+}

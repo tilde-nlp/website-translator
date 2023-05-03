@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<head>
+    <!-- Update your html tag to include the itemscope and itemtype attributes. -->
+    <!-- Place this data between the <head> tags of your website -->
+    <title>Page Title. Maximum length 60-70 characters</title>
+    <meta name="description" content="Page description. No longer than 155 characters." />
+
+    <!-- Schema.org markup for Google+ -->
+    <meta itemprop="name" content="The Name or Title Here">
+    <meta itemprop="description" content="This is the page description">
+    <meta itemprop="image" content="http://www.example.com/image.jpg">
+
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="product">
+    <meta name="twitter:site" content="@publisher_handle">
+    <meta name="twitter:title" content="Page Title">
+    <meta name="twitter:description" content="Page description less than 200 characters">
+    <meta name="twitter:creator" content="@author_handle">
+    <meta name="twitter:image" content="http://www.example.com/image.jpg">
+    <meta name="twitter:data1" content="$3">
+    <meta name="twitter:label1" content="Price">
+    <meta name="twitter:data2" content="Black">
+    <meta name="twitter:label2" content="Color">
+
+    <!-- Open Graph data -->
+    <meta property="og:title" content="Title Here" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="http://www.example.com/" />
+    <meta property="og:image" content="http://example.com/image.jpg" />
+    <meta property="og:description" content="Description Here" />
+    <meta property="og:site_name" content="Site Name, i.e. Moz" />
+    <meta property="og:price:amount" content="15.00" />
+    <meta property="og:price:currency" content="USD" />
+
+
+    <script src="/dist/widget.js"></script>
+    <!-- <link rel="stylesheet" href="/dist/widget.css"></link> -->
+    <link rel="stylesheet" href="/pages/styles/wtw-main.css"/>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        .mycolor {
+            color: cornflowerblue;
+        }
+        .notranslate, [translate="no"], [lang="xxx"]{
+            color:crimson;
+        }
+
+        [translate="yes"], [lang="en"]{
+            color:green;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div>
+        <div class="website-translator"></div>
+
+        <form>
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname"><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname">
+        </form>
+    
+        <form>
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username"><br>
+            <label for="pwd">Password:</label><br>
+            <input type="password" id="pwd" name="pwd">
+        </form>
+    
+        <form action="/action_page.php">
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" value="John"><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname" value="Doe"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    
+        <form action="/action_page.php">
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" value="John"><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname" value="Doe"><br><br>
+            <input type="submit">
+        </form>
+    
+        <form action="/action_page.php">
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" value="John"><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname" value="Doe"><br><br>
+            <input type="submit" value="Submit">
+            <input type="reset">
+        </form>
+    
+        <form>
+            <input type="radio" id="male" name="gender" value="male">
+            <label for="male">Male</label><br>
+            <input type="radio" id="female" name="gender" value="female">
+            <label for="female">Female</label><br>
+            <input type="radio" id="other" name="gender" value="other">
+            <label for="other">Other</label>
+        </form>
+    
+        <form>
+            <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+            <label for="vehicle1"> I have a bike</label><br>
+            <input type="checkbox" id="vehicle2" name="vehicle2" value="Car">
+            <label for="vehicle2"> I have a car</label><br>
+            <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat">
+            <label for="vehicle3"> I have a boat</label>
+        </form>
+    
+        <input type="button" onclick="alert('Hello World!')" value="Click Me!">
+    
+        <form>
+            <label for="favcolor">Select your favorite color:</label>
+            <input type="color" id="favcolor" name="favcolor">
+        </form>
+    
+        <form>
+            <label for="birthday">Birthday:</label>
+            <input type="date" id="birthday" name="birthday">
+        </form>
+    
+        <form>
+            <label for="datemax">Enter a date before 1980-01-01:</label>
+            <input type="date" id="datemax" name="datemax" max="1979-12-31"><br><br>
+            <label for="datemin">Enter a date after 2000-01-01:</label>
+            <input type="date" id="datemin" name="datemin" min="2000-01-02">
+        </form>
+    
+        <form>
+            <label for="birthdaytime">Birthday (date and time):</label>
+            <input type="datetime-local" id="birthdaytime" name="birthdaytime">
+        </form>
+    
+        <form>
+            <label for="email">Enter your email:</label>
+            <input type="email" id="email" name="email">
+        </form>
+    
+        <form>
+            <label for="myfile">Select a file:</label>
+            <input type="file" id="myfile" name="myfile">
+        </form>
+    
+        <form>
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <input type="hidden" id="custId" name="custId" value="3487">
+            <input type="submit" value="Submit">
+        </form>
+    
+    
+        <form>
+            <label for="bdaymonth">Birthday (month and year):</label>
+            <input type="month" id="bdaymonth" name="bdaymonth">
+        </form>
+    
+        <form>
+            <label for="quantity">Quantity (between 1 and 5):</label>
+            <input type="number" id="quantity" name="quantity" min="1" max="5">
+        </form>
+    
+        <form>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="0" max="100" step="10" value="30">
+        </form>
+    
+        <form>
+            <label for="vol">Volume (between 0 and 50):</label>
+            <input type="range" id="vol" name="vol" min="0" max="50">
+        </form>
+    
+        <form>
+            <label for="gsearch">Search Google:</label>
+            <input type="search" id="gsearch" name="gsearch">
+        </form>
+    
+        <form>
+            <label for="phone">Enter your phone number:</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}">
+        </form>
+    
+    
+        <form>
+            <label for="homepage">Add your homepage:</label>
+            <input type="url" id="homepage" name="homepage">
+        </form>
+    
+        <form>
+            <label for="week">Select a week:</label>
+            <input type="week" id="week" name="week">
+        </form>
+    
+        <form>
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" value="John"><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname" value="Doe">
+        </form>
+    
+        <form>
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" value="John" readonly><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname" value="Doe">
+        </form>
+    
+        <form>
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" value="John" disabled><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname" value="Doe">
+        </form>
+    
+    
+        <form>
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" size="50"><br>
+            <label for="pin">PIN:</label><br>
+            <input type="text" id="pin" name="pin" size="4">
+        </form>
+    
+        <form>
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" size="50"><br>
+            <label for="pin">PIN:</label><br>
+            <input type="text" id="pin" name="pin" maxlength="4" size="4">
+        </form>
+    
+        <form>
+            <label for="datemax">Enter a date before 1980-01-01:</label>
+            <input type="date" id="datemax" name="datemax" max="1979-12-31"><br><br>
+    
+            <label for="datemin">Enter a date after 2000-01-01:</label>
+            <input type="date" id="datemin" name="datemin" min="2000-01-02"><br><br>
+    
+            <label for="quantity">Quantity (between 1 and 5):</label>
+            <input type="number" id="quantity" name="quantity" min="1" max="5">
+        </form>
+    
+        <form>
+            <label for="files">Select files:</label>
+            <input type="file" id="files" name="files" multiple>
+        </form>
+    
+        <form>
+            <label for="country_code">Country code:</label>
+            <input type="text" id="country_code" name="country_code" pattern="[A-Za-z]{3}"
+                title="Three letter country code">
+        </form>
+    
+        <form>
+            <label for="phone">Enter a phone number:</label>
+            <input type="tel" id="phone" name="phone" placeholder="123-45-678" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}">
+        </form>
+    
+        <form>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </form>
+    
+    
+        <form>
+            <label for="points">Points:</label>
+            <input type="number" id="points" name="points" step="3">
+        </form>
+    
+    
+        <form>
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" autofocus><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname">
+        </form>
+    
+        <form>
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <label for="lname">Last name:</label>
+            <input type="text" id="lname" name="lname"><br><br>
+            <input type="image" src="img_submit.gif" alt="Submit" width="48" height="48">
+        </form>
+    
+        <form>
+            <input list="browsers">
+            <datalist id="browsers">
+                <option value="Internet Explorer">
+                <option value="Firefox">
+                <option value="Chrome">
+                <option value="Opera">
+                <option value="Safari">
+            </datalist>
+        </form>
+    
+        <form action="/action_page.php" autocomplete="on">
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <label for="lname">Last name:</label>
+            <input type="text" id="lname" name="lname"><br><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" autocomplete="off"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    
+        <form action="/action_page.php" id="form1">
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    
+        <label for="lname">Last name:</label>
+        <input type="text" id="lname" name="lname" form="form1">
+    
+        <form action="/action_page.php">
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <label for="lname">Last name:</label>
+            <input type="text" id="lname" name="lname"><br><br>
+            <input type="submit" value="Submit">
+            <input type="submit" formaction="/action_page2.php" value="Submit as Admin">
+        </form>
+    
+    
+        <form action="/action_page_binary.asp" method="post">
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <input type="submit" value="Submit">
+            <input type="submit" formenctype="multipart/form-data" value="Submit as Multipart/form-data">
+        </form>
+    
+        <form action="/action_page.php" method="get">
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <label for="lname">Last name:</label>
+            <input type="text" id="lname" name="lname"><br><br>
+            <input type="submit" value="Submit using GET">
+            <input type="submit" formmethod="post" value="Submit using POST">
+        </form>
+    
+        <form action="/action_page.php">
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <label for="lname">Last name:</label>
+            <input type="text" id="lname" name="lname"><br><br>
+            <input type="submit" value="Submit">
+            <input type="submit" formtarget="_blank" value="Submit to a new window/tab">
+        </form>
+    
+        <form action="/action_page.php">
+            <label for="email">Enter your email:</label>
+            <input type="email" id="email" name="email"><br><br>
+            <input type="submit" value="Submit">
+            <input type="submit" formnovalidate="formnovalidate" value="Submit without validation">
+        </form>
+    
+        <form action="/action_page.php" novalidate>
+            <label for="email">Enter your email:</label>
+            <input type="email" id="email" name="email"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    
+        <div class="discount-line" style="display: block;">
+            <span class="discount">-3 %</span>
+            <span class="previous-price">
+                <span style="display: inline-block;">309</span>
+                <span style="display: inline-block;">&nbsp;€</span>
+            </span>
+        </div>
+        
+        <!-- Dynamically added iframe -->
+        <div id="iframe-dropzone" title="no-title">
+            <iframe src="iframes/attributes.html"></iframe>
+        </div>
+
+        <script>
+            setTimeout(()=>{
+                var dropzone = document.querySelector("#iframe-dropzone")
+                var iframe1 = document.createElement("iframe")
+                iframe1.src = "iframes/attributes.html"
+
+                var iframe2 = document.createElement("iframe")
+                iframe2.src = "iframes/attributes.html"
+
+                dropzone.title = "iframes added"
+                dropzone.append(iframe1, iframe2)
+            }, 2000)
+        </script>
+
+        <div>
+            <h2>The &lt;form&gt; Element</h2>
+            <p>
+                The HTML
+                <code style="color:red;">&lt;form&gt;</code>
+                element is used to create an HTML form for user input:
+            </p>
+        </div>
+
+        <div>
+            <b style="color:teal;">
+                A Team of
+            </b>
+
+            <b style="color:coral;">
+                <i>
+                    Scientists. This is tag reordering example.
+                </i>
+            </b>
+        </div>
+
+        <div><b style="color:teal;">A Team of</b><b style="color:coral;"><i>Scientists.They are quite few of them.</i>Hello</b><em>world</em></div>
+
+        <div>
+            <a href="/pages/my-page.html">link without language code</a>
+        </div>
+        <div>
+            <a href="/pages/my-page.html?lang=ru">link with language code</a>
+        </div>
+
+        <br>
+
+        <ul><li>Offline recognition systems
+            <ul style="list-style-type:circle"><li>LVASR – speech recognition for Latvian <b>(default)</b></li>
+                <li>LTASR – speech recognition for Lithuanian</li>
+                <li>EEASR – speech recognition for Estonian</li>
+            </ul></li>
+            <li>Online recognition systems
+            <ul style="list-style-type:circle"><li>LVASR-ONLINE – speech recognition for Latvian <b>(default)</b></li>
+                <li>LTASR-ONLINE – speech recognition for Lithuanian</li>
+                <li>EEASR-ONLINE – speech recognition for Estonian</li>
+                <li>ADDRESS-ONLINE – street address recognition for Latvian</li>
+                <li>ADDRESS-LT-ONLINE – street address recognition for Lithuanian</li>
+            </ul></li>
+        </ul>
+
+        <br>
+
+        <div class="w3-card-4 w3-container">
+            <h2><a href="howto_js_animate_icons.asp" class="h2-anchor">Animated Icons</a></h2>
+            <div id="charging" class="fa faicons"></div>
+            <div class="howto-container">
+                <p><a href="howto_js_animate_icons.asp" class="ws-btn">Learn How To »</a></p>
+            </div>
+            <script>
+                function chargebattery() {
+                    var a;
+                    a = document.getElementById("charging");
+                    a.innerHTML = "&#xf244;";
+                    setTimeout(function () {
+                        a.innerHTML = "&#xf243;";
+                    }, 1000);
+                    setTimeout(function () {
+                        a.innerHTML = "&#xf242;";
+                    }, 2000);
+                    setTimeout(function () {
+                        a.innerHTML = "&#xf241;";
+                    }, 3000);
+                    setTimeout(function () {
+                        a.innerHTML = "&#xf240;";
+                    }, 4000);
+                }
+                chargebattery();
+                setInterval(chargebattery, 5000);
+            </script>
+        </div>
+
+        <br>
+
+        <br>
+
+        <label for="country">Country</label>
+        <select id="country" name="country">
+          <option>Australia</option>
+          <option>Canada</option>
+          <option>USA</option>
+        </select>
+
+        <br>
+
+        <p>The question in the title <cite translate="no">How Far Can You Go?</cite> applies to both the undermining of traditional religious belief by radical theology and the undermining of literary convention by the device of "breaking frame"...</p>
+
+        <br>
+
+        <form>
+            <p><input placeholder="No label"></p>
+        </form>
+
+        <br>
+
+        <p>A <b>computer</b> is a <a href="/wiki/Machine" title="Machine">machine</a> that can be programmed to carry out <a href="/wiki/Sequence" title="Sequence">sequences</a> of <a href="/wiki/Arithmetic" title="Arithmetic">arithmetic</a> or <a href="/wiki/Logical_operations" class="mw-redirect" title="Logical operations">logical operations</a> automatically.</p>
+
+        <br>
+
+        <div class="baz">
+            <!-- Block element examples -->
+            <span style="display: block;">
+                <b>Block</b> element with inline style
+            </span>
+
+            <span class="block">
+                Block element with class css style
+            </span>
+
+            Transformed block element
+            <div class="inline">
+                to inline element.
+            </div>
+
+            Normal
+            <a href="">link</a>
+            that is inline.
+
+
+            Customized link:
+            <a href="" class="block">link</a>
+
+            <style>
+                .block{
+                    display: block;
+                }
+                .inline{
+                    display:inline;
+                }
+                .baz div, .baz span, .baz a{
+                    padding:5px;
+                    border: 1px solid grey;
+                }
+            </style>
+        </div>
+
+        <br>
+
+        <a>
+            <b translate="no">
+                [NonTranslatable]
+            </b>
+            <span>
+                Translate this
+            </span>
+        </a>
+
+        <br>
+
+        <span translate="no">
+            [NonTranslatable]
+            <span translate="yes">
+                Translation expected
+                <span translate="no">
+                    [NonTranslatable]
+                    <span translate="yes">
+                        Translation expected
+                    </span>
+                    [NonTranslatable]
+                </span>
+            </span>
+            [NonTranslatable]
+        </span>
+
+        <br>
+        <br>
+
+        <div translate="no">
+            [NonTranslatable]
+            <div translate="yes">
+                Translation expected
+                <div translate="no">
+                    [NonTranslatable]
+                    <div translate="yes">
+                        Translation expected
+                    </div>
+                    [NonTranslatable]
+                </div>
+            </div>
+            [NonTranslatable]
+        </div>
+
+        <br>
+
+        <div lang="xxx">
+            [NonTranslatable]
+            <div lang="en">
+                Translation expected
+                <div lang="xxx">
+                    [NonTranslatable]
+                    <div lang="en">
+                        Translation expected
+                    </div>
+                    [NonTranslatable]
+                </div>
+            </div>
+            [NonTranslatable]
+        </div>
+
+        <video width="320" height="320">
+            <source src="small.mp4" type="video/mp4">
+            <track label="This is cool text">
+        </video>
+
+        <a>
+            <!---->
+            <span>
+                <!---->I am comment<!---->
+            </span>
+            <!---->
+        </a>
+
+        <div>
+            This sentence
+            <b>
+                ends in tags.
+                The next sentence
+            </b>
+            starts right after the first one.
+            Please split sentences correctly
+        </div>
+
+        <div translate="no">[NonTranslatable]</div>
+        <div class="notranslate">[NonTranslatable]</div>
+
+        <p>
+            Text
+            <a href="javascript:;" id="clickableLink">
+                <b>
+                    Click me
+                </b>
+                , please
+            </a>
+        </p>
+
+
+
+        <div>
+            Text
+            <div>
+                Another
+            </div>
+            One
+        </div>
+
+        <a>
+            <b translate="no">
+                [NonTranslatable]
+            </b>
+            <span>
+                Translate this
+            </span>
+        </a>
+
+        <br>
+
+        <tr>
+            <td>
+                <strong>Pay to: </strong>
+                <br>
+                Acme Billing Co.
+            </td>
+        </tr>
+
+        These are some of &copy;&lambda; named entities.
+
+
+        <iframe src="https://www.google.com"></iframe>
+        <iframe src="my-frame.html"></iframe>
+
+        <script>
+            var element = document.querySelector("#clickableLink")
+            element.onclick = function(){
+                alert("success")
+            }
+        </script>
+
+
+        <br><br>
+
+
+        <span>
+            Simple sentence.
+            <span>
+                Second inline sentence.
+            </span>
+        </span>
+
+
+        <br><br>
+
+
+        <div>
+            The famous celebrity
+            <b translate="no">Elon Musk</b>
+            created
+            <b translate="no">Spacex</b>
+            corporation
+        </div>
+
+
+        <br><br>
+
+
+        <p class="foo">
+            b1
+            <a class="bar">a1</a>
+            . b2
+            <a class="waldo">a2</a>
+            b3
+            <a>a3</a>
+            b4
+            <a>a4</a>
+            . b5
+        </p>
+        <style>
+            .foo > .bar{
+                background:hotpink;
+                color:white;
+            }
+        </style>
+        <script>
+            setTimeout(()=>{
+                var waldo = document.querySelector(".foo > .waldo")
+                waldo.style.backgroundColor = "crimson"
+                waldo.style.color = "white"
+
+                console.log("waldo colored")
+            }, 7000)
+        </script>
+
+
+        <br><br>
+
+
+        text
+        <br>
+        text
+
+
+        <br><br>
+
+
+        <p>
+            <b>Space Exploration Technologies Corp.</b> (<b>SpaceX</b>) is an American <a href="/wiki/Aerospace_manufacturer" title="Aerospace manufacturer">aerospace manufacturer</a> and
+            <a href="/wiki/Space_transportation" class="mw-redirect" title="Space transportation">space transportation</a> services company headquartered in
+            <a href="/wiki/Hawthorne,_California" title="Hawthorne, California">Hawthorne, California</a>. It was founded in 2002 by <a href="/wiki/Elon_Musk" title="Starlink">Elon Musk</a> with the goal of reducing space transportation costs to
+            enable the <a href="/wiki/Colonization_of_Mars" title="Colonization of Mars">colonization of Mars</a>. SpaceX manufactures the <a href="/wiki/Falcon_9" title="Falcon 9">Falcon 9</a> and
+            <a href="/wiki/Falcon_Heavy" title="Falcon Heavy">Falcon Heavy</a> launch vehicles, <a href="/wiki/SpaceX_rocket_engines" title="">several rocket engines</a>, <a href="/wiki/SpaceX_Dragon_2" title="SpaceX Dragon 2">Dragon</a> cargo and
+            crew spacecraft and <a href="/wiki/Starlink" title="">Starlink</a> satellites.
+        </p>
+
+
+        <br><br>
+
+
+        <p>
+            SpaceX's achievements include the first privately funded <a href="/wiki/Liquid-propellant_rocket" title="Liquid-propellant rocket">liquid-propellant rocket</a> to reach orbit (
+            <a href="/wiki/Falcon_1" title="SpaceX rocket engines">Falcon 1</a> in 2008), the first private company to successfully launch, orbit, and recover a spacecraft (<a href="/wiki/SpaceX_Dragon" title="SpaceX Dragon">Dragon</a> in 2010),
+            the first private company to send a spacecraft to the International Space Station (Dragon in 2012), the first <a href="/wiki/VTVL" title="VTVL">vertical take-off and vertical propulsive landing</a> for an orbital rocket (
+            <a href="/wiki/Falcon_9" title="Falcon 9">Falcon 9</a> in 2015), the first reuse of an orbital rocket (Falcon 9 in 2017), and the first private company to send astronauts to orbit and to the
+            <a href="/wiki/International_Space_Station" title="International Space Station">International Space Station</a> (<a href="/wiki/Crew_Dragon_Demo-2" title="Crew Dragon Demo-2">SpaceX Crew Dragon Demo-2</a> and
+            <a href="/wiki/SpaceX_Crew-1" title="SpaceX Crew-1">SpaceX Crew-1</a> missions in 2020). SpaceX has flown and reflown the Falcon 9 series of rockets
+            <a href="/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches" title="List of Falcon 9 and Falcon Heavy launches">over one hundred times</a>.
+        </p>
+
+
+        <br><br>
+
+
+        <p>
+            SpaceX is developing a large internet satellite constellation named
+            <a href="/wiki/Starlink" title="Starlink">Starlink</a>
+            . In January 2020 the Starlink constellation became the largest satellite constellation in the world. SpaceX is also developing
+            <a href="/wiki/SpaceX_Starship" title="">Starship</a>
+            , a privately funded
+            <a href="/wiki/Super_heavy-lift_launch_vehicle" title="Super heavy-lift launch vehicle">super heavy-lift launch system</a>
+            for
+            <a href="/wiki/Interplanetary_spaceflight" title="Interplanetary spaceflight">interplanetary spaceflight</a>
+            . Starship is intended to become the primary SpaceX orbital vehicle once operational, supplanting the existing Falcon 9, Falcon
+            Heavy and Dragon fleet. Starship will be fully reusable and will have the highest payload capacity of any orbital rocket ever on its debut, scheduled for the early 2020s.
+        </p>
+
+
+        <br><br>
+
+
+        <div translate="yes">
+            You can define elements to translate with translate attribute
+            <div translate="no">
+                Excluded elements can be child of translatable elements
+                <div translate="yes">
+                    Multiple levels of translate attribute can be processed
+                    <div translate="no">
+                        This element will not be translated because of translate attribute
+                    </div>
+                    Multiple levels of translate attribute can be processed
+                </div>
+                Excluded elements can be child of translatable elements
+            </div>
+            You can define elements to translate with translate attribute
+        </div>
+
+
+        <br><br>
+
+
+        <span translate="yes">
+            You can define elements to translate with translate attribute
+            <span translate="no">
+                Excluded elements can be child of translatable elements
+                <span translate="yes">
+                    Multiple levels of translate attribute can be processed
+                    <span translate="no">
+                        This element will not be translated because of translate attribute
+                    </span>
+                    Multiple levels of translate attribute can be processed
+                </span>
+                Excluded elements can be child of translatable elements
+            </span>
+            You can define elements to translate with translate attribute
+        </span>
+
+
+        <br><br>
+
+
+        <div>
+            Optical character
+            <!-- Comment -->
+            recognition software
+            <b translate="no">Tesseract</b>
+            is an engine for various operating systems.
+
+            <div>
+                block element
+            </div>
+
+            Optical character recognition software
+            <b translate="no">Tesseract</b>
+            is an engine for various operating systems.
+        </div>
+
+
+        <br><br>
+
+
+        <div>
+            <span>
+                <span>
+                    Hello
+
+                    <code translate="no" style="background-color: rgb(236, 236, 236); color:hotpink;">
+                        Just some JS code here
+                        <em translate="yes">
+                            big
+                        </em>
+                    </code>
+
+                </span>
+            </span>
+            <span>
+                <span>
+                    world
+                </span>
+            </span>
+        </div>
+
+
+        <br><br>
+
+
+        <div>
+            <span><span>Hello</span></span>
+            <span><span>world</span></span>
+        </div>
+
+
+        <br><br>
+
+
+        <span>
+            text 1.1
+            <span>
+                text 1.2
+                <span translate="no">
+                    [[[ no ]]]
+                    <span>
+                        [[[ no ]]]
+                        <span translate="yes">
+                            <span>
+                                text 2.1
+
+                                <span>
+                                    text 2.2
+                                </span>
+
+                                <span>
+                                    <span translate="no">
+                                        [[[ no ]]]
+                                    </span>
+                                </span>
+                            </span>
+                        </span>
+                        [[[ no ]]]
+                    </span>
+                    [[[ no ]]]
+                </span>
+                text 1.3
+            </span>
+            text 1.4
+        </span>
+
+
+        <br><br>
+
+        <div>
+            <div>
+                <span>
+                    <span>
+                        <span>
+                            text 1.1
+                        </span>
+                        text 1.2
+                    </span>
+
+                    text 1.3
+
+                    <span>
+                        text 1.4
+
+                        <span>
+                            text 1.5
+                        </span>
+
+                        <span>
+                            <span>
+                                text 1.6
+
+                                <span>
+                                    text 1.7
+                                </span>
+
+                                <span>
+                                    <span translate="no">
+                                        [[[ no ]]]
+                                    </span>
+                                </span>
+                            </span>
+                        </span>
+
+                        text 1.8
+
+                        <span>
+                            text 1.9
+                            <span translate="no">
+                                [[[ no ]]]
+                            </span>
+                            text 1.10
+                        </span>
+                        text 1.11
+                    </span>
+                    text 1.12
+                </span>
+            </div>
+        </div>
+    </div>
+</body>
+
+<footer>
+    <script>
+        // Customize ui messages
+        WebsiteTranslator.Options.ui.toolbarPosition = "top"
+
+        // Configure plugin
+
+        WebsiteTranslator.Options.api.clientId = "b8fe8f36-780f-45ad-821e-d4644477cbbe";
+        WebsiteTranslator.Options.api.services.Translation = "https://localhost:7204/wt";
+
+        // Run the plugin
+        WebsiteTranslator.Initialize()
+    </script>
+</footer>
+</html>

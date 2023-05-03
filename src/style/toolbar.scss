@@ -1,0 +1,261 @@
+$toolbarBackground: #F0F2F4;
+$toolbarBorder: 1px 0px solid rgb(223, 223, 223);
+$fontSize: 14px;
+
+.website-translator-toolbar-spacer {
+  width: 100%;
+  display: inline-block;
+
+  &.headless{
+    display: none;
+  }
+}
+
+.website-translator-toolbar {
+  display: flex;
+  flex-direction: column;
+  font-family: $defaultFontFamily;
+  font-size: $fontSize;
+  position: fixed;
+
+  left: 0;
+  max-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  border-top: $toolbarBorder;
+
+  z-index: $zIndex;
+  color: $defaultTextColor;
+
+  &.headless{
+    display: none;
+  }
+  * {
+    font-size: $fontSize;
+  }
+
+  .website-translator{
+    align-self: center;
+    padding: 0;
+  }
+
+  .hidden{
+    display:none !important;
+  }
+
+  .website-translator-button {
+    font-weight: bold;
+    color: $defaultAccentColor;
+    text-decoration: none;
+    padding: 5px;
+    border: none;
+    background: transparent;
+
+    &.disabled{
+      color:#7a7a7a;
+    }
+  }
+
+  &:not(.authenticated) > .dashboard > .info {
+    > .translation-notice{
+      margin-left: 25px;
+    }
+    > .website-translator-branding{
+      display:none;
+    }
+  }
+
+  &.top {
+    top: 0;
+  }
+
+  &.bottom {
+    bottom: 0;
+  }
+
+  .title {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .close-wrapper {
+    margin-left: auto;
+    padding-left: 20px;
+    align-items: flex-end;
+    display: flex;
+  }
+
+  > * {
+    padding: 4px;
+  }
+
+  > div:not(.dashboard):not(.progress-bar) {
+    background: white;
+    border: 1px solid rgb(223, 223, 223);
+  }
+
+  &:not(.authenticated){
+    .dashboard{
+      min-height:30px;
+      .website-translator-info{
+        > .mt-info{
+          display: none;
+        }
+      }
+    }
+  }
+
+  &.authenticated {
+    .translation-notice{
+      display: none;
+    }
+    .translate-icon{
+      display: flex !important;
+    }
+
+    .dashboard{
+      height: 54px;
+      flex-wrap: nowrap;
+      z-index: $zIndex + 10;
+      .controls *{
+        display: none;
+      }
+    }
+  }
+
+  .dashboard {
+    z-index: $zIndex;
+
+    background: $toolbarBackground;
+    display: flex;
+    flex-wrap: wrap;
+
+    @media (min-width: 768px) {
+      flex-wrap: nowrap;
+      .info{
+        flex-direction: row !important;
+      }
+      .translation-notice{
+        padding: 0px !important;
+      }
+    }
+
+    .controls{
+      @media (max-width: 768px) {
+        margin-left: 35px;
+        margin-bottom: 5px;
+      }
+    }
+    .translation-notice{
+      padding: 10px;
+    }
+
+    .textual-branding{
+      display: flex;
+      align-items: center;
+      a{
+        color:#888888;
+        font-size: 13px;
+        text-decoration: none;
+      }
+    }
+    .info {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+
+      @media (max-width: 768px) {
+        flex-direction: row;
+      }
+      > .mt-info {
+        font-weight: bold;
+
+        > .mt-provider{
+          color: rgb(97, 110, 124);
+          text-transform: uppercase;
+          font-size: 10px;
+        }
+      }
+
+      > .translation-notice{
+        > .vendor{
+          padding:0;
+        }
+      }
+      .website-translator-branding {
+        margin-right: 15px;
+        @media (min-width: 768px) {
+          margin-left: 59px;
+        }
+        margin-left: 0;
+        font-weight: 700;
+        white-space: nowrap;
+
+        &-visual {
+          display: block;
+          height: 36px;
+        }
+
+        &-link {
+          display: block;
+        }
+      }
+    }
+
+    .controls {
+      flex-grow: 1;
+      display: flex;
+      margin-left: auto;
+      margin-right: auto;
+      flex-basis: 100%;
+      align-items: center;
+      // margin-right: 15px;
+
+      @media (min-width: 768px) {
+        margin-bottom:0;
+        padding-left: 3px;
+        flex-direction: row;
+        flex-basis: auto;
+      }
+
+      @media (min-width: 992px) {
+        align-self: center;
+      }
+
+      .restore-button{
+        padding:0;
+      }
+    }
+
+    .auth {
+      @media (max-width: 768px) {
+        display: none;
+      }
+      display: flex;
+      align-items: center;
+      margin-right: 25px;
+      .auth-identity {
+        margin-left: auto;
+        margin-right: 15px;
+        padding-left: 20px;
+        white-space: nowrap;
+        // align-self: start;
+        align-items: center;
+        display: flex;
+
+        @media (min-width: 768px) {
+          align-self: center;
+        }
+
+        + .controls {
+          margin-left: 0;
+
+          @media (min-width: 768px) {
+            padding-left: 10px;
+          }
+        }
+      }
+    }
+  }
+}

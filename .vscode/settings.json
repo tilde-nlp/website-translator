@@ -1,0 +1,7 @@
+{
+  "javascript.validate.enable": false,
+  "standard.autoFixOnSave": true,
+  "standard.engine":"standardx",
+  "standard.usePackageJson": true,
+  "cmake.configureOnOpen": false
+}

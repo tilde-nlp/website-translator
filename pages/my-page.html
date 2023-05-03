@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <script src="/dist/widget.js"></script>
+        <link rel="stylesheet" href="/pages/styles/wtw-main.css"/>
+        <meta property="og:title" content="Title Here" />
+        <title>My title</title>
+    </head>
+    <body>
+        <div class="website-translator"></div>
+        <p>According to the United Nations <a href="/wiki/World_Food_Programme" title="World Food Programme">World Food Programme</a>, famine is declared when malnutrition is widespread, and when people have started dying of starvation through lack of access to sufficient,&nbsp;nutritious food.<sup id="cite_ref-3" class="reference"><a href="#cite_note-3">[3]</a></sup> The <a href="/wiki/Integrated_Food_Security_Phase_Classification" title="Integrated Food Security Phase Classification">Integrated Food Security Phase Classification</a> criteria define <i>Phase 5 famine</i> of acute food insecurity as occurring when:<sup id="cite_ref-4" class="reference"><a href="#cite_note-4">[4]</a></sup><sup id="cite_ref-IPC_famine_5-0" class="reference"><a href="#cite_note-IPC_famine-5">[5]</a></sup>
+        </p>
+
+        <div id="dynamic-content">Dynamic content</div>
+        <div id="dynamic-content-2">Dynamic content</div>
+
+        <div id="iframe-dropzone" title="no-title">
+            <iframe src="iframes/attributes.html"></iframe>
+        </div>
+    </body>
+    <footer>
+        <script>
+            const dynamicContent = document.querySelector('#dynamic-content')
+            const dynamicContent2 = document.querySelector('#dynamic-content-2')
+
+            setTimeout(() => {
+                dynamicContent.textContent = 'Hello dynamic';
+            }, 3000);
+
+
+            setTimeout(() => {
+                dynamicContent2.childNodes[1].childNodes[0].textContent = '⛔ Hello dynamic';
+            }, 5000);
+
+            setTimeout(() => {
+                var dropzone = document.querySelector("#iframe-dropzone")
+                dropzone.title = "iframes added"
+
+                for (var i = 0; i < 3; i++) {
+                    var frame = document.createElement("iframe")
+                    frame.src = "iframes/attributes.html"
+
+                    dropzone.append(frame)
+                }
+            }, 2000)
+
+            // Customize ui messages
+            WebsiteTranslator.Options.ui.toolbarPosition = "top"
+
+            // Configure plugin
+            WebsiteTranslator.Options.debug = true
+
+            // NLTP dev
+            WebsiteTranslator.Options.api.clientId = "81be176a-e58e-45eb-b85d-54b4b28ec007";
+            WebsiteTranslator.Options.api.services.Translation = "https://nltp-dev.tilde.lv/api/translate/website";
+
+            // LOCAL
+            // WebsiteTranslator.Options.api.clientId = "81be176a-e58e-45eb-b85d-54b4b28ec007";
+            // WebsiteTranslator.Options.api.services.Translation = "https://localhost:7204/translate/website";
+            
+            // Run the plugin
+            WebsiteTranslator.Initialize()
+
+        </script>
+    </footer>
+
+</html>

@@ -1,0 +1,37 @@
+$buttonColor: #7a7a7a;
+$buttonColorSelected: $defaultAccentColor;
+$buttonImageColorSelected: invert(21%) sepia(50%) saturate(3311%) hue-rotate(322deg) brightness(87%) contrast(94%);
+.website-translator {
+  padding: 5px 0;
+
+  button {
+    &:not(:first-child) {
+      margin-left: 5px;
+    }
+
+    &.active {
+      font-weight: bold;
+    }
+  }
+}
+
+.website-translator {
+  &-close {
+    margin-left: auto;
+  }
+
+  &-animations {
+    &-fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
+  }
+}
+
+.website-translator-toolbar .icon{
+  filter: $iconDefaultColor;
+}
+
+.website-translator-toolbar{
+  font-family: $defaultFontFamily;
+}

@@ -1,0 +1,75 @@
+$tooltipBackground: white;
+$tooltipBorder: 1px 0px solid rgb(223, 223, 223);
+$tooltipColor: rgb(13, 46, 70);
+
+.website-translator-tooltip {
+  color: $tooltipColor;
+  display: none;
+  position: fixed;
+  min-width: 300px;
+  max-width: 300px;
+  font-family: $defaultFontFamily;
+  font-size: $defaultFontSize;
+  border: $tooltipBorder;
+  background: $tooltipBackground;
+  box-sizing: border-box;
+  z-index: $zIndex;
+  border-radius: 0.25rem;
+  box-shadow: 0px 0px 5px -1px #8c8c8cbf;
+
+  &.active {
+    display: block;
+  }
+
+  > .body {
+    display: none;
+    padding: 10px;
+
+    > .original-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    > .original {
+      margin-bottom: 10px;
+      line-height: 16px;
+      font-size: $defaultFontSize;
+    }
+  }
+
+  > .footer {
+    display: none;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    line-height: 14px;
+
+    > * {
+      margin: 5px;
+    }
+    > .text {
+      font-size: 10px;
+    }
+    > .icon {
+      display: inline-block;
+      align-self: center;
+      img {
+        height: 25px;
+      }
+    }
+  }
+
+  &.footer-visible {
+    > .footer {
+      display: flex;
+    }
+  }
+
+  &.original-text-visible {
+    > .body {
+      display: block;
+    }
+    > .footer {
+      border-top: 2px solid rgba(0, 123, 255, 0.5);
+    }
+  }
+}

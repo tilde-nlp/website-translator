@@ -1,0 +1,42 @@
+$textColor: rgb(13, 46, 70);
+$tooltipBorder: 1px 0px rgb(223, 223, 223);
+
+.website-translator-toolbar {
+  .suggestion-dialog {
+    color: $textColor;
+    border: $tooltipBorder;
+
+    > .closable-wrapper {
+      > .submission-dialog,
+      > .form {
+        width: 100%;
+        display: flex;
+        margin: auto;
+        flex-direction: column;
+        @media (min-width: 768px) {
+          max-width: 1000px;
+          flex-direction: row;
+        }
+      }
+    }
+
+    .translated-label,
+    .original-label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      margin-top: 12px;
+    }
+    .original {
+      margin-bottom: 12px;
+      line-height: 16px;
+      font-size: 12px;
+    }
+
+    &-form {
+      display: flex;
+      flex-grow: 1;
+      flex-direction: column;
+    }
+  }
+}

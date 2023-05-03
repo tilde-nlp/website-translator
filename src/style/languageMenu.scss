@@ -1,0 +1,163 @@
+$itemSelectedBackground: white;
+$itemSelectedColor: cornflowerblue;
+
+$itemHoveredBackground: rgb(238, 238, 238);
+// $itemHoveredColor: white;
+
+$machineTranslatedIconColor: $itemSelectedColor;
+
+$languageWidth: 200px;
+$itemHeight:45px;
+
+.website-translator {
+  &.left-aligned{
+    .language-menu > .website-translator-select > .selected-item{
+      padding: 0 10px;
+    }
+    > .language-menu > .website-translator-select > .selected-item > .menu-text{
+      text-align: left;
+    }
+  }
+  &.inverted{
+    > .language-menu > .website-translator-select > .options{
+      transform: translateY(calc(-100% - #{$itemHeight}));
+    }
+  }
+
+  > .language-menu,
+  > .language-list {
+    .icon * {
+      height: 1em;
+    }
+  }
+  > .language-list {
+    .icon {
+      margin-left: 5px;
+    }
+  }
+  > .language-menu {
+    position: relative;
+    user-select: none;
+    width: $languageWidth;
+
+    :focus{
+      outline: none;
+    }
+    > .website-translator-select {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+      font-family: $defaultFontFamily;
+
+      &.open {
+        > .selected-item > .menu-arrow {
+          transform: rotate(180deg);
+        }
+
+        > .options {
+          opacity: 1;
+          visibility: visible;
+          pointer-events: all;
+        }
+      }
+
+      > .selected-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 5px;
+        font-size: $defaultFontSize;
+        color: #3b3b3b;
+        height: $itemHeight;
+        line-height: $itemHeight;
+        cursor: pointer;
+        border: none;
+        background-color: transparent;
+        font-weight: bold;
+
+        > .translate-icon{
+          filter:$iconDefaultColor;
+          margin-right: .25rem;
+          display:none;
+        }
+        > .menu-text {
+          text-align: right;
+          flex-grow: 1;
+        }
+        > .menu-arrow {
+          filter: $iconDefaultColor;
+          margin-left: 10px;
+          transition: all 0.1s;
+          transform: rotate(0deg);
+        }
+      }
+      > .options {
+        border-radius: 0;
+
+        max-height: 500px;
+        overflow: auto;
+
+        position: absolute;
+        display: block;
+        top: 100%;
+        left: 0;
+        right: 0;
+        border: none;
+        background: #fff;
+
+        box-shadow: 0px 0px 4px 0px #c8c8c8;
+
+        // Animations will break custom menu accessability :(
+        // If we need to save animations then we need to delay focus on menu items
+
+        transition:none !important;
+        // transition: all 0.2s;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: $zIndex;
+
+        > .option {
+          display: flex;
+          position: relative;
+          padding: 0 16px 0 16px;
+          font-size: $defaultFontSize;
+          color: #3b3b3b;
+          line-height: $itemHeight;
+          cursor: pointer;
+
+          // Animations will break custom menu accessability :(
+          // If we need to save animations then we need to delay focus on menu items
+
+          transition:none !important;
+          // transition: all 0.2s;
+
+          &:hover, &:focus {
+            cursor: pointer;
+            background-color: $itemHoveredBackground !important;
+            // color: $itemHoveredColor !important;
+          }
+          &.selected {
+            color: $itemSelectedColor;
+            background-color: $itemSelectedBackground;
+          }
+
+          > .text {
+            display: flex;
+            flex-grow: 1;
+          }
+          > .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            > * {
+              fill: $machineTranslatedIconColor;
+            }
+          }
+        }
+      }
+    }
+  }
+}
