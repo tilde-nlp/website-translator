@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="https://nltp-test.tilde.lv/">
-    <img width="200" height="200" src="https://nltp-test.tilde.lv/assets/external-overrides/images/logo.svg">
+  <a href="https://translate.tilde.com/">
+    <img width="200" height="200" src="https://tilde.com/themes/custom/drupal8_zymphonies_theme/logo.svg">
   </a>
 </div>
 
