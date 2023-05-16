@@ -32,6 +32,7 @@ jobs:
       - run: npm ci
       # - run: npm run patch-version
       - run: pwd
+      - run: find
       - run: npm run build:prod
       - run: npm publish
         env:
