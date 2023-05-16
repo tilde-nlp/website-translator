@@ -1,4 +1,4 @@
-import { IPluginOptions } from './Interfaces/IPluginOptions'
+import { IPluginOptions } from './interfaces/IPluginOptions'
 
 class SentenceHighlight {
   private lastDocument: Document;

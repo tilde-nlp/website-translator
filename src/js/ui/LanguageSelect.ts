@@ -1,12 +1,12 @@
 
 import { BehaviorSubject } from 'rxjs'
-import { ILanguageSelect } from '../Interfaces/ILanguageSelect'
+import { ILanguageSelect } from '../interfaces/ILanguageSelect'
 import { LanguageList } from './LanguageList'
 import { LanguageSelectDummy } from './LanguageSelectDummy'
 import LanguageMenu from './LanguageMenu'
-import { ILocalizedLanguage } from '../Interfaces/ILocalizedLanguage'
-import { IPluginOptions } from '../Interfaces/IPluginOptions'
-import { IInternalUiOptions } from '../Interfaces/IInternalUiOptions'
+import { ILocalizedLanguage } from '../interfaces/ILocalizedLanguage'
+import { IPluginOptions } from '../interfaces/IPluginOptions'
+import { IInternalUiOptions } from '../interfaces/IInternalUiOptions'
 
 const selectTypes = {
   list: LanguageList,

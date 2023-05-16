@@ -2,7 +2,7 @@
 // https://w3c.github.io/aria/#translatable-attributes
 // https://developers.google.com/search/docs/advanced/crawling/special-tags
 
-import { TranslatableItemType } from '../Enums/TranslatableItemType'
+import { TranslatableItemType } from '../enums/TranslatableItemType'
 import IAttributeCandidate from '../interfaces/IAttributeCandidate'
 
 export const TranslationAttributeCandidates = new Map<string, IAttributeCandidate[]>([

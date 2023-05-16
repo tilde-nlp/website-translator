@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs'
-import { ILanguage } from './Interfaces/ILanguage'
-import { ILocalizedLanguage } from './Interfaces/ILocalizedLanguage'
-import { IPluginOptions } from './Interfaces/IPluginOptions'
+import { ILanguage } from './interfaces/ILanguage'
+import { ILocalizedLanguage } from './interfaces/ILocalizedLanguage'
+import { IPluginOptions } from './interfaces/IPluginOptions'
 import languageCodes from '../localization/langCodes'
 
 /**

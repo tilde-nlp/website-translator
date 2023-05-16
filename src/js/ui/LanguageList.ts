@@ -1,9 +1,9 @@
-import { ILanguageSelect } from '../Interfaces/ILanguageSelect'
+import { ILanguageSelect } from '../interfaces/ILanguageSelect'
 
 import settingsIcon from '../../assets/settings.png'
 import { BehaviorSubject, Subscription } from 'rxjs'
-import { ILocalizedLanguage } from '../Interfaces/ILocalizedLanguage'
-import { IPluginOptions } from '../Interfaces/IPluginOptions'
+import { ILocalizedLanguage } from '../interfaces/ILocalizedLanguage'
+import { IPluginOptions } from '../interfaces/IPluginOptions'
 import { getLanguageName } from '../Common'
 
 export class LanguageList implements ILanguageSelect {

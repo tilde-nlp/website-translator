@@ -1,5 +1,5 @@
 import { closeToolbarSection } from './Common'
-import { IPluginOptions } from './Interfaces/IPluginOptions'
+import { IPluginOptions } from './interfaces/IPluginOptions'
 
 class Alert {
   static display (

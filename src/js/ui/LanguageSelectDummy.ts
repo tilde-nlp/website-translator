@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { ILanguageSelect } from '../Interfaces/ILanguageSelect'
+import { ILanguageSelect } from '../interfaces/ILanguageSelect'
 
 export class LanguageSelectDummy implements ILanguageSelect {
   create (items: any[], onSelect: Function, defaultItem: any) {
