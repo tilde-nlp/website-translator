@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+    <!-- Enter correct source code path -->
+    <script src="widget.js"></script>
+    <style>
+        [translate="yes"]{
+            color:green;
+        }
+        [translate="no"]{
+            color:crimson;
+        }
+    </style>
+</head>
+<body>
+    <div class="website-translator"></div>
+
+    <button onclick="translateToLV()">
+        Click this button to start translation to Latvian.
+    </button><br>
+
+    <button onclick="translateToLT()">
+        Click this button to start translation to Lithuanian.
+    </button><br>
+
+    <button onclick="restoreTranslation()">
+        Click this button to stop translation and return page to original state
+    </button><br>
+
+
+
+    This text will not be translated because of
+    <code>
+        WebsiteTranslator.Options.translation.translateOnlyAllowedTags = true
+    </code>
+
+    <div translate="yes">
+        You can define elements to translate with translate attribute
+
+        <div translate="no">
+            Excluded elements can be child of translatable elements
+            <div translate="yes">
+                Multiple levels of translate attribute can be processed
+                <div translate="no">
+                    This element will not be translated because of translate attribute
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<footer>
+    <script>
+        var translatorIsInitialized = false;
+        // Configure plugin
+        WebsiteTranslator.Options.translation.translateOnlyAllowedTags = true
+        WebsiteTranslator.Options.translation.autoTranslate = false
+        WebsiteTranslator.Options.debug = true
+
+        WebsiteTranslator.Options.api.clientId = 'x-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+
+        WebsiteTranslator.Initialize().then(function(){
+            translatorIsInitialized = true;
+        })
+        function translateToLV(){
+            if(translatorIsInitialized){
+                var translationFinish = null
+
+                // You should always await for translation start
+                translationFinish = WebsiteTranslator.Translate("lv").then(function(translationFinish){
+                    console.log("Translation is started")
+                })
+            }
+        }
+
+        function translateToLT(){
+            if(translatorIsInitialized){
+                // But you can call next translation even when previous is not finished
+                WebsiteTranslator.Translate("lt").then(function(translationFinish){
+                    // Or you can await when page is translated
+                    Promise.all(translationFinish).then(function(){
+                        console.log("Translation is complete")
+                    })
+                })
+            }
+        }
+
+        function restoreTranslation(){
+            if(translatorIsInitialized){
+                // To restore page in original state
+                WebsiteTranslator.CancelAndRestore()
+            }
+        }
+    </script>
+</footer>
+</html>

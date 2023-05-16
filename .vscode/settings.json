@@ -1,0 +1,12 @@
+{
+  "javascript.validate.enable": false,
+  "standard.autoFixOnSave": true,
+  "standard.engine":"standardx",
+  "standard.usePackageJson": true,
+  "cmake.configureOnOpen": false,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#2E0E87",
+    "titleBar.activeBackground": "#4014BD",
+    "titleBar.activeForeground": "#FDFCFF"
+  }
+}

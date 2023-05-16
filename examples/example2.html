@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<head>
+    <!-- Enter correct source code path -->
+    <script src="widget.js"></script>
+    <style>
+        [translate="yes"]{
+            color:green;
+        }
+        [translate="no"]{
+            color:crimson;
+        }
+        .website-translator{
+            background:ghostwhite;
+        }
+    </style>
+</head>
+<body>
+    <div class="website-translator"></div>
+
+    <div translate="yes">
+        You can define elements to translate with translate attribute
+
+        <div translate="no">
+            Excluded elements can be child of translatable elements
+            <div translate="yes">
+                Multiple levels of translate attribute can be processed
+                <div translate="no">
+                    This element will not be translated because of translate attribute
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<footer>
+    <script>
+        // Configure
+        WebsiteTranslator.Options.ui.toolbarPosition = "top"
+
+        WebsiteTranslator.Options.api.clientId = 'x-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+
+        var params = new URLSearchParams(window.location.search);
+
+        //   Languages which are already pretranslated and don't need to be machine translated
+        var thirdPartyLanguages = ["de", "fr", "sv"];
+        WebsiteTranslator.Options.translation.thirdPartyTranslationLanguages = thirdPartyLanguages;
+        WebsiteTranslator.Options.translation.onLanguageSelected = function(selectedLanguage) {
+            return new Promise(function(resolve) {
+                var translationHandled = false;
+
+                console.info("Selecting language", selectedLanguage);
+                if (thirdPartyLanguages.includes(selectedLanguage)) {
+                    console.info("Switching to third-party language with external code");
+                    translationHandled = true;
+                    // Third party translation
+
+                    var newUrl = new URL(window.location.href)
+                    newUrl.searchParams.set("lang", selectedLanguage)
+                    window.location.href = newUrl.href
+                }
+
+                resolve(translationHandled);
+            });
+        };
+
+        // Initialize and run translations
+        WebsiteTranslator.Initialize()
+    </script>
+</footer>
+</html>

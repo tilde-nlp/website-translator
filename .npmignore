@@ -1,0 +1,13 @@
+# Ignore all except allowed items
+**/*
+
+# Allowed whitelist
+
+!dist/*
+!src/style/**/*
+!src/js/interfaces/IPluginOptions.ts
+!src/js/Enums/PluginUILanguageType.ts
+!src/js/Enums/ToolbarPositionType.ts
+!examples/**/*
+!LICENCE
+!README.md
