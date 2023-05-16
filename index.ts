@@ -17,7 +17,7 @@ import {
 import './src/style/widget.scss'
 
 import { ILanguageSelect } from './src/js/interfaces/ILanguageSelect'
-import { LanguageSelectDummy } from './src/js/uiLanguageSelectDummy'
+import { LanguageSelectDummy } from './src/js/ui/LanguageSelectDummy'
 import { DOMTranslation } from './src/js/lib/DOMTranslation'
 import { Logger } from './src/js/Logger'
 import { DataStorage } from './src/js/DataStorage'
