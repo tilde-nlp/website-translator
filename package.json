@@ -1,5 +1,5 @@
 {
-  "name": "website-translator",
+  "name": "@tilde-nlp/website-translator",
   "description": "Widget to integrate in to another website to translate it",
   "version": "7.1.0",
   "main": "dist/widget.js",
