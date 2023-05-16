@@ -1,4 +1,4 @@
-import { ILanguage } from '../js/Interfaces/ILanguage'
+import { ILanguage } from '../js/interfaces/ILanguage'
 
 const languageCodes: { [Key: string]: ILanguage} = {
   aa: {
