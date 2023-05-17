@@ -1,4 +1,4 @@
-import { IExtractedTextElementInfo } from '../Interfaces/IExtractedTextElementInfo'
+import { IExtractedTextElementInfo } from '../interfaces/IExtractedTextElementInfo'
 
 export class DOMExtensions {
   /**

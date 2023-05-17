@@ -1,7 +1,7 @@
 import { Logger } from '../Logger'
-import { IPluginOptions } from '../Interfaces/IPluginOptions'
-import { ITranslatableItem } from '../Interfaces/ITranslatableItem'
-import { TranslationPriority } from '../Enums/TranslationPriority'
+import { IPluginOptions } from '../interfaces/IPluginOptions'
+import { ITranslatableItem } from '../interfaces/ITranslatableItem'
+import { TranslationPriority } from '../enums/TranslationPriority'
 
 /**
  * Async queue for processing items.

@@ -6,7 +6,7 @@
 // References:
 // https://developers.google.com/search/docs/advanced/crawling/localized-versions?hl=en&ref_topic=2370587&visit_id=637414821910235813-3065476810&rd=1
 // https://developers.google.com/search/docs/advanced/crawling/managing-multi-regional-sites?hl=en&ref_topic=2370587&visit_id=637414822196199164-1055925763&rd=1
-import { IPluginOptions } from '../Interfaces/IPluginOptions'
+import { IPluginOptions } from '../interfaces/IPluginOptions'
 import { Logger } from '../Logger'
 import { DOMExtensions } from './DOMExtensions'
 

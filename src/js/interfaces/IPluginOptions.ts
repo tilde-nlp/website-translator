@@ -1,7 +1,7 @@
 // TODO: convert some of the types to enums
 
-import { PluginUILanguageType } from '../Enums/PluginUILanguageType'
-import { PluginToolbarPositionType } from '../Enums/ToolbarPositionType'
+import { PluginUILanguageType } from '../enums/PluginUILanguageType'
+import { PluginToolbarPositionType } from '../enums/ToolbarPositionType'
 
 export interface IPluginOptions{
     /**

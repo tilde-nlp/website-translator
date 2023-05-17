@@ -1,12 +1,12 @@
 import { BehaviorSubject, Subscription } from 'rxjs'
-import { ILanguageSelect } from '../Interfaces/ILanguageSelect'
+import { ILanguageSelect } from '../interfaces/ILanguageSelect'
 
 import settingsIcon from '../../assets/settings.png'
 import { closest, getLanguageName } from '../Common'
-import { ILocalizedLanguage } from '../Interfaces/ILocalizedLanguage'
-import { IPluginOptions } from '../Interfaces/IPluginOptions'
-import { ILanguage } from '../Interfaces/ILanguage'
-import { IInternalUiOptions } from '../Interfaces/IInternalUiOptions'
+import { ILocalizedLanguage } from '../interfaces/ILocalizedLanguage'
+import { IPluginOptions } from '../interfaces/IPluginOptions'
+import { ILanguage } from '../interfaces/ILanguage'
+import { IInternalUiOptions } from '../interfaces/IInternalUiOptions'
 
 /**
  * This is custom language select and not the native DOM select because of the requirements

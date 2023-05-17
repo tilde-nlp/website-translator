@@ -1,11 +1,11 @@
 import axios, { CancelToken } from 'axios'
-import { TranslatableItemType } from '../Enums/TranslatableItemType'
-import { IPluginOptions } from '../Interfaces/IPluginOptions'
-import { ITranslatableItem } from '../Interfaces/ITranslatableItem'
-import { ITranslation } from '../interfaces/Services/WebsiteService/ITranslation'
-import IConfiguration from '../interfaces/Services/WebsiteService/v2/IConfiguration'
-import IWebsiteConfiguration from '../interfaces/Services/WebsiteService/IWebsiteConfiguration'
-import IWebsite from '../interfaces/Services/WebsiteService/v1/IWebsite'
+import { TranslatableItemType } from '../enums/TranslatableItemType'
+import { IPluginOptions } from '../interfaces/IPluginOptions'
+import { ITranslatableItem } from '../interfaces/ITranslatableItem'
+import { ITranslation } from '../interfaces/services/websiteService/ITranslation'
+import IConfiguration from '../interfaces/services/websiteService/v2/IConfiguration'
+import IWebsiteConfiguration from '../interfaces/services/websiteService/IWebsiteConfiguration'
+import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
 
 class WebsiteService {
     private pluginOptions:IPluginOptions

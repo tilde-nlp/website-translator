@@ -1,6 +1,6 @@
-import { IPluginOptions } from '../Interfaces/IPluginOptions'
-import { PluginUILanguageType } from '../Enums/PluginUILanguageType'
-import { PluginToolbarPositionType } from '../Enums/ToolbarPositionType'
+import { IPluginOptions } from '../interfaces/IPluginOptions'
+import { PluginUILanguageType } from '../enums/PluginUILanguageType'
+import { PluginToolbarPositionType } from '../enums/ToolbarPositionType'
 
 export const pluginOptions: IPluginOptions = {
   sourceLanguage: 'en',
