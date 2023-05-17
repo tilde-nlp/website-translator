@@ -1,5 +1,5 @@
-import { TranslatableItemType } from '../Enums/TranslatableItemType'
-import { TranslationTextRange } from '../Models/TranslationTextRange'
+import { TranslatableItemType } from '../enums/TranslatableItemType'
+import { TranslationTextRange } from '../models/TranslationTextRange'
 
 export interface ITranslatableItem{
     translatableItem: TranslationTextRange

@@ -1,4 +1,4 @@
-import { TranslatableItemType } from '../Enums/TranslatableItemType'
+import { TranslatableItemType } from '../enums/TranslatableItemType'
 
 export interface IDomTranslation {
     sourceHTML:string;

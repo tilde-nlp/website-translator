@@ -1,5 +1,5 @@
 {
-  "name": "website-translator",
+  "name": "@tilde-nlp/website-translator",
   "description": "Widget to integrate in to another website to translate it",
   "version": "7.1.0",
   "main": "dist/widget.js",
@@ -11,6 +11,10 @@
   "author": {
     "name": "Tilde, SIA",
     "url": "https://tilde.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tilde-nlp/website-translator.git"
   },
   "keywords": [
     "translate",
@@ -24,8 +28,7 @@
   "scripts": {
     "lint": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin **/*.ts",
     "lint:fix": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin **/*.ts --fix",
-    "patch-version": "@powershell -NoProfile -Command ./auto_version_patch.ps1",
-    "publish-public-latest": "@powershell -NoProfile -Command ./publish_public_npm.ps1",
+    "patch-version": "node auto_version_patch.js",
     "build:prod": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "start": "webpack serve --progress --mode development"

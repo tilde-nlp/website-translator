@@ -1,5 +1,5 @@
-import { TranslatableItemType } from '../Enums/TranslatableItemType'
-import { ITranslationAttribute } from '../Interfaces/ITranslationAttribute'
+import { TranslatableItemType } from '../enums/TranslatableItemType'
+import { ITranslationAttribute } from '../interfaces/ITranslationAttribute'
 
 export class TranslationTextRange {
     startMarker: HTMLElement
