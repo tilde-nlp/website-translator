@@ -4,24 +4,12 @@
 name: Node.js Package
 
 on:
-  [push]
-  #push:
-  #  branches:
-  #    - main
+  push:
+    branches:
+      - main
 
 jobs:
-  #test:
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v3
-  #    - uses: actions/setup-node@v3
-  #      with:
-  #        node-version: 16
-  #    - run: npm ci
-  #    - run: npm run lint
-
   publish-npm:
-    #needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,6 +18,7 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: npm ci
+      - run: npm run lint
       - run: npm run patch-version
       - run: npm run build:prod
       - run: npm publish --access public
