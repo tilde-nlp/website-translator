@@ -28,6 +28,7 @@
   "scripts": {
     "lint": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin **/*.ts",
     "lint:fix": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin **/*.ts --fix",
+    "patch-version": "node auto_version_patch.js",
     "build:prod": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "start": "webpack serve --progress --mode development"
