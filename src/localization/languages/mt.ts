@@ -2,7 +2,7 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang: ILocalizedLanguage = {
   controls: {
-    restore: 'Irrestawra {original language}',
+    restore: 'Irrestawra {lingwa oriġinali}',
     close: 'Agħlaq',
     cancel: 'Ikkanċella'
   },
