@@ -8,6 +8,8 @@
 
 # Website Translator
 
+[![Node.js Package](https://github.com/tilde-nlp/website-translator/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/tilde-nlp/website-translator/actions/workflows/npm-publish.yml)
+
 Quickly scale up from one language to a dozen!
 No coding, manual translation, or duplicated webpages! Simply select the target languages and  Website Translator will instantly translate the content. For quality control, you can review and edit translations with a visual editor.
 
