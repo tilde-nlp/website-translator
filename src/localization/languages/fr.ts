@@ -7,24 +7,25 @@ const lang:ILocalizedLanguage = {
     cancel: 'Annuler'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Développé par {0}',
     original: 'Original',
     machineTranslatedText: 'Texte traduit automatiquement',
-    machineTranslation: 'Machine translation',
+    machineTranslation: 'Traduction automatique',
     translationNotice: 'Le texte sélectionné est traduit automatiquement par le service {0}',
     pageIsTranslated: 'Page traduite automatiquement par {0}',
+    pageIsTranslatedWithoutBranding: 'Contenu de la page traduit mécaniquement.',
     pageIsTranslating: 'Le contenu de la page est en cours de traduction automatique',
-    noSegmentsFound: 'No segments found'
+    noSegmentsFound: 'Aucun segment trouvé'
   },
   alerts: {
     errors: {
       default: 'Erreur',
       connection: 'Erreur de connexion',
       systems: 'Aucun système n’est actuellement disponible',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
+      forbidden: 'Traduction du site web interdite. Veuillez vérifier si les domaines autorisés contiennent le domaine actuel',
       translation: 'Erreur lors de la traduction de la page, il est possible qu’une partie du texte ne soit pas traduite',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Ressource non trouvée'
       }
     }
   },

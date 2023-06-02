@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Відновити {мову оригіналу}',
+    close: 'Закрити',
+    cancel: 'Скасувати'
   },
   labels: {
-    developedBy: 'Developed by {0}',
-    original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    developedBy: 'Розроблено {0}',
+    original: 'Оригінал',
+    machineTranslatedText: 'Машинний переклад',
+    machineTranslation: 'Машинний переклад',
+    translationNotice: 'Виділений текст перекладено автоматично сервісом {0}',
+    pageIsTranslated: 'Вміст сторінки перекладено машинним перекладом {0}',
+    pageIsTranslatedWithoutBranding: 'Вміст сторінки перекладено автоматично.',
+    pageIsTranslating: 'Триває машинний переклад вмісту сторінки',
+    noSegmentsFound: 'Сегментів не знайдено'
   },
   alerts: {
     errors: {
-      default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      default: 'Помилка',
+      connection: 'Помилка з\'єднання',
+      systems: 'Наразі немає доступних систем',
+      forbidden: 'Переклад сайту заборонено. Будь ласка, перевірте, чи є в списку дозволених доменів ваш поточний домен',
+      translation: 'Помилка під час перекладу сторінки, частина тексту може залишитися неперекладеною',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Ресурс не знайдено'
       }
     }
   },

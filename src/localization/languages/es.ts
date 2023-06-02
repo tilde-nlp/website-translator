@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Restaurar {idioma original}',
+    close: 'Cerrar',
+    cancel: 'Cancelar'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Desarrollado por {0}',
     original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    machineTranslatedText: 'Texto traducido automáticamente',
+    machineTranslation: 'Traducción automática',
+    translationNotice: 'El texto seleccionado es traducido automáticamente por el servicio {0}',
+    pageIsTranslated: 'Contenido de la página traducido automáticamente por {0}',
+    pageIsTranslatedWithoutBranding: 'Contenido de la página traducido automáticamente.',
+    pageIsTranslating: 'Traducción automática del contenido de la página en curso',
+    noSegmentsFound: 'No se han encontrado segmentos'
   },
   alerts: {
     errors: {
       default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      connection: 'Error de conexión',
+      systems: 'No hay sistemas disponibles',
+      forbidden: 'La traducción del sitio está prohibida. Por favor, compruebe si los dominios permitidos contienen el dominio actual',
+      translation: 'Error al traducir la página, es posible que parte del texto no se traduzca',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Recurso no encontrado'
       }
     }
   },

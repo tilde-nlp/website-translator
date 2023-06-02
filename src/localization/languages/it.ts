@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Ripristina {lingua originale}',
+    close: 'Chiudi',
+    cancel: 'Annulla'
   },
   labels: {
-    developedBy: 'Developed by {0}',
-    original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    developedBy: 'Sviluppato da {0}',
+    original: 'Originale',
+    machineTranslatedText: 'Testo tradotto a macchina',
+    machineTranslation: 'Traduzione automatica',
+    translationNotice: 'Il testo selezionato è tradotto automaticamente dal servizio {0}',
+    pageIsTranslated: 'Contenuto della pagina tradotto automaticamente da {0}',
+    pageIsTranslatedWithoutBranding: 'Contenuto della pagina tradotto automaticamente.',
+    pageIsTranslating: 'Traduzione automatica del contenuto della pagina in corso',
+    noSegmentsFound: 'Nessun segmento trovato'
   },
   alerts: {
     errors: {
-      default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      default: 'Errore',
+      connection: 'Errore di connessione',
+      systems: 'Non ci sono sistemi attualmente disponibili',
+      forbidden: 'Traduzione del sito web vietata. Controllare se i domini consentiti contengono il dominio corrente',
+      translation: 'Errore durante la traduzione della pagina, alcuni testi potrebbero rimanere non tradotti',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Risorsa non trovata'
       }
     }
   },

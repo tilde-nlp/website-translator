@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Възстановяване на {оригинален език}',
+    close: 'Затвори',
+    cancel: 'Отказ'
   },
   labels: {
-    developedBy: 'Developed by {0}',
-    original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    developedBy: 'Разработено от {0}',
+    original: 'Оригинален',
+    machineTranslatedText: 'Машинно преведен текст',
+    machineTranslation: 'Машинен превод',
+    translationNotice: 'Избраният текст е преведен автоматично от услугата {0}',
+    pageIsTranslated: 'Съдържанието на страницата е преведено машинно от {0}',
+    pageIsTranslatedWithoutBranding: 'Съдържанието на страницата е преведено машинно.',
+    pageIsTranslating: 'Машинният превод на съдържанието на страницата е в ход',
+    noSegmentsFound: 'Не са намерени сегменти'
   },
   alerts: {
     errors: {
-      default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      default: 'Грешка',
+      connection: 'Грешка при свързване',
+      systems: 'В момента няма налични системи',
+      forbidden: 'Преводът на уебсайтове е забранен. Моля, проверете дали разрешените домейни съдържат текущия домейн',
+      translation: 'Грешка при превода на страницата, част от текста може да остане непреведен',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Ресурсът не е намерен'
       }
     }
   },

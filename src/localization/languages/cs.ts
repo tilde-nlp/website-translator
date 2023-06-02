@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Obnovit {původní jazyk}',
+    close: 'Zavřít',
+    cancel: 'Zrušit'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Vyvinuto {0}',
     original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    machineTranslatedText: 'Strojově přeložený text',
+    machineTranslation: 'Strojový překlad',
+    translationNotice: 'Vybraný text je automaticky přeložen službou {0}',
+    pageIsTranslated: 'Obsah stránky je strojově přeložen službou {0}',
+    pageIsTranslatedWithoutBranding: 'Obsah stránky strojově přeložen.',
+    pageIsTranslating: 'Probíhá strojový překlad obsahu stránky',
+    noSegmentsFound: 'Nenalezeny žádné segmenty'
   },
   alerts: {
     errors: {
       default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      connection: 'Chyba spojení',
+      systems: 'Žádné systémy nejsou momentálně k dispozici',
+      forbidden: 'Překlad webových stránek zakázán. Zkontrolujte, zda povolené domény obsahují aktuální doménu',
+      translation: 'Chyba při překladu stránky, některé texty mohou zůstat nepřeložené',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Zdroj nenalezen'
       }
     }
   },

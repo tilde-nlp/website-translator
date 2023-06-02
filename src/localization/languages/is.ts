@@ -13,6 +13,7 @@ const lang:ILocalizedLanguage = {
     machineTranslation: 'Vélþýðing',
     translationNotice: 'Valinn texti er þýddur sjálfvirkt með {0} þjónustunni',
     pageIsTranslated: 'Innihald síðunnar þýtt með {0}',
+    pageIsTranslatedWithoutBranding: 'Innihald síðu vél þýtt.',
     pageIsTranslating: 'Vélþýðing á efni síðunnar er í vinnslu',
     noSegmentsFound: 'Engir hlutar fundust'
   },

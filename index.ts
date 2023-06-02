@@ -266,6 +266,8 @@ async function checkAutoTranslate () {
 }
 
 function setTranslationProgress (progress: number) {
+  const showBranding = pluginOptions.ui.branding.visible || (
+    pluginOptions.ui.branding.visible === null && pluginOptions.api.version === 1)
   if (toolbar) {
     const progressBar:ProgressBar = toolbar.progressBar
 
@@ -273,8 +275,13 @@ function setTranslationProgress (progress: number) {
       if (progress === 0) {
         // toolbar.translationNotice.textContent = `${uiLocalization.value.labels.pageIsTranslating}.`
         const vendor = createVendorButton()
-        toolbar.translationNotice.innerHTML = `${uiLocalization.value.labels.pageIsTranslated.replace('{0}', vendor.outerHTML)}.`
 
+        if (showBranding) {
+          toolbar.translationNotice.innerHTML = `${uiLocalization.value.labels.pageIsTranslated.replace('{0}', vendor.outerHTML)}.`
+        }
+        else {
+          toolbar.translationNotice.innerHTML = uiLocalization.value.labels.pageIsTranslatedWithoutBranding
+        }
         progressBar.unsetProgress()
       }
       else if (progress < 1) {
@@ -282,7 +289,13 @@ function setTranslationProgress (progress: number) {
       }
       else {
         const vendor = createVendorButton()
-        toolbar.translationNotice.innerHTML = `${uiLocalization.value.labels.pageIsTranslated.replace('{0}', vendor.outerHTML)}.`
+
+        if (showBranding) {
+          toolbar.translationNotice.innerHTML = `${uiLocalization.value.labels.pageIsTranslated.replace('{0}', vendor.outerHTML)}.`
+        }
+        else {
+          toolbar.translationNotice.innerHTML = uiLocalization.value.labels.pageIsTranslatedWithoutBranding
+        }
 
         progressBar.setProgress(progress)
       }

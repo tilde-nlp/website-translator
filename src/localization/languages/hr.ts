@@ -13,6 +13,7 @@ const lang:ILocalizedLanguage = {
     machineTranslation: 'Strojno prevođenje',
     translationNotice: 'Odabrani tekst automatski je preveo servis {0}',
     pageIsTranslated: 'Sadržaj stranice automatski je preveo servis {0}',
+    pageIsTranslatedWithoutBranding: 'Sadržaj stranice strojno preveden.',
     pageIsTranslating: 'Strojno prevođenje sadržaja stranice u tijeku',
     noSegmentsFound: 'Nisu pronađeni segmenti'
   },

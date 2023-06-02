@@ -13,6 +13,7 @@ const lang:ILocalizedLanguage = {
     machineTranslation: 'Konekäännös',
     translationNotice: 'Palvelu {0} kääntää valitun tekstin automaattisesti',
     pageIsTranslated: '{0} on käännättänyt sivun konekäännöksenä',
+    pageIsTranslatedWithoutBranding: 'Sivun sisältö koneellisesti käännetty.',
     pageIsTranslating: 'Kone kääntää sivun sisältöä',
     noSegmentsFound: 'Segmenttejä ei löytynyt'
   },
@@ -21,10 +22,10 @@ const lang:ILocalizedLanguage = {
       default: 'Virhe',
       connection: 'Yhteysvirhe',
       systems: 'Järjestelmiä ei tällä hetkellä ole käytettävissä',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
+      forbidden: 'Verkkosivuston käännös kielletty. Tarkista, sisältääkö sallitut verkkotunnukset nykyisen verkkotunnuksen',
       translation: 'Virhe käännettäessä sivua. Osaa tekstistä ei välttämättä käännetä',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Resurssia ei löydy'
       }
     }
   },

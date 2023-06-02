@@ -34,6 +34,17 @@ export const TranslationAttributeCandidates = new Map<string, IAttributeCandidat
       }
     ]
   ],
+  [
+    'FIELDSET',
+    [
+      // --- Magento CMS
+      {
+
+        translatableAttribute: 'data-hasrequired',
+        type: TranslatableItemType.ATTRIBUTE
+      }
+    ]
+  ],
   ['TH',
     [
       {
@@ -137,6 +148,14 @@ export const TranslationAttributeCandidates = new Map<string, IAttributeCandidat
   ],
   ['META',
     [
+      // --- Magento CMS
+      {
+        translatableAttribute: 'content',
+        requiredAttributeName: 'name',
+        requiredAttributeValue: 'title',
+        type: TranslatableItemType.ATTRIBUTE_SEO
+      },
+      // --- Default
       {
         translatableAttribute: 'content',
         requiredAttributeName: 'name',

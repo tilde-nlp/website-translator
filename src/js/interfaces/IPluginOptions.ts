@@ -135,7 +135,11 @@ export interface IPluginOptions{
       /**
        * URL which is used for links to MT
        */
-      url:string
+      url:string,
+      /**
+       * Is branding visible
+       */
+      visible:boolean|null
     }
   },
   /**

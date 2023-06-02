@@ -14,6 +14,7 @@ const lang:ILocalizedLanguage = {
     translationNotice: 'Markerad text har översatts automatiskt av tjänsten {0}',
     pageIsTranslated: 'Sidans innehåll maskinöversätts av {0}',
     pageIsTranslating: 'Sidans innehåll maskinöversätts',
+    pageIsTranslatedWithoutBranding: 'Sidans innehåll maskinöversatt.',
     noSegmentsFound: 'Inga segment hittades'
   },
   alerts: {
@@ -21,9 +22,9 @@ const lang:ILocalizedLanguage = {
       default: 'Fel',
       connection: 'Anslutningsfel',
       systems: 'Inga system finns för närvarande tillgängliga',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
+      forbidden: 'Översättning av webbplatsen förbjuden. Kontrollera om tillåtna domäner innehåller aktuell domän',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Resurs hittades inte'
       },
       translation: 'Fel vid översättning av sidan, viss text kan ha lämnats oöversatt'
     }

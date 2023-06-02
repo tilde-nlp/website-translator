@@ -42,7 +42,8 @@ export const pluginOptions: IPluginOptions = {
     showLanguagesInNativeLanguage: false,
     branding: {
       name: 'Tilde',
-      url: ''
+      url: '',
+      visible: null
     }
   },
   debug: false,
