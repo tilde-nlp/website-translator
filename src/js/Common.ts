@@ -14,7 +14,7 @@ function getLanguageName (
   uiLocalization: BehaviorSubject<ILocalizedLanguage>
 ):string {
   // TODO: maybe more sophisticated language name here taking into account country code
-  const resolvedLangCode = langCode.split('-')[0]
+  const resolvedLangCode = langCode.split('-')[0].toLowerCase()
   let language:ILanguage
   if (pluginOptions.ui.showLanguagesInNativeLanguage) {
     language = languageCodes[resolvedLangCode]
