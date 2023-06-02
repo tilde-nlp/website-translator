@@ -13,6 +13,7 @@ const lang: ILocalizedLanguage = {
     machineTranslation: 'Traduzzjoni bil-magni',
     translationNotice: 'It-test magħżul huwa tradott awtomatikament minn {0} servizz',
     pageIsTranslated: 'Il-kontenut tal-paġna tradott bil-magna {0}',
+    pageIsTranslatedWithoutBranding: 'Il-kontenut tal-paġna tradott bil-magna',
     pageIsTranslating: 'Traduzzjoni awtomatika tal-kontenut tal-paġna għaddejja',
     noSegmentsFound: 'Ma nstab l-ebda segment'
   },

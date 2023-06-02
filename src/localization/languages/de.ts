@@ -13,6 +13,7 @@ const lang:ILocalizedLanguage = {
     machineTranslation: 'Maschinelle Übersetzung:',
     translationNotice: 'Ausgewählte Sätze werden automatisch übersetzt mit {0}',
     pageIsTranslated: 'Seite maschinell übersetzt von {0}',
+    pageIsTranslatedWithoutBranding: 'Seiteninhalt maschinell übersetzt.',
     pageIsTranslating: 'Seiteninhalte werden maschinell übersetzt',
     noSegmentsFound: 'Keine Segmente gefunden'
   },
@@ -21,10 +22,10 @@ const lang:ILocalizedLanguage = {
       default: 'Fehler',
       connection: 'Verbindungsproblem',
       systems: 'Derzeit sind keine Systeme verfügbar',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
+      forbidden: 'Website-Übersetzung verboten. Bitte prüfen Sie, ob die erlaubten Domains die aktuelle Domain enthalten',
       translation: 'Fehler beim Übersetzen der Seite, Teile des Texts bleiben möglicherweise unübersetzt',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Ressource nicht gefunden'
       }
     }
   },

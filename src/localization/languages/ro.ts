@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Restaurați {limba originală}',
+    close: 'Închide',
+    cancel: 'Anulează'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Dezvoltat de {0}',
     original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    machineTranslatedText: 'Text tradus automat',
+    machineTranslation: 'Traducere automată',
+    translationNotice: 'Textul selectat este tradus automat de serviciul {0}',
+    pageIsTranslated: 'Conținutul paginii este tradus automat de {0}',
+    pageIsTranslatedWithoutBranding: 'Conținutul paginii tradus automat.',
+    pageIsTranslating: 'Traducerea automată a conținutului paginii este în curs de desfășurare',
+    noSegmentsFound: 'Nu s-au găsit segmente'
   },
   alerts: {
     errors: {
       default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      connection: 'Eroare de conexiune',
+      systems: 'Nu există sisteme disponibile în prezent',
+      forbidden: 'Traducerea site-ului este interzisă. Vă rugăm să verificați dacă domeniile permise conțin domeniul curent',
+      translation: 'Eroare în timpul traducerii paginii, este posibil ca unele texte să rămână netraduse',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Resursele nu au fost găsite'
       }
     }
   },

@@ -3,28 +3,29 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 const lang:ILocalizedLanguage = {
   controls: {
     restore: 'Gå tilbage til det {oprindelige sprog}',
-    close: 'Close',
-    cancel: 'Cancel'
+    close: 'Luk',
+    cancel: 'Annuller'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Udviklet af {0}',
     original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
+    machineTranslatedText: 'Maskinoversat tekst',
+    machineTranslation: 'Maskinoversættelse',
+    translationNotice: 'Valgt tekst oversættes automatisk af {0}-tjenesten',
     pageIsTranslated: 'Siden er maskinoversat af {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    pageIsTranslatedWithoutBranding: 'Sidens indhold er maskinoversat.',
+    pageIsTranslating: 'Maskinoversættelse af sidens indhold er i gang',
+    noSegmentsFound: 'Ingen segmenter fundet'
   },
   alerts: {
     errors: {
-      default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      default: 'Fejl',
+      connection: 'Forbindelsesfejl',
+      systems: 'Ingen systemer er tilgængelige i øjeblikket',
+      forbidden: 'Oversættelse af hjemmeside forbudt. Tjek venligst, om tilladte domæner indeholder det aktuelle domæne',
+      translation: 'Fejl under oversættelse af siden, noget tekst kan være uoversat',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Ressource ikke fundet'
       }
     }
   },

@@ -13,6 +13,7 @@ const lang:ILocalizedLanguage = {
     machineTranslation: 'Masint\u00f5lge',
     translationNotice: 'Valitud teksti t\u00f5lgib automaatselt teenus {0}',
     pageIsTranslated: 'Lehek\u00fclje sisumasin t\u00f5lkinud {0}',
+    pageIsTranslatedWithoutBranding: 'Lehekülje sisu masintõlkes.',
     pageIsTranslating: 'Poolelioleva lehek\u00fclje sisu masint\u00f5lge',
     noSegmentsFound: 'Segmente ei leitud'
   },

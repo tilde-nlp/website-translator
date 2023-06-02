@@ -13,6 +13,7 @@ const lang:ILocalizedLanguage = {
     machineTranslation: 'Mašininis vertimas',
     translationNotice: 'Pasirinktas tekstas automatiškai išverstas naudojant {0} paslaugą',
     pageIsTranslated: 'Puslapį išvertė {0} mašininis vertimas',
+    pageIsTranslatedWithoutBranding: 'Puslapio turinio mašininis vertimas.',
     pageIsTranslating: 'Puslapio turinio vertimas yra mašininis',
     noSegmentsFound: 'Segmentų nerasta'
   },
@@ -21,10 +22,10 @@ const lang:ILocalizedLanguage = {
       default: 'Klaida',
       connection: 'Ryšio klaida',
       systems: 'Šiuo metu nėra pasiekiamų sistemų',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
+      forbidden: 'Svetainės vertimas draudžiamas. Patikrinkite, ar leistinuose domenuose yra dabartinis domenas',
       translation: 'Klaida verčiant puslapį, dalis teksto gali likti neišversta',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Išteklius nerastas'
       }
     }
   },

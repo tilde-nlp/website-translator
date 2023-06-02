@@ -17,6 +17,7 @@ export interface ILocalizedLanguage{
     machineTranslation: string,
     translationNotice: string,
     pageIsTranslated: string,
+    pageIsTranslatedWithoutBranding: string,
     pageIsTranslating: string,
     noSegmentsFound: string,
   },

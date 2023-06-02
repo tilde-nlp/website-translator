@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Επαναφορά της {αρχικής γλώσσας}',
+    close: 'Κλείσιμο',
+    cancel: 'Ακύρωση'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Αναπτύχθηκε από {0}',
     original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    machineTranslatedText: 'Μηχανικά μεταφρασμένο κείμενο',
+    machineTranslation: 'Μηχανική μετάφραση',
+    translationNotice: 'Το επιλεγμένο κείμενο μεταφράζεται αυτόματα από την υπηρεσία {0}',
+    pageIsTranslated: 'Το περιεχόμενο της σελίδας μεταφράζεται αυτόματα από {0}',
+    pageIsTranslatedWithoutBranding: 'Περιεχόμενο σελίδας μεταφρασμένο μηχανικά.',
+    pageIsTranslating: 'Μηχανική μετάφραση του περιεχομένου της σελίδας σε εξέλιξη',
+    noSegmentsFound: 'Δεν βρέθηκαν τμήματα'
   },
   alerts: {
     errors: {
-      default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      default: 'Σφάλμα',
+      connection: 'Σφάλμα σύνδεσης',
+      systems: 'Δεν υπάρχουν διαθέσιμα συστήματα',
+      forbidden: 'Απαγορεύεται η μετάφραση του ιστότοπου. Παρακαλούμε ελέγξτε αν οι επιτρεπόμενοι τομείς περιέχουν τον τρέχοντα τομέα',
+      translation: 'Σφάλμα κατά τη μετάφραση της σελίδας, ενδέχεται να μην μεταφραστεί κάποιο κείμενο',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Ο πόρος δεν βρέθηκε'
       }
     }
   },

@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
+    restore: 'Восстановить {оригинальный язык}',
     close: 'Закрыть',
     cancel: 'Отменить'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Разработано {0}',
     original: 'Оригинал',
     machineTranslatedText: 'Машинный перевод',
-    machineTranslation: 'Machine translation',
+    machineTranslation: 'Машинный перевод',
     translationNotice: 'Выбранный текст переводится службой {0} автоматически',
-    pageIsTranslated: 'Page content machine translated by {0}',
+    pageIsTranslated: 'Машинный перевод содержимого страницы выполнен {0}',
+    pageIsTranslatedWithoutBranding: 'Машинный перевод содержимого страницы.',
     pageIsTranslating: 'Содержимое страницы переводится машинным способом',
-    noSegmentsFound: 'No segments found'
+    noSegmentsFound: 'Сегменты не найдены'
   },
   alerts: {
     errors: {
       default: 'Ошибка',
       connection: 'Ошибка подключения',
       systems: 'В настоящее время нет доступных систем',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
+      forbidden: 'Перевод сайта запрещен. Пожалуйста, проверьте, содержит ли разрешенный домен текущий домен',
       translation: 'Ошибка при переводе страницы, некоторый части текста может остаться непереведенными',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Ресурс не найден'
       }
     }
   },

@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Obnoviť {pôvodný jazyk}',
+    close: 'Zavrieť',
+    cancel: 'Zrušiť'
   },
   labels: {
-    developedBy: 'Developed by {0}',
-    original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    developedBy: 'Vyvinutý spoločnosťou {0}',
+    original: 'Pôvodný',
+    machineTranslatedText: 'Strojovo preložený text',
+    machineTranslation: 'Strojový preklad',
+    translationNotice: 'Vybraný text je automaticky preložený službou {0}',
+    pageIsTranslated: 'Obsah stránky strojovo preložený službou {0}',
+    pageIsTranslatedWithoutBranding: 'Obsah stránky strojovo preložený.',
+    pageIsTranslating: 'Prebieha strojový preklad obsahu stránky',
+    noSegmentsFound: 'Nenašli sa žiadne segmenty'
   },
   alerts: {
     errors: {
       default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      connection: 'Chyba spojenia',
+      systems: 'V súčasnosti nie sú k dispozícii žiadne systémy',
+      forbidden: 'Preklad webovej stránky zakázaný. Skontrolujte, či povolené domény obsahujú aktuálnu doménu',
+      translation: 'Chyba pri preklade stránky, niektoré texty môžu zostať nepreložené',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Zdroj nebol nájdený'
       }
     }
   },

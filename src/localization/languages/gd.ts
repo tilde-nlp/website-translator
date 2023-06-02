@@ -13,6 +13,7 @@ const lang:ILocalizedLanguage = {
     machineTranslation: 'Machine translation',
     translationNotice: 'Selected text is translated automatically by {0} service',
     pageIsTranslated: 'Page content machine translated by {0}',
+    pageIsTranslatedWithoutBranding: 'Page content machine translated.',
     pageIsTranslating: 'Machine translation of page content in progress',
     noSegmentsFound: 'No segments found'
   },

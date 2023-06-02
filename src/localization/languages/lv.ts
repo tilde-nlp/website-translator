@@ -7,24 +7,25 @@ const lang:ILocalizedLanguage = {
     cancel: 'Atcelt'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Izstrādājis {0}',
     original: 'Oriģināls',
     machineTranslatedText: 'Mašīntulkots teksts',
-    machineTranslation: 'Machine translation',
+    machineTranslation: 'Mašīntulkojums',
     translationNotice: 'Iezīmētais teksts ir automātiski pārtulkots izmantojot {0} servisu',
     pageIsTranslated: 'Lapas satura mašīntulkojumu nodrošina {0}',
+    pageIsTranslatedWithoutBranding: 'Lapas saturs ir mašīntulkots.',
     pageIsTranslating: 'Lapas saturs tiek mašīntulkots',
-    noSegmentsFound: 'No segments found'
+    noSegmentsFound: 'Segmenti nav atrasti'
   },
   alerts: {
     errors: {
       default: 'Kļūda',
       connection: 'Savienojuma kļūda',
       systems: 'Nav pieejamu sistēmu',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
+      forbidden: 'Tīmekļa vietnes tulkošana ir aizliegta. Lūdzu, pārbaudiet, vai atļautajos domēnos ir pašreizējais domēns',
       translation: 'Kļūda tulkojot mājaslapu. Daļa teksta var nebūt iztulkota.',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Resurss nav atrasts'
       }
     }
   },

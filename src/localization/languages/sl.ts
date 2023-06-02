@@ -3,28 +3,29 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 const lang:ILocalizedLanguage = {
   controls: {
     restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    close: 'Zapri',
+    cancel: 'Prekliči'
   },
   labels: {
-    developedBy: 'Developed by {0}',
-    original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    developedBy: 'Razvil {0}',
+    original: 'Izvirnik',
+    machineTranslatedText: 'Strojno prevedeno besedilo',
+    machineTranslation: 'Strojno prevajanje',
+    translationNotice: 'Izbrano besedilo je samodejno prevedeno s storitvijo {0}',
+    pageIsTranslated: 'Vsebina strani je strojno prevedena s strani {0}',
+    pageIsTranslatedWithoutBranding: 'Vsebina strani je strojno prevedena.',
+    pageIsTranslating: 'Strojno prevajanje vsebine strani v teku',
+    noSegmentsFound: 'Ni najdenih segmentov'
   },
   alerts: {
     errors: {
-      default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      default: 'Napaka',
+      connection: 'Napaka v povezavi',
+      systems: 'Trenutno ni na voljo nobenih sistemov',
+      forbidden: 'Prevajanje spletne strani je prepovedano. Preverite, ali dovoljene domene vsebujejo trenutno domeno',
+      translation: 'Napaka pri prevajanju strani, nekatera besedila lahko ostanejo neprevedena',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Vir ni najden'
       }
     }
   },

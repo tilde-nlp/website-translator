@@ -2,29 +2,30 @@ import { ILocalizedLanguage } from '../../js/interfaces/ILocalizedLanguage'
 
 const lang:ILocalizedLanguage = {
   controls: {
-    restore: 'Restore {original language}',
-    close: 'Close',
-    cancel: 'Cancel'
+    restore: 'Herstel {originele taal}',
+    close: 'Sluit',
+    cancel: 'Annuleren'
   },
   labels: {
-    developedBy: 'Developed by {0}',
+    developedBy: 'Ontwikkeld door {0}',
     original: 'Original',
-    machineTranslatedText: 'Machine translated text',
-    machineTranslation: 'Machine translation',
-    translationNotice: 'Selected text is translated automatically by {0} service',
-    pageIsTranslated: 'Page content machine translated by {0}',
-    pageIsTranslating: 'Machine translation of page content in progress',
-    noSegmentsFound: 'No segments found'
+    machineTranslatedText: 'Door machine vertaalde tekst',
+    machineTranslation: 'Machinevertaling',
+    translationNotice: 'Geselecteerde tekst wordt automatisch vertaald door {0} service',
+    pageIsTranslated: 'Pagina-inhoud machinaal vertaald door {0}',
+    pageIsTranslatedWithoutBranding: 'Pagina-inhoud machinaal vertaald.',
+    pageIsTranslating: 'Machinevertaling van pagina-inhoud in uitvoering',
+    noSegmentsFound: 'Geen segmenten gevonden'
   },
   alerts: {
     errors: {
-      default: 'Error',
-      connection: 'Connection error',
-      systems: 'No systems are currently available',
-      forbidden: 'Website translation forbidden. Please check if allowed domains contains current domain',
-      translation: 'Error while translating page, some text may be left untranslated',
+      default: 'Fout',
+      connection: 'Fout in verbinding',
+      systems: 'Er zijn momenteel geen systemen beschikbaar',
+      forbidden: 'Vertaling website verboden. Controleer of de toegestane domeinen het huidige domein bevatten',
+      translation: 'Fout bij het vertalen van de pagina, sommige tekst kan onvertaald blijven',
       translationSubStatus: {
-        resourceNotFound: 'Resource not found'
+        resourceNotFound: 'Bron niet gevonden'
       }
     }
   },
