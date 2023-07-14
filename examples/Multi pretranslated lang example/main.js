@@ -2,9 +2,10 @@
 WebsiteTranslator.Options.api.clientId = 'x-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 
 // Step #1: Specify embedded languages of your webpage that has translation already
-WebsiteTranslator.Options.translation.thirdPartyTranslationLanguages = ['en', 'fr']
+WebsiteTranslator.Options.translation.thirdPartyTranslationLanguages = ['en', 'fr', 'de']
 // Step #2: Set language of the webpage that is currently rendered
 WebsiteTranslator.Options.currentLanguage = document.documentElement.getAttribute('lang')
+
 console.log('Current document language: ' + WebsiteTranslator.Options.currentLanguage)
 // Step #3: Add custom logic to use embedded translations instead of machine translation
 WebsiteTranslator.Options.translation.onLanguageSelected = function (selectedLanguage) {
