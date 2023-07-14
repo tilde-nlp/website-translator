@@ -40,6 +40,9 @@ import { ITranslationError } from './src/js/interfaces/ITranslationError'
 import IWebsiteConfiguration from './src/js/interfaces/services/websiteService/IWebsiteConfiguration'
 const pluginVersion = require('./src/js/PluginVersion')
 
+const STORAGE_KEY_AUTOTRANSLATE = 'website-translator-autotranslate-system'
+const STORAGE_KEY_TRANSLATE_ONCE_NEXT = 'website-translator-translate-once-system'
+
 const internalUiOptions:IInternalUiOptions = {
   ui: {
     branding: {
@@ -234,7 +237,16 @@ function translationLeave (event) {
 }
 
 async function checkAutoTranslate () {
-  if (pluginOptions.translation.autoTranslate) {
+  const systemSave = sessionStorage.getItem(STORAGE_KEY_TRANSLATE_ONCE_NEXT)
+  if (systemSave !== null) {
+    sessionStorage.removeItem(STORAGE_KEY_TRANSLATE_ONCE_NEXT)
+
+    logger.debug('Found scheduled translation from third party websites')
+    const savedSystem = JSON.parse(systemSave)
+
+    await translate(savedSystem.language)
+  }
+  else if (pluginOptions.translation.autoTranslate) {
     const urlParams = new URLSearchParams(window.location.search)
     const urlParamLanguage = urlParams.get('lang')
 
@@ -249,17 +261,12 @@ async function checkAutoTranslate () {
       await translate(urlParamLanguage)
     }
     else {
-      const systemSave = DataStorage.get('website-translator-autotranslate-system')
+      const systemSave = DataStorage.get(STORAGE_KEY_AUTOTRANSLATE)
       if (systemSave !== null) {
         logger.debug('Found saved language information')
         const savedSystem = JSON.parse(systemSave)
 
-        if (pluginOptions.ui.layout === null) {
-          await translate(savedSystem.language)
-        }
-        else {
-          languageSelect.select(savedSystem.language)
-        }
+        await translate(savedSystem.language)
       }
     }
   }
@@ -308,7 +315,9 @@ function cancel () {
   if (widgetContainer) {
     const restoreControl = widgetContainer.querySelector('.restore-button')
 
-    restoreControl && restoreControl.parentNode.removeChild(restoreControl)
+    if (restoreControl) {
+      restoreControl.parentNode.removeChild(restoreControl)
+    }
   }
   translationHelper.cancel()
   domTranslator.restoreSeo()
@@ -325,99 +334,103 @@ function cancel () {
 }
 
 async function translate (language:string): Promise<any> {
-  const isDefaultLanguage: Boolean = language === pluginOptions.sourceLanguage || language === pluginOptions.currentLanguage
+  const isDefaultLanguage = language === pluginOptions.sourceLanguage || language === pluginOptions.currentLanguage
+  const nextLanguageIsThirdParty = pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
+  const currLanguageIsThirdParty = pluginOptions.translation.thirdPartyTranslationLanguages.includes(pluginOptions.currentLanguage)
+  const languageIsSupported = pluginOptions.translation.targetLanguages.includes(language)
 
-  if (
-    (!pluginOptions.translation.targetLanguages.includes(language)) &&
-    !isDefaultLanguage &&
-    !pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
-  ) {
+  if (!languageIsSupported && !isDefaultLanguage && !nextLanguageIsThirdParty) {
     // pluginOptions.currentLanguage = pluginOptions.sourceLanguage
     logger.error(`Given language code could not be resolved: ${language}. Translation canceled.`)
     cancel()
     return [Promise.reject(new Error(`Given language code could not be resolved: ${language}. Translation canceled.`))]
   }
 
-  cancel()
-
-  logger.debug(`schedule next translation to lang: ${language}`)
-
   targetLanguage.next(language)
-
-  const webpageIsPretranslated = pluginOptions.currentLanguage != null && pluginOptions.currentLanguage !== pluginOptions.sourceLanguage
-
   languageSelect.silentSelect(language)
 
-  const translationHandled = await pluginOptions.translation.onLanguageSelected(language)
-  if (translationHandled) {
+  if (pluginOptions.currentLanguage === language) {
     return [Promise.resolve()]
   }
-  else {
-    if (pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)) {
-      // eslint-disable-next-line no-console
-      console.error(`Third party translation to lang "${language}" not handled`)
-      return [
-        Promise.reject(new Error(`Third party translation to lang "${language}" not handled`))
-      ]
-    }
-    if (language === pluginOptions.sourceLanguage) {
-      // Even if source lang is not marked as third party, we dont want to translate it to itself.
-      return [Promise.resolve()]
-    }
 
-    DataStorage.set('website-translator-autotranslate-system',
+  if (currLanguageIsThirdParty && language !== pluginOptions.currentLanguage && pluginOptions.sourceLanguage !== pluginOptions.currentLanguage) {
+    sessionStorage.setItem(STORAGE_KEY_TRANSLATE_ONCE_NEXT,
       JSON.stringify({
         language: language
       })
     )
 
-    // If webpage is pre-translated in other language, then we will need to get page in sourceLanguage
-    if (webpageIsPretranslated) {
-      // If this is third party translation, then we need to get original translation
-      await pluginOptions.translation.onLanguageSelected(pluginOptions.sourceLanguage)
+    logger.info(`schedule language switching to intermediate language: ${pluginOptions.sourceLanguage}`)
+    const translationHandled = await pluginOptions.translation.onLanguageSelected(pluginOptions.sourceLanguage)
+
+    if (!translationHandled) {
+    // eslint-disable-next-line no-console
+      console.error(`Third party translation to lang "${language}" not handled`)
+      return [
+        Promise.reject(new Error(`Third party translation to lang "${language}" not handled`))
+      ]
     }
-    else if (isDefaultLanguage) {
-      return [Promise.resolve()]
-    }
-
-    changeLanguage(language)
-
-    toolbar = new Toolbar()
-    if (!toolbar.toolbar()) {
-      toolbar.display()
-    }
-    toolbar.dashboard()
-
-    setTranslationProgress(0)
-
-    enableTooltips()
-
-    return [
-      new Promise<void>((resolve, reject) => {
-        translationHelper.translate(
-          language,
-          allTranslations,
-          availableLocales
-        ).then(() => {
-          logger.debug(`Translated items: ${allTranslations.size}`)
-          resolve()
-        }).catch((err: ITranslationError) => {
-          logger.debug(`translation failed ${err}`)
-
-          const progressBar = toolbar.progressBar as ProgressBar
-          progressBar.remove()
-
-          Alert.display(
-            pluginOptions,
-            uiLocalization.value.alerts.errors.default,
-            'danger',
-            uiLocalization
-          )
-          reject(err)
-        })
-      })
-    ]
   }
+  else {
+    logger.debug(`schedule next translation to lang: ${language}`)
+    await pluginOptions.translation.onLanguageSelected(language)
+  }
+
+  if (!nextLanguageIsThirdParty) {
+    cancel()
+  }
+
+  if (pluginOptions.translation.autoTranslate) {
+    DataStorage.set(STORAGE_KEY_AUTOTRANSLATE,
+      JSON.stringify({
+        language: language
+      })
+    )
+  }
+
+  targetLanguage.next(language)
+  languageSelect.silentSelect(language)
+  changeLanguage(language)
+
+  if (language === pluginOptions.sourceLanguage) {
+    return [Promise.resolve()]
+  }
+
+  toolbar = new Toolbar()
+  if (!toolbar.toolbar()) {
+    toolbar.display()
+  }
+  toolbar.dashboard()
+
+  setTranslationProgress(0)
+
+  enableTooltips()
+
+  return [
+    new Promise<void>((resolve, reject) => {
+      translationHelper.translate(
+        language,
+        allTranslations,
+        availableLocales
+      ).then(() => {
+        logger.debug(`Translated items: ${allTranslations.size}`)
+        resolve()
+      }).catch((err: ITranslationError) => {
+        logger.debug(`translation failed ${err}`)
+
+        const progressBar = toolbar.progressBar as ProgressBar
+        progressBar.remove()
+
+        Alert.display(
+          pluginOptions,
+          uiLocalization.value.alerts.errors.default,
+          'danger',
+          uiLocalization
+        )
+        reject(err)
+      })
+    })
+  ]
 }
 
 function enableTooltips () {
@@ -678,7 +691,7 @@ function restore () {
     tooltip.parentNode.removeChild(tooltip)
   }
 
-  DataStorage.remove('website-translator-autotranslate-system')
+  DataStorage.remove(STORAGE_KEY_AUTOTRANSLATE)
 
   languageSelect.reset()
 }
