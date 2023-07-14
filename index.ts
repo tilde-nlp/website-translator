@@ -742,12 +742,15 @@ function getLanguageSelectItems () {
   })
 
   for (const language of pluginOptions.translation.targetLanguages) {
-    items.push({
-      id: language,
-      langCode: language,
-      text: getLanguageName(language, pluginOptions, uiLocalization),
-      machineTranslated: !pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
-    })
+    if (!langs[language]) {
+      langs[language] = true
+      items.push({
+        id: language,
+        langCode: language,
+        text: getLanguageName(language, pluginOptions, uiLocalization),
+        machineTranslated: true
+      })
+    }
   }
   items = items.sort(function (a, b) {
     if (a.machineTranslated !== b.machineTranslated) {
