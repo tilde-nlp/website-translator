@@ -665,6 +665,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Norwegian Nynorsk',
     nativeName: 'Norsk (nynorsk)'
   },
+  nb: {
+    name: 'Norwegian Bokmål',
+    nativeName: 'Norsk (bokmål)'
+  },
   no: {
     name: 'Norwegian',
     nativeName: 'Norsk (bokmål / riksmål)'
