@@ -607,7 +607,7 @@ const languageCodes: { [Key: string]: ILanguage} = {
   },
   mt: {
     name: 'Maltese',
-    nativeName: 'bil-Malti'
+    nativeName: 'Malti'
   },
   mus: {
     name: 'Creek / Muskogee',
