@@ -4,6 +4,10 @@ import { ILocalizedLanguage } from './interfaces/ILocalizedLanguage'
 import { IPluginOptions } from './interfaces/IPluginOptions'
 import languageCodes from '../localization/langCodes'
 
+function normalizeLanguageCode (langCode:string) {
+  return langCode.split('-')[0].toLowerCase()
+}
+
 /**
  * Get localized language name or default language name
  * @param langCode
@@ -14,7 +18,7 @@ function getLanguageName (
   uiLocalization: BehaviorSubject<ILocalizedLanguage>
 ):string {
   // TODO: maybe more sophisticated language name here taking into account country code
-  const resolvedLangCode = langCode.split('-')[0].toLowerCase()
+  const resolvedLangCode = normalizeLanguageCode(langCode)
   let language:ILanguage
   if (pluginOptions.ui.showLanguagesInNativeLanguage) {
     language = languageCodes[resolvedLangCode]
@@ -99,4 +103,4 @@ function mouseRelativeToIframe (event) {
   }
   return mousePosition
 }
-export { mouseRelativeToIframe, closeToolbarSection, closest, getLanguageName }
+export { mouseRelativeToIframe, closeToolbarSection, closest, getLanguageName, normalizeLanguageCode }

@@ -6,6 +6,7 @@ import { ITranslation } from '../interfaces/services/websiteService/ITranslation
 import IConfiguration from '../interfaces/services/websiteService/v2/IConfiguration'
 import IWebsiteConfiguration from '../interfaces/services/websiteService/IWebsiteConfiguration'
 import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
+import { normalizeLanguageCode } from '../Common'
 
 class WebsiteService {
     private pluginOptions:IPluginOptions
@@ -30,7 +31,7 @@ class WebsiteService {
         const response = await axios.get<IConfiguration>(`${this.pluginOptions.api.url}/api/configurationservice/configuration/${this.pluginOptions.api.clientId}`)
 
         website.srcLang = response.data.srcLang
-        website.languages = response.data.languages.map(item => item.trgLang)
+        website.languages = response.data.languages.map(item => normalizeLanguageCode(item.trgLang))
       }
       else {
         throw Error(`API version '${this.pluginOptions.api.version}' not recognized`)
