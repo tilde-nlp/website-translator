@@ -11,7 +11,8 @@ import AsyncTranslator from './src/js/lib/AsyncTranslator'
 import LanguageSelect from './src/js/ui/LanguageSelect'
 import {
   mouseRelativeToIframe,
-  getLanguageName
+  getLanguageName,
+  normalizeLanguageCode
 } from './src/js/Common'
 
 import './src/style/widget.scss'
@@ -844,6 +845,12 @@ async function Initialize () {
 
     logger.debug('Initializing plugin')
 
+    ValidatePluginOptions()
+
+    pluginOptions.translation.thirdPartyTranslationLanguages.forEach((item, index) => {
+      pluginOptions.translation.thirdPartyTranslationLanguages[index] = normalizeLanguageCode(item)
+    })
+
     seoTool = new SearchEngineOptimization(pluginOptions)
     translationCache = new TranslationCache()
 
@@ -889,7 +896,7 @@ async function Initialize () {
         throw new Error(`Failed to get website info. error code: ${err.response.status} message: '${err.response.statusText}'`)
       }
     }
-    pluginOptions.sourceLanguage = website.srcLang
+    pluginOptions.sourceLanguage = normalizeLanguageCode(website.srcLang)
     pluginOptions.translation.targetLanguages = website.languages
 
     targetLanguage.next(pluginOptions.currentLanguage || pluginOptions.sourceLanguage)
@@ -940,7 +947,6 @@ async function Initialize () {
       pluginOptions.ui.layout = null
       // throw new Error('Widget container not found. If you want to use custom menu, then set WebsiteTranslator.Options.ui.layout to null')
     }
-    ValidatePluginOptions()
 
     createLanguageMenu()
     seoTool.applyLinkedPages(null, availableLocales)
