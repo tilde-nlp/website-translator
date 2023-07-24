@@ -67,6 +67,7 @@ class WebsiteService {
         url = `${this.pluginOptions.api.url}/api/translate/website/${this.pluginOptions.api.clientId}/translate`
       }
       else if (this.pluginOptions.api.version === 2) {
+        data.lang = data.lang.toUpperCase()
         url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate`
       }
       else {
