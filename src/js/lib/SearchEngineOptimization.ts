@@ -40,7 +40,7 @@ export class SearchEngineOptimization {
   public restoreUrlLocalization (links: Array<HTMLElement>) {
     this.logger.info('Restore SEO')
     this.localizeUrls(links, null)
-    // debugger
+
     DOMExtensions.selectAllDocuments().forEach(doc => {
       this.markCanonicalUrl(doc, null, true)
     })

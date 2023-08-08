@@ -339,6 +339,8 @@ async function translate (language:string): Promise<any> {
   const nextLanguageIsThirdParty = pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
   const currLanguageIsThirdParty = pluginOptions.translation.thirdPartyTranslationLanguages.includes(pluginOptions.currentLanguage)
   const languageIsSupported = pluginOptions.translation.targetLanguages.includes(language)
+  const currLanguageIsDifferent = language !== pluginOptions.currentLanguage
+  const currLangNotSourceLang = pluginOptions.sourceLanguage !== pluginOptions.currentLanguage
 
   if (!languageIsSupported && !isDefaultLanguage && !nextLanguageIsThirdParty) {
     // pluginOptions.currentLanguage = pluginOptions.sourceLanguage
@@ -354,7 +356,11 @@ async function translate (language:string): Promise<any> {
     return [Promise.resolve()]
   }
 
-  if (currLanguageIsThirdParty && language !== pluginOptions.currentLanguage && pluginOptions.sourceLanguage !== pluginOptions.currentLanguage) {
+  if (nextLanguageIsThirdParty) {
+    logger.debug(`schedule next translation to lang: ${language}`)
+    await pluginOptions.translation.onLanguageSelected(language)
+  }
+  else if (currLanguageIsThirdParty && currLanguageIsDifferent && currLangNotSourceLang) {
     sessionStorage.setItem(STORAGE_KEY_TRANSLATE_ONCE_NEXT,
       JSON.stringify({
         language: language
@@ -371,10 +377,6 @@ async function translate (language:string): Promise<any> {
         Promise.reject(new Error(`Third party translation to lang "${language}" not handled`))
       ]
     }
-  }
-  else {
-    logger.debug(`schedule next translation to lang: ${language}`)
-    await pluginOptions.translation.onLanguageSelected(language)
   }
 
   if (!nextLanguageIsThirdParty) {
@@ -653,12 +655,6 @@ function setCurrentWindowLanguage () {
       originalPageLanguageAttribute = url.searchParams.get('lang')
       originalPageLanguageAttributeSaved = true
     }
-    if (targetLanguage.value !== pluginOptions.sourceLanguage) {
-      url.searchParams.set('lang', targetLanguage.value)
-      window.history.pushState({
-
-      }, '', url.href)
-    }
   }
   else {
     if (targetLanguage.value !== pluginOptions.sourceLanguage) {
@@ -672,9 +668,7 @@ function setCurrentWindowLanguage () {
         url.searchParams.set('lang', targetLanguage.value)
       }
     }
-    window.history.pushState({
-
-    }, '', url.href)
+    window.history.pushState({}, '', url.href)
   }
 }
 
