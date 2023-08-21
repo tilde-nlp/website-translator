@@ -351,6 +351,7 @@ async function translate (language:string): Promise<any> {
 
   targetLanguage.next(language)
   languageSelect.silentSelect(language)
+  switchWindowLanguage(language) // If language comes after source language redirect, it will have this source language so change it.
 
   if (pluginOptions.currentLanguage === language) {
     return [Promise.resolve()]
@@ -657,19 +658,24 @@ function setCurrentWindowLanguage () {
     }
   }
   else {
-    if (targetLanguage.value !== pluginOptions.sourceLanguage) {
-      url.searchParams.set('lang', targetLanguage.value)
+    if (targetLanguage.value !== pluginOptions.sourceLanguage || originalPageLanguageAttribute !== null) {
+      switchWindowLanguage(targetLanguage.value)
     }
     else {
-      if (originalPageLanguageAttribute === null) {
-        url.searchParams.delete('lang')
-      }
-      else {
-        url.searchParams.set('lang', targetLanguage.value)
-      }
+      switchWindowLanguage(null)
     }
-    window.history.pushState({}, '', url.href)
   }
+}
+
+function switchWindowLanguage (language:string) {
+  const url = new URL(window.location.href)
+  if (language) {
+    url.searchParams.set('lang', language)
+  }
+  else {
+    url.searchParams.delete('lang')
+  }
+  window.history.pushState({}, '', url.href)
 }
 
 function restore () {
