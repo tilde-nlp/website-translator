@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Съдържанието на страницата е преведено машинно от {0}',
     pageIsTranslatedWithoutBranding: 'Съдържанието на страницата е преведено машинно.',
     pageIsTranslating: 'Машинният превод на съдържанието на страницата е в ход',
-    noSegmentsFound: 'Не са намерени сегменти'
+    noSegmentsFound: 'Не са намерени сегменти',
+    selectLanguage: 'Избери език'
   },
   alerts: {
     errors: {

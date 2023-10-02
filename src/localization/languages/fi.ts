@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: '{0} on käännättänyt sivun konekäännöksenä',
     pageIsTranslatedWithoutBranding: 'Sivun sisältö koneellisesti käännetty.',
     pageIsTranslating: 'Kone kääntää sivun sisältöä',
-    noSegmentsFound: 'Segmenttejä ei löytynyt'
+    noSegmentsFound: 'Segmenttejä ei löytynyt',
+    selectLanguage: 'Valitse kieli'
   },
   alerts: {
     errors: {

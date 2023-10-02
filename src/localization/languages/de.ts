@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Seite maschinell übersetzt von {0}',
     pageIsTranslatedWithoutBranding: 'Seiteninhalt maschinell übersetzt.',
     pageIsTranslating: 'Seiteninhalte werden maschinell übersetzt',
-    noSegmentsFound: 'Keine Segmente gefunden'
+    noSegmentsFound: 'Keine Segmente gefunden',
+    selectLanguage: 'Sprache auswählen'
   },
   alerts: {
     errors: {

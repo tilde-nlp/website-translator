@@ -15,7 +15,8 @@ const lang: ILocalizedLanguage = {
     pageIsTranslated: 'Il-kontenut tal-paġna tradott bil-magna {0}',
     pageIsTranslatedWithoutBranding: 'Il-kontenut tal-paġna tradott bil-magna',
     pageIsTranslating: 'Traduzzjoni awtomatika tal-kontenut tal-paġna għaddejja',
-    noSegmentsFound: 'Ma nstab l-ebda segment'
+    noSegmentsFound: 'Ma nstab l-ebda segment',
+    selectLanguage: 'Agħżel il-lingwa'
   },
   alerts: {
     errors: {

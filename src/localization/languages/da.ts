@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Siden er maskinoversat af {0}',
     pageIsTranslatedWithoutBranding: 'Sidens indhold er maskinoversat.',
     pageIsTranslating: 'Maskinoversættelse af sidens indhold er i gang',
-    noSegmentsFound: 'Ingen segmenter fundet'
+    noSegmentsFound: 'Ingen segmenter fundet',
+    selectLanguage: 'Vælg sprog'
   },
   alerts: {
     errors: {

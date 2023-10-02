@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Conținutul paginii este tradus automat de {0}',
     pageIsTranslatedWithoutBranding: 'Conținutul paginii tradus automat.',
     pageIsTranslating: 'Traducerea automată a conținutului paginii este în curs de desfășurare',
-    noSegmentsFound: 'Nu s-au găsit segmente'
+    noSegmentsFound: 'Nu s-au găsit segmente',
+    selectLanguage: 'Selecteaza limba'
   },
   alerts: {
     errors: {

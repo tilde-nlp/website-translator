@@ -20,6 +20,7 @@ export interface ILocalizedLanguage{
     pageIsTranslatedWithoutBranding: string,
     pageIsTranslating: string,
     noSegmentsFound: string,
+    selectLanguage: string,
   },
   /**
    * Alert messages

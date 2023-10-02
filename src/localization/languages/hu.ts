@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Az oldal tartalmát {0} gépi fordította le',
     pageIsTranslatedWithoutBranding: 'Az oldal tartalma gépi fordításban.',
     pageIsTranslating: 'Az oldal tartalmának gépi fordítása folyamatban',
-    noSegmentsFound: 'Nem találtunk szegmenseket'
+    noSegmentsFound: 'Nem találtunk szegmenseket',
+    selectLanguage: 'Válasszon nyelvet'
   },
   alerts: {
     errors: {

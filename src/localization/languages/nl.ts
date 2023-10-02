@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Pagina-inhoud machinaal vertaald door {0}',
     pageIsTranslatedWithoutBranding: 'Pagina-inhoud machinaal vertaald.',
     pageIsTranslating: 'Machinevertaling van pagina-inhoud in uitvoering',
-    noSegmentsFound: 'Geen segmenten gevonden'
+    noSegmentsFound: 'Geen segmenten gevonden',
+    selectLanguage: 'Selecteer taal'
   },
   alerts: {
     errors: {
