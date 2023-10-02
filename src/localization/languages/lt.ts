@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Puslapį išvertė {0} mašininis vertimas',
     pageIsTranslatedWithoutBranding: 'Puslapio turinio mašininis vertimas.',
     pageIsTranslating: 'Puslapio turinio vertimas yra mašininis',
-    noSegmentsFound: 'Segmentų nerasta'
+    noSegmentsFound: 'Segmentų nerasta',
+    selectLanguage: 'Pasirinkite kalbą'
   },
   alerts: {
     errors: {

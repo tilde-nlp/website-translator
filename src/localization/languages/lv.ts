@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Lapas satura mašīntulkojumu nodrošina {0}',
     pageIsTranslatedWithoutBranding: 'Lapas saturs ir mašīntulkots.',
     pageIsTranslating: 'Lapas saturs tiek mašīntulkots',
-    noSegmentsFound: 'Segmenti nav atrasti'
+    noSegmentsFound: 'Segmenti nav atrasti',
+    selectLanguage: 'Izvēlēties valodu'
   },
   alerts: {
     errors: {

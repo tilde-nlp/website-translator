@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Obsah stránky je strojově přeložen službou {0}',
     pageIsTranslatedWithoutBranding: 'Obsah stránky strojově přeložen.',
     pageIsTranslating: 'Probíhá strojový překlad obsahu stránky',
-    noSegmentsFound: 'Nenalezeny žádné segmenty'
+    noSegmentsFound: 'Nenalezeny žádné segmenty',
+    selectLanguage: 'Zvolte jazyk'
   },
   alerts: {
     errors: {

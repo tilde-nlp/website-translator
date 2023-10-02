@@ -42,6 +42,10 @@ $itemHeight:45px;
 
     :focus{
       outline: none;
+
+      .menu-text {
+        text-decoration: underline;
+      }
     }
     > .website-translator-select {
       position: relative;

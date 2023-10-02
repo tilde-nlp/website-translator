@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Вміст сторінки перекладено машинним перекладом {0}',
     pageIsTranslatedWithoutBranding: 'Вміст сторінки перекладено автоматично.',
     pageIsTranslating: 'Триває машинний переклад вмісту сторінки',
-    noSegmentsFound: 'Сегментів не знайдено'
+    noSegmentsFound: 'Сегментів не знайдено',
+    selectLanguage: 'Оберіть мову'
   },
   alerts: {
     errors: {

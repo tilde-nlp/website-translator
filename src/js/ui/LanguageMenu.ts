@@ -68,6 +68,7 @@ export class LanguageMenu implements ILanguageSelect {
     const selectedItem = document.createElement('button')
     selectedItem.classList.add('selected-item')
     selectedItem.type = 'button'
+    selectedItem.setAttribute('aria-label', this.uiLocalization.value.labels.selectLanguage)
 
     this.selectedItem = selectedItem
 
@@ -88,7 +89,8 @@ export class LanguageMenu implements ILanguageSelect {
           menuText.textContent = getLanguageName(this.currentLangCode, this.pluginOptions, this.uiLocalization)
           if (this.pluginOptions.ui.showLanguagesInNativeLanguage) {
             menuText.setAttribute('lang', this.currentLangCode)
-          }
+          }          
+          selectedItem.setAttribute('aria-label', this.uiLocalization.value.labels.selectLanguage)
         }
       })
     )
@@ -96,6 +98,7 @@ export class LanguageMenu implements ILanguageSelect {
     const menuArrow = document.createElement('img')
     menuArrow.classList.add('menu-arrow')
     menuArrow.src = this.internalOptions.ui.icons.menuIcon
+    menuArrow.setAttribute('role', 'presentation')
 
     selectedItem.appendChild(menuText)
     selectedItem.appendChild(menuArrow)
@@ -126,11 +129,13 @@ export class LanguageMenu implements ILanguageSelect {
     const options = document.createElement('div')
     options.classList.add('options')
     options.setAttribute('tabindex', '0')
+    options.setAttribute('role', 'menu')
 
     for (const item of items) {
       const option = document.createElement('span')
       option.classList.add('option')
       option.setAttribute('tabindex', '-1')
+      option.setAttribute('role', 'menuitem')
 
       this.items[item.id] = option
       this.menuItems[item.id] = item

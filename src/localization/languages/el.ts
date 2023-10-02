@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Το περιεχόμενο της σελίδας μεταφράζεται αυτόματα από {0}',
     pageIsTranslatedWithoutBranding: 'Περιεχόμενο σελίδας μεταφρασμένο μηχανικά.',
     pageIsTranslating: 'Μηχανική μετάφραση του περιεχομένου της σελίδας σε εξέλιξη',
-    noSegmentsFound: 'Δεν βρέθηκαν τμήματα'
+    noSegmentsFound: 'Δεν βρέθηκαν τμήματα',
+    selectLanguage: 'Επιλέξτε γλώσσα'
   },
   alerts: {
     errors: {

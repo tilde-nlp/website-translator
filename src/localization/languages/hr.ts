@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Sadržaj stranice automatski je preveo servis {0}',
     pageIsTranslatedWithoutBranding: 'Sadržaj stranice strojno preveden.',
     pageIsTranslating: 'Strojno prevođenje sadržaja stranice u tijeku',
-    noSegmentsFound: 'Nisu pronađeni segmenti'
+    noSegmentsFound: 'Nisu pronađeni segmenti',
+    selectLanguage: 'Izaberi jezik'
   },
   alerts: {
     errors: {

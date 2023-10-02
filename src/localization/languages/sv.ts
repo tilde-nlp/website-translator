@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Sidans innehåll maskinöversätts av {0}',
     pageIsTranslating: 'Sidans innehåll maskinöversätts',
     pageIsTranslatedWithoutBranding: 'Sidans innehåll maskinöversatt.',
-    noSegmentsFound: 'Inga segment hittades'
+    noSegmentsFound: 'Inga segment hittades',
+    selectLanguage: 'Välj språk'
   },
   alerts: {
     errors: {

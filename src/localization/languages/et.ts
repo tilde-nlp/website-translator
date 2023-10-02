@@ -15,7 +15,8 @@ const lang:ILocalizedLanguage = {
     pageIsTranslated: 'Lehek\u00fclje sisumasin t\u00f5lkinud {0}',
     pageIsTranslatedWithoutBranding: 'Lehekülje sisu masintõlkes.',
     pageIsTranslating: 'Poolelioleva lehek\u00fclje sisu masint\u00f5lge',
-    noSegmentsFound: 'Segmente ei leitud'
+    noSegmentsFound: 'Segmente ei leitud',
+    selectLanguage: 'Vali keel'
   },
   alerts: {
     errors: {
