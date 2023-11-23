@@ -1051,6 +1051,19 @@ class DOMTranslation {
     )
   }
 
+  private addUserElementToCollection (collection: Set<HTMLElement>, element) {
+    if (
+      element.nodeType === Node.ELEMENT_NODE && (
+        element.nodeName === TILDE_MT_RAW_TEXT_NODE_TAG ||
+        element.nodeName === TILDE_MT_TEXT_MARKER_START_TAG ||
+        element.nodeName === TILDE_MT_TEXT_MARKER_END_TAG
+      )
+    ) {
+      return
+    }
+    collection.add(element)
+  }
+
   /**
    *
    * @param translatableParentElements
@@ -1108,21 +1121,22 @@ class DOMTranslation {
             if (element.nodeName === 'SELECT') {
               forceVisibility = true
             }
-            translatableElements.add(element)
+
+            this.addUserElementToCollection(translatableElements, element)
           }
         }
         else if (mode === TranslationElementMode.METADATA_ELEMENTS) {
           const hasSeoAttributes = this.getTranslatableAttributes(element)
             .some(item => item.type === TranslatableItemType.ATTRIBUTE_SEO)
           if (hasSeoAttributes) {
-            translatableElements.add(element)
+            this.addUserElementToCollection(translatableElements, element)
           }
         }
         else if (mode === TranslationElementMode.URLS) {
           if (element.nodeType === Node.ELEMENT_NODE) {
             const htmlElement = (element as HTMLElement)
             if (htmlElement.parentNode.nodeName !== 'HEAD' && htmlElement.hasAttribute('HREF')) {
-              translatableElements.add(element)
+              this.addUserElementToCollection(translatableElements, element)
             }
           }
         }
@@ -1169,8 +1183,9 @@ class DOMTranslation {
               const metadataChildAllowed = mode === TranslationElementMode.METADATA_ELEMENTS && TranslationElementCandidates.get(element.parentElement.nodeName)?.type === TranslatableItemType.ELEMENT_SEO
 
               if (visibleChildAllowed || metadataChildAllowed || forceVisibility) {
-                translatableParentElements.add(currentParent)
-                translatableElements.add(element)
+                this.addUserElementToCollection(translatableParentElements, currentParent)
+
+                this.addUserElementToCollection(translatableElements, element)
               }
             }
           }
