@@ -1054,9 +1054,9 @@ class DOMTranslation {
   private addUserElementToCollection (collection: Set<HTMLElement>, element) {
     if (
       element.nodeType === Node.ELEMENT_NODE && (
-        element.nodeName === TILDE_MT_RAW_TEXT_NODE_TAG ||
-        element.nodeName === TILDE_MT_TEXT_MARKER_START_TAG ||
-        element.nodeName === TILDE_MT_TEXT_MARKER_END_TAG
+        element.nodeName === RAW_TEXT_NODE_WRAPPER_TAG ||
+        element.nodeName === TEXT_MARKER_START_TAG ||
+        element.nodeName === TEXT_MARKER_END_TAG
       )
     ) {
       return
