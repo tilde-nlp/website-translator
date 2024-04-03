@@ -8,7 +8,7 @@ export const pluginOptions: IPluginOptions = {
   api: {
     clientId: null,
     url: 'https://example-test-domain.com',
-    version: 2
+    version: 3
   },
   translation: {
     autoTranslate: true,
