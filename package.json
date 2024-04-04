@@ -38,7 +38,7 @@
     "@typescript-eslint/parser": "^5.14.0",
     "css-loader": "^6.7.1",
     "ifdef-loader": "^2.3.2",
-    "node-sass": "^7.0.1",
+    "node-sass": "^9.0.0",
     "sass-loader": "^12.6.0",
     "standardx": "^7.0.0",
     "style-loader": "^3.3.1",
