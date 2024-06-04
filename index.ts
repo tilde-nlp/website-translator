@@ -851,7 +851,8 @@ async function Initialize () {
       pluginOptions.translation.thirdPartyTranslationLanguages[index] = normalizeLanguageCode(item)
     })
 
-    if (pluginOptions.api.version < 2 && pluginOptions.translation.translateWholePage) {
+    // in cases where API version is 1, whole page translation is not allowed
+    if (pluginOptions.api.version === 1 && pluginOptions.translation.translateWholePage) {
       pluginOptions.translation.translateWholePage = false;
     }
 

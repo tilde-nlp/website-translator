@@ -365,11 +365,7 @@ class DOMTranslation {
       translationRoots.push(document.documentElement)
     }
 
-    const translationMode = this.pluginOptions.translation.translateWholePage 
-      ? TranslationElementMode.ALL_ELEMENTS 
-      : TranslationElementMode.VISIBLE_ELEMENTS;
-
-    const translationRanges = this.prepareNextTranslationRanges(translationRoots, translationMode)
+    const translationRanges = this.prepareNextTranslationRanges(translationRoots, TranslationElementMode.VISIBLE_ELEMENTS)
 
     this.onTranslationItemsDiscovered(translationRanges, TranslationPriority.Text)
   }
@@ -1043,6 +1039,8 @@ class DOMTranslation {
     sourceLanguage:string,
     mode: TranslationElementMode
   ) {
+    const forceVisibility = this.pluginOptions.translation.translateWholePage && mode === TranslationElementMode.VISIBLE_ELEMENTS;
+
     this.collectTextElementsChunked(
       translatableParentElements,
       translatableElements,
@@ -1051,7 +1049,7 @@ class DOMTranslation {
       true,
       true,
       mode,
-      false,
+      forceVisibility,
       element as HTMLElement,
       true
     )
@@ -1079,7 +1077,7 @@ class DOMTranslation {
    * @param sourceLanguageSame Element some level child of translatable language
    * @param isTranslatable If element is not some level of [translate="no"]. [translate="yes"] resets this
    * @param mode
-   * @param forceTranslation
+   * @param forceVisibility
    * @param currentParent
    * @param firstLevel
    * @returns
@@ -1092,7 +1090,7 @@ class DOMTranslation {
     sourceLanguageSame:boolean,
     isTranslatable:boolean,
     mode:TranslationElementMode,
-    forceTranslation: boolean,
+    forceVisibility: boolean,
     currentParent: HTMLElement,
     firstLevel: boolean = false
   ) {
@@ -1124,18 +1122,11 @@ class DOMTranslation {
           if (element.nodeType === Node.ELEMENT_NODE && DOMExtensions.elementIsVisible(element, this.registredIframes)) {
             // Select <option> will always be "invisible", so we need to translate it if select itself is visible
             if (element.nodeName === 'SELECT') {
-              forceTranslation = true
+              forceVisibility = true
             }
 
             this.addUserElementToCollection(translatableElements, element)
           }
-        }
-        else if (mode === TranslationElementMode.ALL_ELEMENTS) {
-          // this property forces element to be translated
-          // useful in this case, when all elements, whether they are in frame or no, should be translated
-          // as well as in line 1126-1129, where select and option tag texts should be forced to translate
-          forceTranslation = true;
-          this.addUserElementToCollection(translatableElements, element)
         }
         else if (mode === TranslationElementMode.METADATA_ELEMENTS) {
           const hasSeoAttributes = this.getTranslatableAttributes(element)
@@ -1182,7 +1173,7 @@ class DOMTranslation {
           currentSourceLangSame,
           currentIsTranslatable,
           mode,
-          forceTranslation,
+          forceVisibility,
           currentParent
         )
       }
@@ -1195,7 +1186,7 @@ class DOMTranslation {
               const visibleChildAllowed = mode === TranslationElementMode.VISIBLE_ELEMENTS && DOMExtensions.elementIsVisible(element.parentElement, this.registredIframes)
               const metadataChildAllowed = mode === TranslationElementMode.METADATA_ELEMENTS && TranslationElementCandidates.get(element.parentElement.nodeName)?.type === TranslatableItemType.ELEMENT_SEO
 
-              if (visibleChildAllowed || metadataChildAllowed || forceTranslation) {
+              if (visibleChildAllowed || metadataChildAllowed || forceVisibility) {
                 this.addUserElementToCollection(translatableParentElements, currentParent)
                 this.addUserElementToCollection(translatableElements, element)
               }
@@ -1211,7 +1202,7 @@ class DOMTranslation {
                 currentSourceLangSame,
                 currentIsTranslatable,
                 mode,
-                forceTranslation,
+                forceVisibility,
                 currentParent
               )
             })
