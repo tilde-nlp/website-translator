@@ -851,8 +851,12 @@ async function Initialize () {
       pluginOptions.translation.thirdPartyTranslationLanguages[index] = normalizeLanguageCode(item)
     })
 
-    // in cases where API version is 1, whole page translation is not allowed
-    if (pluginOptions.api.version === 1 && pluginOptions.translation.translateWholePage) {
+    // by default, all versions from 3 and up have whole page translation turned on
+    if (pluginOptions.api.version > 2) {
+      pluginOptions.translation.translateWholePage = true;
+    }
+    // if widget with version 3 and up has whole page translation turned off in settings, it is taken into account
+    if (pluginOptions.api.version > 2 && !pluginOptions.translation.translateWholePage) {
       pluginOptions.translation.translateWholePage = false;
     }
 

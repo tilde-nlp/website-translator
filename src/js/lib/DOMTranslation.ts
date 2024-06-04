@@ -976,7 +976,7 @@ class DOMTranslation {
       }
     }
     for (const range of translationRanges) {
-      range.visibleInCurrentView = this.pluginOptions.translation.translateWholePage ? true : DOMExtensions.elementIsVisible(range.startMarker, this.registredIframes)
+      range.visibleInCurrentView = DOMExtensions.elementIsVisible(range.startMarker, this.registredIframes)
       range.type = TranslatableItemType.ELEMENT
       range.html = this.cropAndMinifyTranslationRange(range, translatableElements, range.startMarker, range.startMarker, range.endMarker)
     }
