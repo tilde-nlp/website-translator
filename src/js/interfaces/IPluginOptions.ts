@@ -48,6 +48,11 @@ export interface IPluginOptions{
      */
     autoTranslate: boolean,
 
+    /**
+     * Translate whole page immediately, without waiting while content is in screen view
+     */
+    translateWholePage: boolean,
+
     targetLanguages:Array<string>
     /**
      * Translate only tags and their children which have [translate="yes"] attribute

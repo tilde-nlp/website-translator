@@ -607,6 +607,7 @@ class DOMTranslation {
    */
   private restoreElementTranslation (range: TranslationTextRange) {
     const translatedSegment = this.translatedSegments.get(range.startMarker)
+
     if (translatedSegment) {
       const originalHTML = DOMExtensions.stringToElement(translatedSegment.source)
 
@@ -720,6 +721,7 @@ class DOMTranslation {
 
     const sourceParent = sourceElement.parentElement
     let nextTarget: Node
+
     while (sourceElement || targetElement) {
       if (sourceElement && (sourceElement.nodeName === TEXT_MARKER_START_TAG)) {
         sourceElement = sourceElement.nextSibling
@@ -1037,6 +1039,8 @@ class DOMTranslation {
     sourceLanguage:string,
     mode: TranslationElementMode
   ) {
+    const forceVisibility = this.pluginOptions.translation.translateWholePage && mode === TranslationElementMode.VISIBLE_ELEMENTS;
+
     this.collectTextElementsChunked(
       translatableParentElements,
       translatableElements,
@@ -1045,7 +1049,7 @@ class DOMTranslation {
       true,
       true,
       mode,
-      false,
+      forceVisibility,
       element as HTMLElement,
       true
     )
@@ -1113,7 +1117,6 @@ class DOMTranslation {
         // Don't translate child elements of website translator
         return
       }
-
       if (currentSourceLangSame && currentIsTranslatable) {
         if (mode === TranslationElementMode.VISIBLE_ELEMENTS) {
           if (element.nodeType === Node.ELEMENT_NODE && DOMExtensions.elementIsVisible(element, this.registredIframes)) {
@@ -1128,6 +1131,7 @@ class DOMTranslation {
         else if (mode === TranslationElementMode.METADATA_ELEMENTS) {
           const hasSeoAttributes = this.getTranslatableAttributes(element)
             .some(item => item.type === TranslatableItemType.ATTRIBUTE_SEO)
+
           if (hasSeoAttributes) {
             this.addUserElementToCollection(translatableElements, element)
           }
@@ -1184,7 +1188,6 @@ class DOMTranslation {
 
               if (visibleChildAllowed || metadataChildAllowed || forceVisibility) {
                 this.addUserElementToCollection(translatableParentElements, currentParent)
-
                 this.addUserElementToCollection(translatableElements, element)
               }
             }

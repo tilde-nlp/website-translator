@@ -12,6 +12,7 @@ export const pluginOptions: IPluginOptions = {
   },
   translation: {
     autoTranslate: true,
+    translateWholePage: null,
     // systems: null,
     targetLanguages: null,
     translateOnlyAllowedTags: false,
@@ -39,7 +40,7 @@ export const pluginOptions: IPluginOptions = {
     alwaysShowOriginalTextInPopup: false,
     showPopupTranslationProvider: true,
     showPopup: true,
-    showLanguagesInNativeLanguage: false,
+    showLanguagesInNativeLanguage: true,
     branding: {
       name: 'Tilde',
       url: '',
