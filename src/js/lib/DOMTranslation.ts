@@ -365,7 +365,11 @@ class DOMTranslation {
       translationRoots.push(document.documentElement)
     }
 
-    const translationRanges = this.prepareNextTranslationRanges(translationRoots, TranslationElementMode.VISIBLE_ELEMENTS)
+    const translationMode = this.pluginOptions.translation.translateWholePage 
+      ? TranslationElementMode.ALL_ELEMENTS 
+      : TranslationElementMode.VISIBLE_ELEMENTS;
+
+    const translationRanges = this.prepareNextTranslationRanges(translationRoots, translationMode)
 
     this.onTranslationItemsDiscovered(translationRanges, TranslationPriority.Text)
   }
@@ -607,6 +611,7 @@ class DOMTranslation {
    */
   private restoreElementTranslation (range: TranslationTextRange) {
     const translatedSegment = this.translatedSegments.get(range.startMarker)
+
     if (translatedSegment) {
       const originalHTML = DOMExtensions.stringToElement(translatedSegment.source)
 
@@ -720,6 +725,7 @@ class DOMTranslation {
 
     const sourceParent = sourceElement.parentElement
     let nextTarget: Node
+
     while (sourceElement || targetElement) {
       if (sourceElement && (sourceElement.nodeName === TEXT_MARKER_START_TAG)) {
         sourceElement = sourceElement.nextSibling
@@ -974,7 +980,7 @@ class DOMTranslation {
       }
     }
     for (const range of translationRanges) {
-      range.visibleInCurrentView = DOMExtensions.elementIsVisible(range.startMarker, this.registredIframes)
+      range.visibleInCurrentView = this.pluginOptions.translation.translateWholePage ? true : DOMExtensions.elementIsVisible(range.startMarker, this.registredIframes)
       range.type = TranslatableItemType.ELEMENT
       range.html = this.cropAndMinifyTranslationRange(range, translatableElements, range.startMarker, range.startMarker, range.endMarker)
     }
@@ -1091,7 +1097,7 @@ class DOMTranslation {
     firstLevel: boolean = false
   ) {
     try {
-      if (element.nodeType === Node.TEXT_NODE && element.textContent.trim().length === 0) {
+      if (element.nodeType === Node.TEXT_NODE && element.textContent.trim().length === 0 && !this.pluginOptions.translation.translateWholePage) {
         return
       }
 
@@ -1124,6 +1130,10 @@ class DOMTranslation {
 
             this.addUserElementToCollection(translatableElements, element)
           }
+        }
+        else if (mode === TranslationElementMode.ALL_ELEMENTS) {
+          forceVisibility = true;
+          this.addUserElementToCollection(translatableElements, element)
         }
         else if (mode === TranslationElementMode.METADATA_ELEMENTS) {
           const hasSeoAttributes = this.getTranslatableAttributes(element)
@@ -1184,7 +1194,6 @@ class DOMTranslation {
 
               if (visibleChildAllowed || metadataChildAllowed || forceVisibility) {
                 this.addUserElementToCollection(translatableParentElements, currentParent)
-
                 this.addUserElementToCollection(translatableElements, element)
               }
             }
