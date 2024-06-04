@@ -12,7 +12,7 @@ export const pluginOptions: IPluginOptions = {
   },
   translation: {
     autoTranslate: true,
-    translateWholePage: false,
+    translateWholePage: null,
     // systems: null,
     targetLanguages: null,
     translateOnlyAllowedTags: false,
