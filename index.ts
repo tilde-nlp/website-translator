@@ -851,6 +851,10 @@ async function Initialize () {
       pluginOptions.translation.thirdPartyTranslationLanguages[index] = normalizeLanguageCode(item)
     })
 
+    if (pluginOptions.api.version < 2 && pluginOptions.translation.translateWholePage) {
+      pluginOptions.translation.translateWholePage = false;
+    }
+
     seoTool = new SearchEngineOptimization(pluginOptions)
     translationCache = new TranslationCache()
 

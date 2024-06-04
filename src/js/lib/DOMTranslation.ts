@@ -1079,7 +1079,7 @@ class DOMTranslation {
    * @param sourceLanguageSame Element some level child of translatable language
    * @param isTranslatable If element is not some level of [translate="no"]. [translate="yes"] resets this
    * @param mode
-   * @param forceVisibility
+   * @param forceTranslation
    * @param currentParent
    * @param firstLevel
    * @returns
@@ -1092,12 +1092,12 @@ class DOMTranslation {
     sourceLanguageSame:boolean,
     isTranslatable:boolean,
     mode:TranslationElementMode,
-    forceVisibility: boolean,
+    forceTranslation: boolean,
     currentParent: HTMLElement,
     firstLevel: boolean = false
   ) {
     try {
-      if (element.nodeType === Node.TEXT_NODE && element.textContent.trim().length === 0 && !this.pluginOptions.translation.translateWholePage) {
+      if (element.nodeType === Node.TEXT_NODE && element.textContent.trim().length === 0) {
         return
       }
 
@@ -1119,25 +1119,28 @@ class DOMTranslation {
         // Don't translate child elements of website translator
         return
       }
-
       if (currentSourceLangSame && currentIsTranslatable) {
         if (mode === TranslationElementMode.VISIBLE_ELEMENTS) {
           if (element.nodeType === Node.ELEMENT_NODE && DOMExtensions.elementIsVisible(element, this.registredIframes)) {
             // Select <option> will always be "invisible", so we need to translate it if select itself is visible
             if (element.nodeName === 'SELECT') {
-              forceVisibility = true
+              forceTranslation = true
             }
 
             this.addUserElementToCollection(translatableElements, element)
           }
         }
         else if (mode === TranslationElementMode.ALL_ELEMENTS) {
-          forceVisibility = true;
+          // this property forces element to be translated
+          // useful in this case, when all elements, whether they are in frame or no, should be translated
+          // as well as in line 1126-1129, where select and option tag texts should be forced to translate
+          forceTranslation = true;
           this.addUserElementToCollection(translatableElements, element)
         }
         else if (mode === TranslationElementMode.METADATA_ELEMENTS) {
           const hasSeoAttributes = this.getTranslatableAttributes(element)
             .some(item => item.type === TranslatableItemType.ATTRIBUTE_SEO)
+
           if (hasSeoAttributes) {
             this.addUserElementToCollection(translatableElements, element)
           }
@@ -1179,7 +1182,7 @@ class DOMTranslation {
           currentSourceLangSame,
           currentIsTranslatable,
           mode,
-          forceVisibility,
+          forceTranslation,
           currentParent
         )
       }
@@ -1192,7 +1195,7 @@ class DOMTranslation {
               const visibleChildAllowed = mode === TranslationElementMode.VISIBLE_ELEMENTS && DOMExtensions.elementIsVisible(element.parentElement, this.registredIframes)
               const metadataChildAllowed = mode === TranslationElementMode.METADATA_ELEMENTS && TranslationElementCandidates.get(element.parentElement.nodeName)?.type === TranslatableItemType.ELEMENT_SEO
 
-              if (visibleChildAllowed || metadataChildAllowed || forceVisibility) {
+              if (visibleChildAllowed || metadataChildAllowed || forceTranslation) {
                 this.addUserElementToCollection(translatableParentElements, currentParent)
                 this.addUserElementToCollection(translatableElements, element)
               }
@@ -1208,7 +1211,7 @@ class DOMTranslation {
                 currentSourceLangSame,
                 currentIsTranslatable,
                 mode,
-                forceVisibility,
+                forceTranslation,
                 currentParent
               )
             })
