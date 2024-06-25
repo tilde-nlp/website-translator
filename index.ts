@@ -787,7 +787,9 @@ function createLanguageMenu () {
 
   const widgetContainer = document.querySelector('.website-translator')
 
-  widgetContainer.setAttribute('lang', uiLanguage)
+  if (widgetContainer != null) {
+    widgetContainer.setAttribute('lang', uiLanguage)
+  }
 }
 
 /**
