@@ -25,6 +25,8 @@ class AsyncTranslator {
   private itemsTranslated: number;
   private itemsTotal:number;
   private retryTimeout = 1000;
+  private batchesTotal: number;
+  private translationFinishedEvent = new Event("translation-finished");
 
   constructor (
     private readonly websiteService:WebsiteService,
@@ -193,11 +195,17 @@ class AsyncTranslator {
     if (this.itemsTotal === 0) {
       return 1
     }
+    if (this.batchesTotal === 0 && (this.itemsTranslated / this.itemsTotal) === 1) {
+      document.dispatchEvent(this.translationFinishedEvent);
+    }
+    
     return this.itemsTranslated / this.itemsTotal
   }
 
   private onTranslationItemDiscovered (items: Array<TranslationTextRange>, priority: TranslationPriority) {
     const batches = this.getBatches(items)
+    this.batchesTotal = batches.length;
+
     if (batches.length > 0) {
       const queueBatches = this.queue.getItems()
 
@@ -216,6 +224,10 @@ class AsyncTranslator {
       }
       this.itemsTotal += batches.length
 
+      this.onProgress(this.getProgress())
+    }
+    else {
+      this.batchesTotal = 0;
       this.onProgress(this.getProgress())
     }
   }
