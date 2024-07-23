@@ -97,6 +97,7 @@ export class LanguageMenu implements ILanguageSelect {
 
     const menuArrow = document.createElement('img')
     menuArrow.classList.add('menu-arrow')
+    menuArrow.alt = ""
     menuArrow.src = this.internalOptions.ui.icons.menuIcon
     menuArrow.setAttribute('role', 'presentation')
 
@@ -167,7 +168,8 @@ export class LanguageMenu implements ILanguageSelect {
       if (item.machineTranslated) {
         const img = document.createElement('img')
         img.src = settingsIcon
-        img.role = "presentation";
+        img.alt = ""
+        img.role = "presentation"
 
         this.subscriptions.push(
           this.uiLocalization.subscribe({
