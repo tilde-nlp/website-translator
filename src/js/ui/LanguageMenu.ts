@@ -167,6 +167,7 @@ export class LanguageMenu implements ILanguageSelect {
       if (item.machineTranslated) {
         const img = document.createElement('img')
         img.src = settingsIcon
+        img.role = "presentation";
 
         this.subscriptions.push(
           this.uiLocalization.subscribe({
