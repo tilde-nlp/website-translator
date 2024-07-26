@@ -30,6 +30,7 @@ class WebsiteService {
       }
       else if (this.pluginOptions.api.version === 2) {
         const response = await axios.get<IConfiguration>(`${this.pluginOptions.api.url}/api/configurationservice/configuration/${this.pluginOptions.api.clientId}`)
+        // const response = await axios.get<IConfiguration>(`http://localhost:5254/configuration/${this.pluginOptions.api.clientId}`)
 
         website.srcLang = response.data.srcLang
         website.languages = response.data.languages.map(item => normalizeLanguageCode(item.trgLang))
@@ -75,7 +76,9 @@ class WebsiteService {
       }
       else if (this.pluginOptions.api.version <= 3 ) {
         data.lang = data.lang.toUpperCase()
+        // url = `https://localhost:7204/translate/website/${this.pluginOptions.api.clientId}/translate`
         url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate`
+        console.log(`WIDGET: Translation url: ${url}`)
       }
       else {
         throw Error(`API version '${this.pluginOptions.api.version}' not recognized`)
