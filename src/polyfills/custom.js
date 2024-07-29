@@ -79,10 +79,10 @@ if (!Element.prototype.closest) {
     constructor.prototype.children == null) {
     Object.defineProperty(constructor.prototype, 'children', {
       get: function() {
-	      let nodes = [];
+        let nodes = [];
         try {
           nodes = this.childNodes;
-        } catch(error) {
+        } catch (error) {
           console.log(error);
         }
         let i = 0, node, children = [];
