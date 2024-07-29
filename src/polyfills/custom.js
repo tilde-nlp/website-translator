@@ -79,7 +79,13 @@ if (!Element.prototype.closest) {
     constructor.prototype.children == null) {
     Object.defineProperty(constructor.prototype, 'children', {
       get: function() {
-        let i = 0, node, nodes = this.childNodes, children = [];
+        let nodes = [];
+        try {
+          nodes = this.childNodes;
+        } catch (error) {
+          console.log(error);
+        }
+        let i = 0, node, children = [];
         while (node = nodes[i++]) {
           if (node.nodeType === 1) {
             children.push(node);
