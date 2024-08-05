@@ -5,7 +5,7 @@ import { IPluginOptions } from './interfaces/IPluginOptions'
 import languageCodes from '../localization/langCodes'
 
 function normalizeLanguageCode (langCode:string) {
-  return langCode.split('-')[0].toLowerCase()
+  return langCode.toLowerCase()
 }
 
 /**
