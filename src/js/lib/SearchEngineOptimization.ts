@@ -82,7 +82,7 @@ export class SearchEngineOptimization {
 
   private markCanonicalUrl (doc: Document, currentLocale: string, restore = false) {
     let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement
-    if (!link) {
+    if (!link && doc.head !== null) {
       link = document.createElement('link')
       doc.head.appendChild(link)
       link.rel = 'canonical'
