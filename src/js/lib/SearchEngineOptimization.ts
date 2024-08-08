@@ -84,8 +84,10 @@ export class SearchEngineOptimization {
     let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement
     if (!link) {
       link = document.createElement('link')
-      doc.head.appendChild(link)
-      link.rel = 'canonical'
+      if (doc.head !== null) {
+        doc.head.appendChild(link)
+        link.rel = 'canonical'
+      }
     }
     if (restore) {
       if (link.hasAttribute(ORIGINAL_URL_ATTR)) {
