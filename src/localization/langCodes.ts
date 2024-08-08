@@ -97,6 +97,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Bihari',
     nativeName: 'भोजपुरी'
   },
+  bho: {
+    name: 'Bhojpuri',
+    nativeName: 'भोजपुरी'
+  },
   bi: {
     name: 'Bislama',
     nativeName: 'Bislama'
@@ -165,6 +169,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Cheyenne',
     nativeName: 'Tsetsêhestâhese'
   },
+  ckb: {
+    name: 'Central Kurdish',
+    nativeName: 'کرمانجیی خواروو'
+  },
   co: {
     name: 'Corsican',
     nativeName: 'Corsu'
@@ -204,6 +212,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   diq: {
     name: 'Dimli',
     nativeName: 'Zazaki'
+  },
+  doi: {
+    name: 'Dogri',
+    nativeName: 'डोगरी'
   },
   dsb: {
     name: 'Lower Sorbian',
@@ -317,6 +329,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Guarani',
     nativeName: "Avañe'ẽ"
   },
+  gom: {
+    name: 'Konkani',
+    nativeName: 'कोंकणी'
+  },
   got: {
     name: 'Gothic',
     nativeName: 'gutisk'
@@ -348,6 +364,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   hi: {
     name: 'Hindi',
     nativeName: 'हिन्दी'
+  },
+  hmn: {
+    name: 'Hmong',
+    nativeName: '𞄀𞄩𞄰'
   },
   ho: {
     name: 'Hiri Motu',
@@ -433,6 +453,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Javanese',
     nativeName: 'Basa Jawa'
   },
+  jw: {
+    name: 'Javanese',
+    nativeName: 'Basa Jawa'
+  },
   ka: {
     name: 'Georgian',
     nativeName: 'ქართული'
@@ -476,6 +500,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   kr: {
     name: 'Kanuri',
     nativeName: 'Kanuri'
+  },
+  kri: {
+    name: 'Krio',
+    nativeName: 'Krio'
   },
   ks: {
     name: 'Kashmiri',
@@ -549,6 +577,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Lithuanian',
     nativeName: 'Lietuvių'
   },
+  lus: {
+    name: 'Lushai',
+    nativeName: 'Lushai'
+  },
   lv: {
     name: 'Latvian',
     nativeName: 'Latviešu'
@@ -560,6 +592,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   mg: {
     name: 'Malagasy',
     nativeName: 'Malagasy'
+  },
+  mai: {
+    name: 'Maithili',
+    nativeName: 'मैथिली'
   },
   man: {
     name: 'Mandarin',
@@ -588,6 +624,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   mn: {
     name: 'Mongolian',
     nativeName: 'Монгол'
+  },
+  'mni-mtei': {
+    name: 'Manipuri (Meitei Mayek)',
+    nativeName: 'ꯃꯩꯇꯩꯂꯣꯟ'
   },
   mo: {
     name: 'Moldovan',
@@ -1028,6 +1068,14 @@ const languageCodes: { [Key: string]: ILanguage} = {
   zh: {
     name: 'Chinese',
     nativeName: '中文'
+  },
+  'zh-cn': {
+    name: 'Chinese (China)',
+    nativeName: '简体中文'
+  },
+  'zh-tw': {
+    name: 'Chinese (Taiwan)',
+    nativeName: '繁體中文'
   },
   'zh-classical': {
     name: 'Classical Chinese',
