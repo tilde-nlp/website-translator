@@ -81,24 +81,27 @@ export class SearchEngineOptimization {
   }
 
   private markCanonicalUrl (doc: Document, currentLocale: string, restore = false) {
-    let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement
+    let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+
     if (!link && doc.head !== null) {
       link = document.createElement('link')
       doc.head.appendChild(link)
       link.rel = 'canonical'
     }
-    if (restore) {
-      if (link.hasAttribute(ORIGINAL_URL_ATTR)) {
-        link.href = link.getAttribute(ORIGINAL_URL_ATTR)
+    if (link !== null) {
+      if (restore) {
+        if (link.hasAttribute(ORIGINAL_URL_ATTR)) {
+          link.href = link.getAttribute(ORIGINAL_URL_ATTR)
+        }
       }
-    }
-    else {
-      const localizedUrl = this.localizeUrl(new URL(doc.URL), currentLocale)
-
-      if (!link.hasAttribute(ORIGINAL_URL_ATTR)) {
-        link.setAttribute(ORIGINAL_URL_ATTR, link.href || doc.location.href)
+      else {
+        const localizedUrl = this.localizeUrl(new URL(doc.URL), currentLocale)
+  
+        if (!link.hasAttribute(ORIGINAL_URL_ATTR)) {
+          link.setAttribute(ORIGINAL_URL_ATTR, link.href || doc.location.href)
+        }
+        link.href = localizedUrl
       }
-      link.href = localizedUrl
     }
   }
 
