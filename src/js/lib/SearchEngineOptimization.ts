@@ -111,15 +111,17 @@ export class SearchEngineOptimization {
 
     for (const locale of availableLocales) {
       const localizedUrl = this.localizeUrl(new URL(doc.URL), locale)
-      const existingLink = doc.head.querySelector(`link[rel="alternate"][hreflang="${locale}"]`)
+      if (doc.head !== null) {
+        const existingLink = doc.head.querySelector(`link[rel="alternate"][hreflang="${locale}"]`)
 
-      if (!existingLink) {
-        link = document.createElement('link')
-        link.rel = 'alternate'
-        link.hreflang = locale
-        link.href = localizedUrl
-
-        doc.head.appendChild(link)
+        if (!existingLink) {
+          link = document.createElement('link')
+          link.rel = 'alternate'
+          link.hreflang = locale
+          link.href = localizedUrl
+  
+          doc.head.appendChild(link)
+        }
       }
     }
   }
