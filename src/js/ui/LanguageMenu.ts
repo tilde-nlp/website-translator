@@ -13,6 +13,9 @@ import { IInternalUiOptions } from '../interfaces/IInternalUiOptions'
  * in eu2020. They need styled icons in select options for machine translated languages.
  */
 export class LanguageMenu implements ILanguageSelect {
+  // How many symbols are allowed, before language name will be shortened
+  private static readonly MENU_ITEM_MAX_LENGTH: number = 10;
+
   private menuItems: {[languageCode:string]: any};
   private items: {[id:string]: HTMLElement}
   private selectedItem: HTMLElement;
@@ -146,7 +149,9 @@ export class LanguageMenu implements ILanguageSelect {
       this.subscriptions.push(
         this.uiLocalization.subscribe({
           next: () => {
-            optionText.textContent = getLanguageName(item.langCode, this.pluginOptions, this.uiLocalization)
+            const languageName = getLanguageName(item.langCode, this.pluginOptions, this.uiLocalization);
+            optionText.textContent = languageName.length > LanguageMenu.MENU_ITEM_MAX_LENGTH ? languageName.substring(0, LanguageMenu.MENU_ITEM_MAX_LENGTH) + '...' : languageName;
+            option.title = languageName;
             if (this.pluginOptions.ui.showLanguagesInNativeLanguage) {
               optionText.setAttribute('lang', item.langCode)
             }
