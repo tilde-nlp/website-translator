@@ -6,7 +6,7 @@ $itemHoveredBackground: rgb(238, 238, 238);
 
 $machineTranslatedIconColor: $itemSelectedColor;
 
-$languageWidth: 250px;
+$languageWidth: 150px;
 $itemHeight:45px;
 
 .website-translator {
@@ -149,8 +149,10 @@ $itemHeight:45px;
           }
 
           > .text {
-            display: flex;
-            flex-grow: 1;
+            flex-grow: 1;            
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
           }
           > .icon {
             display: flex;

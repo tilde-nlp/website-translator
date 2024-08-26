@@ -146,7 +146,9 @@ export class LanguageMenu implements ILanguageSelect {
       this.subscriptions.push(
         this.uiLocalization.subscribe({
           next: () => {
-            optionText.textContent = getLanguageName(item.langCode, this.pluginOptions, this.uiLocalization)
+            const languageName = getLanguageName(item.langCode, this.pluginOptions, this.uiLocalization);
+            optionText.textContent = languageName;
+            option.title = languageName;
             if (this.pluginOptions.ui.showLanguagesInNativeLanguage) {
               optionText.setAttribute('lang', item.langCode)
             }
