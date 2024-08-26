@@ -149,8 +149,10 @@ $itemHeight:45px;
           }
 
           > .text {
-            display: flex;
-            flex-grow: 1;
+            flex-grow: 1;            
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
           }
           > .icon {
             display: flex;
