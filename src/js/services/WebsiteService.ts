@@ -8,6 +8,7 @@ import IConfiguration3 from '../interfaces/services/websiteService/v3/IConfigura
 import IWebsiteConfiguration from '../interfaces/services/websiteService/IWebsiteConfiguration'
 import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
 import { normalizeLanguageCode } from '../Common'
+import { TranslationElementCandidates } from '../lib/TranslationElementCandidates'
 
 class WebsiteService {
     private pluginOptions:IPluginOptions
@@ -54,6 +55,13 @@ class WebsiteService {
         texts: batch.map(item => {
           // This is temporary solution
           let isSEO = false
+          let elementSeoItem = TranslationElementCandidates.get(item.tagName)
+
+          if (elementSeoItem && elementSeoItem.type === TranslatableItemType.ELEMENT_SEO) {
+            item.attributeName = elementSeoItem.attributeName
+            item.description = elementSeoItem.attributeName
+            isSEO = true
+          }
           if (item.type === TranslatableItemType.ELEMENT_SEO || item.type === TranslatableItemType.ATTRIBUTE_SEO) {
             isSEO = true
           }
