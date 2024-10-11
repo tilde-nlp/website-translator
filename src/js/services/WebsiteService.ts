@@ -58,7 +58,6 @@ class WebsiteService {
           let elementSeoItem = TranslationElementCandidates.get(item.tagName)
 
           if (elementSeoItem && elementSeoItem.type === TranslatableItemType.ELEMENT_SEO) {
-            item.attributeName = item.tagName
             item.description = item.tagName
             isSEO = true
           }
