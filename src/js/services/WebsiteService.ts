@@ -81,13 +81,15 @@ class WebsiteService {
         throw Error(`API version '${this.pluginOptions.api.version}' not recognized`)
       }
 
-      axios.defaults.headers['X-Origin'] = window.location.href;
       const result = await axios.post<Array<ITranslation>>(
         url,
         data,
         {
-          cancelToken: cancelToken
-        }
+          cancelToken: cancelToken,
+          headers: {
+            "X-Origin": window.location.href,
+          }
+        },
       )
 
       return result.data
