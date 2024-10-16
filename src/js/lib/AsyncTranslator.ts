@@ -260,7 +260,7 @@ class AsyncTranslator {
           translatableItem: element,
           type: element.type,
           attributeName: null,
-          description: null,
+          description: element.type === TranslatableItemType.ELEMENT ? null : element.startMarker.parentElement.tagName,
           text: this.minimizeText(element.html),
           tagName: element.startMarker.parentElement.tagName
         }

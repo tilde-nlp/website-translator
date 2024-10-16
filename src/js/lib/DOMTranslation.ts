@@ -954,6 +954,16 @@ class DOMTranslation {
     return currentHTML
   }
 
+  /**
+   * Method to check whether translatable element is included in seo element list and should be considered as such
+   * @param elementTag
+   */
+  private isTranslatableElementSeo(elementTag: string) {
+    const elementSeoItem = TranslationElementCandidates.get(elementTag)
+
+    return !!elementSeoItem;
+  }
+
   private markTranslationRanges (
     translatableParentElements:Set<Node>,
     translatableElements:Set<Node>
@@ -976,8 +986,10 @@ class DOMTranslation {
       }
     }
     for (const range of translationRanges) {
+      const isSeo = this.isTranslatableElementSeo(range.startMarker.parentElement.tagName);
+
       range.visibleInCurrentView = DOMExtensions.elementIsVisible(range.startMarker, this.registredIframes)
-      range.type = TranslatableItemType.ELEMENT
+      range.type = isSeo ? TranslatableItemType.ELEMENT_SEO : TranslatableItemType.ELEMENT
       range.html = this.cropAndMinifyTranslationRange(range, translatableElements, range.startMarker, range.startMarker, range.endMarker)
     }
 

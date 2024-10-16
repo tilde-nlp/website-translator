@@ -55,12 +55,6 @@ class WebsiteService {
         texts: batch.map(item => {
           // This is temporary solution
           let isSEO = false
-          let elementSeoItem = TranslationElementCandidates.get(item.tagName)
-
-          if (elementSeoItem && elementSeoItem.type === TranslatableItemType.ELEMENT_SEO) {
-            item.description = item.tagName
-            isSEO = true
-          }
           if (item.type === TranslatableItemType.ELEMENT_SEO || item.type === TranslatableItemType.ATTRIBUTE_SEO) {
             isSEO = true
           }
