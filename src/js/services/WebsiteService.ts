@@ -8,7 +8,6 @@ import IConfiguration3 from '../interfaces/services/websiteService/v3/IConfigura
 import IWebsiteConfiguration from '../interfaces/services/websiteService/IWebsiteConfiguration'
 import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
 import { normalizeLanguageCode } from '../Common'
-import { TranslationElementCandidates } from '../lib/TranslationElementCandidates'
 
 class WebsiteService {
     private pluginOptions:IPluginOptions
