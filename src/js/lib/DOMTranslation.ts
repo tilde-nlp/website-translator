@@ -976,8 +976,10 @@ class DOMTranslation {
       }
     }
     for (const range of translationRanges) {
+      const isSeo = TranslationElementCandidates.get(range.startMarker.parentElement.tagName)?.type === TranslatableItemType.ELEMENT_SEO;
+
       range.visibleInCurrentView = DOMExtensions.elementIsVisible(range.startMarker, this.registredIframes)
-      range.type = TranslatableItemType.ELEMENT
+      range.type = isSeo ? TranslatableItemType.ELEMENT_SEO : TranslatableItemType.ELEMENT
       range.html = this.cropAndMinifyTranslationRange(range, translatableElements, range.startMarker, range.startMarker, range.endMarker)
     }
 
