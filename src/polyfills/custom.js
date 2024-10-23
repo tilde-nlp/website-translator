@@ -8,7 +8,7 @@ if (!Element.prototype.matches) {
 
 if (!Element.prototype.closest) {
   Element.prototype.closest = function (s) {
-    var el = this
+    var el = this;
 
     do {
       if (Element.prototype.matches.call(el, s)) return el
@@ -81,7 +81,9 @@ if (!Element.prototype.closest) {
       get: function() {
         let nodes = [];
         try {
-          nodes = this.childNodes;
+          if (this) {
+            nodes = this.childNodes;
+          }
         } catch (error) {
           console.log(error);
         }
@@ -96,8 +98,6 @@ if (!Element.prototype.closest) {
     });
   }
 })(window.Node || window.Element);
-
-
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
 /*
@@ -114,7 +114,6 @@ if (!Element.prototype.closest) {
 /*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js */
 
 if ("document" in self) {
-
   // Full polyfill for browsers with no classList support
   // Including IE < Edge missing SVGElement.classList
   if (
