@@ -569,10 +569,6 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Luxembourgish',
     nativeName: 'Lëtzebuergesch'
   },
-  lg: {
-    name: 'Ganda',
-    nativeName: 'Luganda'
-  },
   li: {
     name: 'Limburgian',
     nativeName: 'Limburgs'
