@@ -289,6 +289,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'French',
     nativeName: 'Français'
   },
+  'fr-ca': {
+    name: 'French (Canada)',
+    nativeName: 'Français (Canada)'
+  },
   frp: {
     name: 'Arpitan / Franco-Provençal',
     nativeName: 'Arpitan / francoprovençal'
@@ -369,6 +373,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Hmong',
     nativeName: '𞄀𞄩𞄰'
   },
+  hne: {
+    name: "Chhattisgarhi",
+    nativeName: "छत्तीसगढ़ी"
+  },
   ho: {
     name: 'Hiri Motu',
     nativeName: 'Hiri Motu'
@@ -376,6 +384,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   hr: {
     name: 'Croatian',
     nativeName: 'Hrvatski'
+  },
+  hsb: {
+    name: "Upper Sorbian",
+    nativeName: "Hornjoserbšćina"
   },
   ht: {
     name: 'Haitian',
@@ -417,6 +429,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Inupiak',
     nativeName: 'Iñupiak'
   },
+  ikt: {
+    name: 'Western Canadian Inuktitut',
+    nativeName: 'ᐃᓄᐃᓐᓇᖅᑐᓐ'
+  },
   ilo: {
     name: 'Ilokano',
     nativeName: 'Ilokano'
@@ -440,6 +456,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   iu: {
     name: 'Inuktitut',
     nativeName: 'ᐃᓄᒃᑎᑐᑦ'
+  },
+  'iu-latn': {
+    name: 'Inuktitut (Latin)',
+    nativeName: 'ᖃᓕᐅᔮᖅᐸᐃᑦ'
   },
   ja: {
     name: 'Japanese',
@@ -484,6 +504,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   km: {
     name: 'Cambodian',
     nativeName: 'ភាសាខ្មែរ'
+  },
+  kmr: {
+    name: 'Kurmanji',
+    nativeName: 'کورمانجی'
   },
   kn: {
     name: 'Kannada',
@@ -573,6 +597,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Laz',
     nativeName: 'Lazuri / ლაზური'
   },
+  lzh: {
+    name: 'Classical Chinese',
+    nativeName: '文言'
+  },
   lt: {
     name: 'Lithuanian',
     nativeName: 'Lietuvių'
@@ -580,6 +608,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   lus: {
     name: 'Lushai',
     nativeName: 'Lushai'
+  },
+  lug: {
+    name: 'Ganda',
+    nativeName: 'Luganda'
   },
   lv: {
     name: 'Latvian',
@@ -629,6 +661,14 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Manipuri (Meitei Mayek)',
     nativeName: 'ꯃꯩꯇꯩꯂꯣꯟ'
   },
+  'mn-cyrl': {
+    name: 'Mongolian (Cyrillic)',
+    nativeName: 'Монгол Кирилл'
+  },
+  'mn-mong': {
+    name: 'Mongolian in Mongolian script',
+    nativeName: 'Монгол'
+  },
   mo: {
     name: 'Moldovan',
     nativeName: 'Moldovenească'
@@ -656,6 +696,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   mwl: {
     name: 'Mirandese',
     nativeName: 'Mirandés'
+  },
+  mww: {
+    name: 'Hmong Daw',
+    nativeName: 'Hmoob Dawb'
   },
   my: {
     name: 'Burmese',
@@ -733,6 +777,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Chichewa',
     nativeName: 'Chi-Chewa'
   },
+  nya: {
+    name: 'Chichewa',
+    nativeName: 'ChiCheŵa'
+  },
   oc: {
     name: 'Occitan',
     nativeName: 'Occitan'
@@ -752,6 +800,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   os: {
     name: 'Ossetian / Ossetic',
     nativeName: 'Иронау'
+  },
+  otq: {
+    name: 'Northwestern Otomi',
+    nativeName: 'Querétaro Otomi'
   },
   pa: {
     name: 'Panjabi / Punjabi',
@@ -789,12 +841,20 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Piedmontese',
     nativeName: 'Piemontèis'
   },
+  prs: {
+    name: 'Persian',
+    nativeName: 'فارسی'
+  },
   ps: {
     name: 'Pashto',
     nativeName: 'پښتو'
   },
   pt: {
     name: 'Portuguese',
+    nativeName: 'Português'
+  },
+  'pt-pt': {
+    name: 'Portuguese (Portugal)',
     nativeName: 'Português'
   },
   qu: {
@@ -824,6 +884,10 @@ const languageCodes: { [Key: string]: ILanguage} = {
   ru: {
     name: 'Russian',
     nativeName: 'Русский'
+  },
+  run: {
+    name: 'Rundi',
+    nativeName: 'Ikirundi'
   },
   rw: {
     name: 'Rwandi',
@@ -896,6 +960,14 @@ const languageCodes: { [Key: string]: ILanguage} = {
   sr: {
     name: 'Serbian',
     nativeName: 'Српски'
+  },
+  'sr-cyrl': {
+    name: 'Serbian (Cyrillic)',
+    nativeName: 'Српски (ћирилица)'
+  },
+  'sr-latn': {
+    name: 'Serbian (Latin)',
+    nativeName: 'Srpski (latinica)'
   },
   ss: {
     name: 'Swati',
@@ -1061,6 +1133,14 @@ const languageCodes: { [Key: string]: ILanguage} = {
     name: 'Yoruba',
     nativeName: 'Yorùbá'
   },
+  yua: {
+    name: 'Yucatec Maya',
+    nativeName: 'Maayaʼ t’aan'
+  },
+  yue: {
+    name: 'Yue Chinese',
+    nativeName: '粤语'
+  },
   za: {
     name: 'Zhuang',
     nativeName: 'Cuengh / Tôô / 壮语'
@@ -1072,6 +1152,14 @@ const languageCodes: { [Key: string]: ILanguage} = {
   'zh-cn': {
     name: 'Chinese (China)',
     nativeName: '简体中文'
+  },
+  'zh-hans': {
+    name: 'Chinese (Simplified)',
+    nativeName: '中文'
+  },
+  'zh-hant': {
+    name: 'Chinese (Traditional)',
+    nativeName: '繁體'
   },
   'zh-tw': {
     name: 'Chinese (Taiwan)',
