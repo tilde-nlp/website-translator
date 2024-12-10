@@ -19,7 +19,6 @@ function getLanguageName (
 ):string {
   // TODO: maybe more sophisticated language name here taking into account country code
   const resolvedLangCode = normalizeLanguageCode(langCode)
-  // const resolvedLangCode = langCode.split('-')[0]
 
   let language:ILanguage
   if (pluginOptions.ui.showLanguagesInNativeLanguage) {
