@@ -31,7 +31,7 @@ export class SearchEngineOptimization {
     this.logger.debug('Applying SEO...')
 
     DOMExtensions.selectAllDocuments().forEach(doc => {
-      if (!pluginOptions.turnOffCanonicalUrls) {
+      if (pluginOptions.seo.setCanonicalUrl) {
         this.markCanonicalUrl(doc, currentLocale)
       }
       this.markAlternativePages(doc, availableLocales)
@@ -45,7 +45,7 @@ export class SearchEngineOptimization {
     this.localizeUrls(links, null)
 
     DOMExtensions.selectAllDocuments().forEach(doc => {
-      if (!pluginOptions.turnOffCanonicalUrls) {
+      if (pluginOptions.seo.setCanonicalUrl) {
         this.markCanonicalUrl(doc, null, true)
       }
     })
