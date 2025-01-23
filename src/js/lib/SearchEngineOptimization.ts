@@ -8,6 +8,7 @@
 // https://developers.google.com/search/docs/advanced/crawling/managing-multi-regional-sites?hl=en&ref_topic=2370587&visit_id=637414822196199164-1055925763&rd=1
 import { IPluginOptions } from '../interfaces/IPluginOptions'
 import { Logger } from '../Logger'
+import { pluginOptions } from '../models/PluginOptions';
 import { DOMExtensions } from './DOMExtensions'
 
 const ORIGINAL_URL_ATTR = 'wt-attr-original-url'
@@ -30,7 +31,9 @@ export class SearchEngineOptimization {
     this.logger.debug('Applying SEO...')
 
     DOMExtensions.selectAllDocuments().forEach(doc => {
-      this.markCanonicalUrl(doc, currentLocale)
+      if (!pluginOptions.turnOffCanonicalUrls) {
+        this.markCanonicalUrl(doc, currentLocale)
+      }
       this.markAlternativePages(doc, availableLocales)
     })
 
@@ -42,7 +45,9 @@ export class SearchEngineOptimization {
     this.localizeUrls(links, null)
 
     DOMExtensions.selectAllDocuments().forEach(doc => {
-      this.markCanonicalUrl(doc, null, true)
+      if (!pluginOptions.turnOffCanonicalUrls) {
+        this.markCanonicalUrl(doc, null, true)
+      }
     })
   }
 

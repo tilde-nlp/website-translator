@@ -924,7 +924,7 @@ async function Initialize () {
           uiLocalization.value.alerts.errors.translation,
           'danger',
           uiLocalization,
-          error.ErrorMessage
+          error.ErrorMessage["error"]["message"]
         )
       },
       translationCache,

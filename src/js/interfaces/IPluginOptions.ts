@@ -154,5 +154,9 @@ export interface IPluginOptions{
   /**
    * App id, this is usefull to make seperate statistics
    */
-  appID: string
+  appID: string,
+  /**
+   * Canonical url tag generation can be turned off
+   */
+  turnOffCanonicalUrls: boolean
 }
