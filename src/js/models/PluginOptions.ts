@@ -47,6 +47,9 @@ export const pluginOptions: IPluginOptions = {
       visible: null
     }
   },
+  seo: {
+    setCanonicalUrl: true
+  },
   debug: false,
   appID: 'WebsiteTranslator'
 }

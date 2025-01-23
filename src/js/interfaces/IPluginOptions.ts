@@ -148,11 +148,20 @@ export interface IPluginOptions{
     }
   },
   /**
+   * Plugin SEO
+   */
+  seo: {
+    /**
+     * Whether canonical url tag generation is set
+     */
+    setCanonicalUrl: boolean
+  }
+  /**
    * Enable verbose logging in console
    */
   debug: boolean,
   /**
    * App id, this is usefull to make seperate statistics
    */
-  appID: string
+  appID: string,
 }
