@@ -1,6 +1,6 @@
 <div align="center">
    <a href="https://translate.tilde.com/">
-    <img width="200" height="200" src="https://tilde.com/themes/custom/drupal8_zymphonies_theme/logo.svg">
+    <img width="200" height="200" src="https://tilde.ai/wp-content/uploads/2024/05/Tilde_logo_1080.png">
   </a>
 </div>
 
