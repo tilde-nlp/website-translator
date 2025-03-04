@@ -81,6 +81,12 @@ export class SearchEngineOptimization {
     })
   }
 
+  /**
+   * Updates canonical url of page
+   * @param doc
+   * @param currentLocale - selected WT widget language
+   * @param restore - whether to restore/keep the original canonical url even if currentLocale changes
+   */
   private markCanonicalUrl (doc: Document, currentLocale: string, restore = false) {
     let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
 
