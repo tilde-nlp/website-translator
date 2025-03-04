@@ -31,9 +31,7 @@ export class SearchEngineOptimization {
     this.logger.debug('Applying SEO...')
 
     DOMExtensions.selectAllDocuments().forEach(doc => {
-      if (pluginOptions.seo.setCanonicalUrl) {
-        this.markCanonicalUrl(doc, currentLocale)
-      }
+      this.markCanonicalUrl(doc, currentLocale)
       this.markAlternativePages(doc, availableLocales)
     })
 
@@ -45,9 +43,7 @@ export class SearchEngineOptimization {
     this.localizeUrls(links, null)
 
     DOMExtensions.selectAllDocuments().forEach(doc => {
-      if (pluginOptions.seo.setCanonicalUrl) {
-        this.markCanonicalUrl(doc, null, true)
-      }
+      this.markCanonicalUrl(doc, null, true)
     })
   }
 
@@ -87,6 +83,11 @@ export class SearchEngineOptimization {
 
   private markCanonicalUrl (doc: Document, currentLocale: string, restore = false) {
     let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+
+    if (!pluginOptions.seo.setCanonicalUrl) {
+      // keeps the original canonical link if setCanonicalUrl is turned off
+      restore = true;
+    }
 
     if (!link && doc.head !== null) {
       link = document.createElement('link')
