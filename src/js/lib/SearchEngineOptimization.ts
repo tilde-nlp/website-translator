@@ -88,31 +88,28 @@ export class SearchEngineOptimization {
    * @param restore - whether to restore/keep the original canonical url even if currentLocale changes
    */
   private markCanonicalUrl (doc: Document, currentLocale: string, restore = false) {
-    let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (pluginOptions.seo.setCanonicalUrl) {
+      let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
 
-    if (!pluginOptions.seo.setCanonicalUrl) {
-      // keeps the original canonical link if setCanonicalUrl is turned off
-      restore = true;
-    }
-
-    if (!link && doc.head !== null) {
-      link = document.createElement('link')
-      doc.head.appendChild(link)
-      link.rel = 'canonical'
-    }
-    if (link !== null) {
-      if (restore) {
-        if (link.hasAttribute(ORIGINAL_URL_ATTR)) {
-          link.href = link.getAttribute(ORIGINAL_URL_ATTR)
-        }
+      if (!link && doc.head !== null) {
+        link = document.createElement('link')
+        doc.head.appendChild(link)
+        link.rel = 'canonical'
       }
-      else {
-        const localizedUrl = this.localizeUrl(new URL(doc.URL), currentLocale)
-  
-        if (!link.hasAttribute(ORIGINAL_URL_ATTR)) {
-          link.setAttribute(ORIGINAL_URL_ATTR, link.href || doc.location.href)
+      if (link !== null) {
+        if (restore) {
+          if (link.hasAttribute(ORIGINAL_URL_ATTR)) {
+            link.href = link.getAttribute(ORIGINAL_URL_ATTR)
+          }
         }
-        link.href = localizedUrl
+        else {
+          const localizedUrl = this.localizeUrl(new URL(doc.URL), currentLocale)
+    
+          if (!link.hasAttribute(ORIGINAL_URL_ATTR)) {
+            link.setAttribute(ORIGINAL_URL_ATTR, link.href || doc.location.href)
+          }
+          link.href = localizedUrl
+        }
       }
     }
   }
