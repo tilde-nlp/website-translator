@@ -57,7 +57,7 @@ export class SearchEngineOptimization {
 
     docRoots.forEach(doc => {
       const link = doc.querySelector('head link[rel="canonical"]')
-      if (link !== null) {
+      if (pluginOptions.seo.setCanonicalUrl && link !== null) {
         links.push(link)
       }
     })
@@ -66,6 +66,7 @@ export class SearchEngineOptimization {
       const linkUrl = link.getAttribute('href')
       const parsedUrl = this.parseUrl(link.ownerDocument, linkUrl)
       let linkTarget:string
+
       if (parsedUrl) {
         if (currentLocale === null) {
           linkTarget = this.cachedLinkTargets.get(link)
@@ -88,28 +89,31 @@ export class SearchEngineOptimization {
    * @param restore - whether to restore/keep the original canonical url even if currentLocale changes
    */
   private markCanonicalUrl (doc: Document, currentLocale: string, restore = false) {
-    if (pluginOptions.seo.setCanonicalUrl) {
-      let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
 
-      if (!link && doc.head !== null) {
-        link = document.createElement('link')
-        doc.head.appendChild(link)
-        link.rel = 'canonical'
+    if (!pluginOptions.seo.setCanonicalUrl) {
+      // keeps the original canonical link if setCanonicalUrl is turned off
+      restore = true;
+    }
+
+    if (!link && doc.head !== null) {
+      link = document.createElement('link')
+      doc.head.appendChild(link)
+      link.rel = 'canonical'
+    }
+    if (link !== null) {
+      if (restore) {
+        if (link.hasAttribute(ORIGINAL_URL_ATTR)) {
+          link.href = link.getAttribute(ORIGINAL_URL_ATTR)
+        }
       }
-      if (link !== null) {
-        if (restore) {
-          if (link.hasAttribute(ORIGINAL_URL_ATTR)) {
-            link.href = link.getAttribute(ORIGINAL_URL_ATTR)
-          }
+      else {
+        const localizedUrl = this.localizeUrl(new URL(doc.URL), currentLocale)
+  
+        if (!link.hasAttribute(ORIGINAL_URL_ATTR)) {
+          link.setAttribute(ORIGINAL_URL_ATTR, link.href || doc.location.href)
         }
-        else {
-          const localizedUrl = this.localizeUrl(new URL(doc.URL), currentLocale)
-    
-          if (!link.hasAttribute(ORIGINAL_URL_ATTR)) {
-            link.setAttribute(ORIGINAL_URL_ATTR, link.href || doc.location.href)
-          }
-          link.href = localizedUrl
-        }
+        link.href = localizedUrl
       }
     }
   }
