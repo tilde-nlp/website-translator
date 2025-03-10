@@ -57,7 +57,7 @@ export class SearchEngineOptimization {
 
     docRoots.forEach(doc => {
       const link = doc.querySelector('head link[rel="canonical"]')
-      if (link !== null) {
+      if (pluginOptions.seo.setCanonicalUrl && link !== null) {
         links.push(link)
       }
     })
@@ -66,6 +66,7 @@ export class SearchEngineOptimization {
       const linkUrl = link.getAttribute('href')
       const parsedUrl = this.parseUrl(link.ownerDocument, linkUrl)
       let linkTarget:string
+
       if (parsedUrl) {
         if (currentLocale === null) {
           linkTarget = this.cachedLinkTargets.get(link)
