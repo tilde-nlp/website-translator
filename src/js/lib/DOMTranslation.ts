@@ -164,6 +164,11 @@ class DOMTranslation {
       }
 
       const translatedSegment = this.translatedSegments.get(translationStartMarker)
+
+      if (!translatedSegment) {
+        return null
+      }
+
       const originalHTML = DOMExtensions.stringToElement(translatedSegment.source)
       const range = focusedElement.ownerDocument.createRange()
       range.setStartBefore(translationStartMarker)
