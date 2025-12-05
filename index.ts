@@ -149,17 +149,18 @@ function translationEnter (e:MouseEvent) {
 
     if (pluginOptions.ui.showPopup) {
       translationEnterHold = null
-      tooltip.classList.add('active')
-
-      tooltip.addEventListener('mouseenter', tooltipEnter)
-      // Removes translation highlighting when mouse leaves tooltip and enters a not translatable element
-      tooltip.addEventListener('mouseleave', tooltipLeave)
 
       selectedSentenceInfo = domTranslator.selectSegmentInformation(element)
 
-        if (selectedSentenceInfo) {
-          sentenceHightlight.removeSentenceHighlight()
-          sentenceHightlight.applySentenceHighlight(element, selectedSentenceInfo.translatedRange)
+      if (selectedSentenceInfo) {
+        tooltip.classList.add('active')
+
+        tooltip.addEventListener('mouseenter', tooltipEnter)
+        // Removes translation highlighting when mouse leaves tooltip and enters a not translatable element
+        tooltip.addEventListener('mouseleave', tooltipLeave)
+
+        sentenceHightlight.removeSentenceHighlight()
+        sentenceHightlight.applySentenceHighlight(element, selectedSentenceInfo.translatedRange)
 
           tooltip.dataset.originalHtml = selectedSentenceInfo.originalHTML
           tooltip.dataset.translatedHtml = selectedSentenceInfo.translatedHTML
