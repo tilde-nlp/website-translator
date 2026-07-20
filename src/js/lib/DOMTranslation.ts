@@ -32,6 +32,7 @@ const TEXT_MARKER_START_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-S`
 const TEXT_MARKER_END_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-E`
 
 const WATCH_INTERVAL_MS = 500
+const PREFETCH_VIEWPORTS_AHEAD = 3
 
 class DOMTranslation {
   private watcherThread: ReturnType<typeof setInterval>
@@ -1075,6 +1076,42 @@ class DOMTranslation {
     collection.add(element)
   }
 
+  private isInDiscoveryWindow (element: HTMLElement) {
+    if (!element) {
+      return false
+    }
+
+    if (DOMExtensions.elementIsVisible(element, this.registredIframes)) {
+      return true
+    }
+
+    let position:DOMRect = element.getBoundingClientRect()
+    if (document !== element.ownerDocument) {
+      const closestIframe = this.registredIframes.get(element.ownerDocument.documentElement)
+      if (!closestIframe) {
+        return false
+      }
+
+      const elementIsInVisibleIframe =
+        position.x + position.width > 0 &&
+        position.y + position.height > 0 &&
+        position.x < closestIframe.clientWidth &&
+        position.y < closestIframe.scrollHeight
+
+      if (!elementIsInVisibleIframe) {
+        return false
+      }
+
+      position = closestIframe.getBoundingClientRect()
+    }
+
+    const prefetchWindowBottom = window.innerHeight * (1 + PREFETCH_VIEWPORTS_AHEAD)
+    const elementTop = position.y
+    const elementBottom = position.y + position.height
+
+    return elementBottom > 0 && elementTop < prefetchWindowBottom
+  }
+
   /**
    *
    * @param translatableParentElements
@@ -1126,7 +1163,7 @@ class DOMTranslation {
       }
       if (currentSourceLangSame && currentIsTranslatable) {
         if (mode === TranslationElementMode.VISIBLE_ELEMENTS) {
-          if (element.nodeType === Node.ELEMENT_NODE && DOMExtensions.elementIsVisible(element, this.registredIframes)) {
+          if (element.nodeType === Node.ELEMENT_NODE && this.isInDiscoveryWindow(element)) {
             // Select <option> will always be "invisible", so we need to translate it if select itself is visible
             if (element.nodeName === 'SELECT') {
               forceVisibility = true
@@ -1190,7 +1227,7 @@ class DOMTranslation {
           if (children.length === 0 && currentSourceLangSame && currentIsTranslatable) {
             const parentIsPreformattedElement = element.parentNode && element.parentNode.nodeName === 'PRE'
             if (element.textContent.trim().length > 0 || parentIsPreformattedElement) {
-              const visibleChildAllowed = mode === TranslationElementMode.VISIBLE_ELEMENTS && DOMExtensions.elementIsVisible(element.parentElement, this.registredIframes)
+              const visibleChildAllowed = mode === TranslationElementMode.VISIBLE_ELEMENTS && this.isInDiscoveryWindow(element.parentElement)
               const metadataChildAllowed = mode === TranslationElementMode.METADATA_ELEMENTS && TranslationElementCandidates.get(element.parentElement.nodeName)?.type === TranslatableItemType.ELEMENT_SEO
 
               if (visibleChildAllowed || metadataChildAllowed || forceVisibility) {
