@@ -31,11 +31,10 @@ const RAW_TEXT_NODE_WRAPPER_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-RAW-TXT`
 const TEXT_MARKER_START_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-S`
 const TEXT_MARKER_END_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-E`
 
-const WATCH_INTERVAL_MS = 500
+const SCROLL_IDLE_DEBOUNCE_MS = 500
 const PREFETCH_VIEWPORTS_AHEAD = 3
 
 class DOMTranslation {
-  private watcherThread: ReturnType<typeof setInterval>
   private translatedSegments: Map<Node, ITranslatedSegment>
   private translatableParentElements: Set<Node>
   private translatableAttributeElements: TranslationTextRange[]
@@ -55,6 +54,8 @@ class DOMTranslation {
   private xmlSerializer: XMLSerializer
 
   private mutationObserver: PausableMutationObserver
+  private onWindowScrollBound: () => void
+  private scrollWatchDebounceTimer: ReturnType<typeof setTimeout> | null
 
   constructor (
     pluginOptions: IPluginOptions,
@@ -71,6 +72,8 @@ class DOMTranslation {
     this.logger = new Logger(pluginOptions.debug, DOMTranslation.name)
     this.pluginOptions = pluginOptions
     this.xmlSerializer = new XMLSerializer()
+    this.onWindowScrollBound = this.onWindowScroll.bind(this)
+    this.scrollWatchDebounceTimer = null
 
     this.mutationObserver = new PausableMutationObserver(this.pluginOptions, this.onMutationObserved.bind(this))
   }
@@ -80,8 +83,12 @@ class DOMTranslation {
    */
   public restoreDOM () {
     this.mutationObserver.stop()
+    window.removeEventListener('scroll', this.onWindowScrollBound)
+    if (this.scrollWatchDebounceTimer) {
+      clearTimeout(this.scrollWatchDebounceTimer)
+      this.scrollWatchDebounceTimer = null
+    }
 
-    clearTimeout(this.watcherThread)
     this.restorePartialDocument()
   }
 
@@ -102,12 +109,28 @@ class DOMTranslation {
     this.translatableAttributeElements = []
     this.translatableElementRanges = []
     this.translatableElements = new Set<HTMLElement>()
+    this.scrollWatchDebounceTimer = null
 
     this.translateMetadata()
-
-    this.watcherThread = setInterval(this.watchTransaltableContent.bind(this), WATCH_INTERVAL_MS)
+    this.watchTransaltableContent()
+    window.addEventListener('scroll', this.onWindowScrollBound, { passive: true })
 
     this.mutationObserver.start()
+  }
+
+  private onWindowScroll () {
+    this.scheduleWatchTranslatableContent()
+  }
+
+  private scheduleWatchTranslatableContent () {
+    if (this.scrollWatchDebounceTimer) {
+      clearTimeout(this.scrollWatchDebounceTimer)
+    }
+
+    this.scrollWatchDebounceTimer = setTimeout(() => {
+      this.scrollWatchDebounceTimer = null
+      this.watchTransaltableContent()
+    }, SCROLL_IDLE_DEBOUNCE_MS)
   }
 
   /**
@@ -359,6 +382,9 @@ class DOMTranslation {
         nextElement.remove()
         wrapper.remove()
       }
+    }
+    else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+      this.scheduleWatchTranslatableContent()
     }
   }
 

@@ -63,6 +63,13 @@ class AsyncTranslator {
     }
   }
 
+  private getSeoChunkSettings (): IChunkSettings {
+    return {
+      maxWordsPerChunk: Number.MAX_SAFE_INTEGER,
+      maxSegmentsPerChunk: Number.MAX_SAFE_INTEGER
+    }
+  }
+
   private countWords (text:string) {
     const normalized = text.trim()
     if (normalized.length === 0) {
@@ -256,7 +263,7 @@ class AsyncTranslator {
     }
 
     const pendingItems = [...this.pendingTextRangesByKey.values()]
-    const pendingSegmentCount = this.buildTranslatableItems(pendingItems).length
+    const pendingSegmentCount = this.countTranslatableItems(pendingItems)
 
     if (pendingSegmentCount >= AsyncTranslator.MIN_SEGMENTS_BEFORE_FLUSH) {
       if (this.pendingTextFlushTimer) {
@@ -290,21 +297,25 @@ class AsyncTranslator {
   }
 
   private enqueueDiscoveredItems (items: Array<TranslationTextRange>, priority: TranslationPriority) {
-    const chunkSettings = this.getChunkSettings()
+    const chunkSettings = priority === TranslationPriority.SEO
+      ? this.getSeoChunkSettings()
+      : this.getChunkSettings()
     const batches = this.getBatches(items, chunkSettings)
     this.batchesCount = batches.length;
 
     if (batches.length > 0) {
-      const queueBatches = this.queue.getItems()
+      if (priority === TranslationPriority.Text) {
+        const queueBatches = this.queue.getItems()
 
-      for (const batch of queueBatches) {
-        this.cancelBatch(batch)
-      }
+        for (const batch of queueBatches) {
+          this.cancelBatch(batch)
+        }
 
-      if (this.queue.size() > 0) {
-        const itemsRemoved = this.queue.clear(TranslationPriority.Text)
+        if (this.queue.size() > 0) {
+          const itemsRemoved = this.queue.clear(TranslationPriority.Text)
 
-        this.itemsTotal -= itemsRemoved
+          this.itemsTotal -= itemsRemoved
+        }
       }
 
       for (const batch of batches) {
@@ -333,6 +344,27 @@ class AsyncTranslator {
     htmlString = htmlString.replace(/&nbsp;/g, ' ')
 
     return htmlString
+  }
+
+  private countTranslatableItems (translationItems:Array<TranslationTextRange>) {
+    let count = 0
+
+    translationItems.forEach(element => {
+      if (element.type === TranslatableItemType.ELEMENT || element.type === TranslatableItemType.ELEMENT_SEO) {
+        if (this.minimizeText(element.html).trim().length > 0) {
+          count++
+        }
+      }
+      else {
+        element.attributes.forEach(attribute => {
+          if (this.minimizeText(attribute.translationAtttibuteValue).trim().length > 0) {
+            count++
+          }
+        })
+      }
+    })
+
+    return count
   }
 
   /**
