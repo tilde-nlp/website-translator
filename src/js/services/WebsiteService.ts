@@ -199,7 +199,7 @@ class WebsiteService {
           text: document,
           meta: {
             seo: false,
-            tag: null,
+            tag: 'BATCH',
             attr: null,
             refAttr: null
           }
