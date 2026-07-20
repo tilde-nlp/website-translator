@@ -20,6 +20,7 @@ import { TranslationElementCandidates } from './TranslationElementCandidates'
 import IAttributeCandidate from '../interfaces/IAttributeCandidate'
 import { TranslationPriority } from '../enums/TranslationPriority'
 import { PausableMutationObserver } from './PausableMutationObserver'
+import { TranslationMode } from '../enums/TranslationMode'
 
 const WEBSITE_TRANSLATOR_PREFIX = 'TMT-WTW'
 
@@ -400,6 +401,15 @@ class DOMTranslation {
     const translationRanges = this.prepareNextTranslationRanges(translationRoots, TranslationElementMode.VISIBLE_ELEMENTS)
 
     this.onTranslationItemsDiscovered(translationRanges, TranslationPriority.Text)
+
+    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
+      this.mutationObserver.stop()
+      window.removeEventListener('scroll', this.onWindowScrollBound)
+      if (this.scrollWatchDebounceTimer) {
+        clearTimeout(this.scrollWatchDebounceTimer)
+        this.scrollWatchDebounceTimer = null
+      }
+    }
   }
 
   private prepareNextTranslationRanges (
@@ -1073,7 +1083,8 @@ class DOMTranslation {
     sourceLanguage:string,
     mode: TranslationElementMode
   ) {
-    const forceVisibility = this.pluginOptions.translation.translateWholePage && mode === TranslationElementMode.VISIBLE_ELEMENTS;
+    const singleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH
+    const forceVisibility = (this.pluginOptions.translation.translateWholePage || singleBatchMode) && mode === TranslationElementMode.VISIBLE_ELEMENTS;
 
     this.collectTextElementsChunked(
       translatableParentElements,

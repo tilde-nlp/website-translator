@@ -22,32 +22,35 @@ class WebsiteService {
     private static readonly GROUP_TAG_SID_REGEX = /\bsid\s*=\s*["']?([^"'\s>]+)["']?/i
 
     async getWebsite () {
-      const website:IWebsiteConfiguration = {
-        srcLang: null,
-        languages: []
-      }
-      if (this.pluginOptions.api.version === 1) {
-        const response = await axios.get<IWebsite>(`${this.pluginOptions.api.url}/api/translate/website/${this.pluginOptions.api.clientId}`)
-        website.srcLang = response.data.sourceLanguage
-        website.languages = response.data.targetLanguages
-      }
-      else if (this.pluginOptions.api.version === 2) {
-        const response = await axios.get<IConfiguration>(`${this.pluginOptions.api.url}/api/configurationservice/configuration/${this.pluginOptions.api.clientId}`)
+      // const website:IWebsiteConfiguration = {
+      //   srcLang: null,
+      //   languages: []
+      // }
+      // if (this.pluginOptions.api.version === 1) {
+      //   const response = await axios.get<IWebsite>(`${this.pluginOptions.api.url}/api/translate/website/${this.pluginOptions.api.clientId}`)
+      //   website.srcLang = response.data.sourceLanguage
+      //   website.languages = response.data.targetLanguages
+      // }
+      // else if (this.pluginOptions.api.version === 2) {
+      //   const response = await axios.get<IConfiguration>(`${this.pluginOptions.api.url}/api/configurationservice/configuration/${this.pluginOptions.api.clientId}`)
 
-        website.srcLang = response.data.srcLang
-        website.languages = response.data.languages.map(item => normalizeLanguageCode(item.trgLang))
-      }
-      else if (this.pluginOptions.api.version === 3) {
-        const response = await axios.get<IConfiguration3>(`${this.pluginOptions.api.url}/api/configurationservice/configuration/${this.pluginOptions.api.clientId}`)
+      //   website.srcLang = response.data.srcLang
+      //   website.languages = response.data.languages.map(item => normalizeLanguageCode(item.trgLang))
+      // }
+      // else if (this.pluginOptions.api.version === 3) {
+      //   const response = await axios.get<IConfiguration3>(`${this.pluginOptions.api.url}/api/configurationservice/configuration/${this.pluginOptions.api.clientId}`)
 
-        website.srcLang = response.data.languageDirections[0]?.srcLang
-        website.languages = response.data.languageDirections.map(item => normalizeLanguageCode(item.trgLang))
-      }
-      else {
-        throw Error(`API version '${this.pluginOptions.api.version}' not recognized`)
-      }
+      //   website.srcLang = response.data.languageDirections[0]?.srcLang
+      //   website.languages = response.data.languageDirections.map(item => normalizeLanguageCode(item.trgLang))
+      // }
+      // else {
+      //   throw Error(`API version '${this.pluginOptions.api.version}' not recognized`)
+      // }
 
-      return website
+      return {
+        srcLang: 'en',
+        languages: ['lv']
+      } as IWebsiteConfiguration
     }
 
     async translate (batch: Array<ITranslatableItem>, targetLanguage:string, pageUrl:string, cancelToken: CancelToken) {

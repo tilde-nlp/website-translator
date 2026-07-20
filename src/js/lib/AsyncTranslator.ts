@@ -13,6 +13,7 @@ import { ILocalizedLanguage } from '../interfaces/ILocalizedLanguage'
 import TranslationCache from './TranslationCache'
 import { TranslationPriority } from '../enums/TranslationPriority'
 import { ITranslationError } from '../interfaces/ITranslationError'
+import { TranslationMode } from '../enums/TranslationMode'
 
 interface IChunkSettings {
   maxWordsPerChunk: number
@@ -36,6 +37,9 @@ class AsyncTranslator {
   private translationFinishedEvent = new Event("translation-finished");
   private pendingTextRangesByKey: Map<Node, TranslationTextRange>
   private pendingTextFlushTimer: ReturnType<typeof setTimeout> | null
+  private pendingWholeSiteRangesByKey: Map<Node, TranslationTextRange>
+  private pendingWholeSiteFlushTimer: ReturnType<typeof setTimeout> | null
+  private singleBatchQueued: boolean
 
   constructor (
     private readonly websiteService:WebsiteService,
@@ -52,6 +56,9 @@ class AsyncTranslator {
     this.cancelToken = null
     this.pendingTextRangesByKey = new Map<Node, TranslationTextRange>()
     this.pendingTextFlushTimer = null
+    this.pendingWholeSiteRangesByKey = new Map<Node, TranslationTextRange>()
+    this.pendingWholeSiteFlushTimer = null
+    this.singleBatchQueued = false
 
     this.logger = new Logger(pluginOptions.debug, 'AsyncTranslator')
   }
@@ -99,6 +106,12 @@ class AsyncTranslator {
     this.itemsTranslated = 0
     this.itemsTotal = 0
     this.pendingTextRangesByKey.clear()
+    this.pendingWholeSiteRangesByKey.clear()
+    this.singleBatchQueued = false
+    if (this.pendingWholeSiteFlushTimer) {
+      clearTimeout(this.pendingWholeSiteFlushTimer)
+      this.pendingWholeSiteFlushTimer = null
+    }
     if (this.pendingTextFlushTimer) {
       clearTimeout(this.pendingTextFlushTimer)
       this.pendingTextFlushTimer = null
@@ -144,6 +157,12 @@ class AsyncTranslator {
       this.pendingTextFlushTimer = null
     }
     this.pendingTextRangesByKey.clear()
+    this.pendingWholeSiteRangesByKey.clear()
+    this.singleBatchQueued = false
+    if (this.pendingWholeSiteFlushTimer) {
+      clearTimeout(this.pendingWholeSiteFlushTimer)
+      this.pendingWholeSiteFlushTimer = null
+    }
 
     if (this.queue !== null) {
       this.queue.kill()
@@ -246,12 +265,67 @@ class AsyncTranslator {
   }
 
   private onTranslationItemDiscovered (items: Array<TranslationTextRange>, priority: TranslationPriority) {
+    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
+      this.enqueueWholeSiteSingleBatch(items)
+      return
+    }
+
     if (priority === TranslationPriority.Text) {
       this.enqueueTextItemsWithMinimumBatch(items)
       return
     }
 
     this.enqueueDiscoveredItems(items, priority)
+  }
+
+  private enqueueWholeSiteSingleBatch (items: Array<TranslationTextRange>) {
+    if (this.singleBatchQueued || !items || items.length === 0) {
+      return
+    }
+
+    for (const item of items) {
+      const itemKey = item.startMarker || item.element
+      if (itemKey) {
+        this.pendingWholeSiteRangesByKey.set(itemKey, item)
+      }
+    }
+
+    if (this.pendingWholeSiteRangesByKey.size === 0) {
+      return
+    }
+
+    // Let metadata + visible content discovery complete before emitting one merged request.
+    if (this.pendingWholeSiteFlushTimer) {
+      clearTimeout(this.pendingWholeSiteFlushTimer)
+    }
+
+    this.pendingWholeSiteFlushTimer = setTimeout(() => {
+      this.pendingWholeSiteFlushTimer = null
+      this.flushWholeSiteSingleBatch()
+    }, 0)
+  }
+
+  private flushWholeSiteSingleBatch () {
+    if (this.singleBatchQueued || this.pendingWholeSiteRangesByKey.size === 0) {
+      return
+    }
+
+    const allItems = [...this.pendingWholeSiteRangesByKey.values()]
+    this.pendingWholeSiteRangesByKey.clear()
+
+    const chunkSettings = this.getSeoChunkSettings()
+    const batches = this.getBatches(allItems, chunkSettings)
+    if (batches.length === 0) {
+      return
+    }
+
+    const mergedBatch = batches.reduce((acc, batch) => acc.concat(batch), [] as ITranslatableItem[])
+    this.queue.addItem(mergedBatch, TranslationPriority.SEO)
+    this.itemsTotal += 1
+    this.batchesCount = 1
+    this.singleBatchQueued = true
+
+    this.onProgress(this.getProgress())
   }
 
   private enqueueTextItemsWithMinimumBatch (items: Array<TranslationTextRange>) {
