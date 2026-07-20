@@ -14,9 +14,14 @@ import TranslationCache from './TranslationCache'
 import { TranslationPriority } from '../enums/TranslationPriority'
 import { ITranslationError } from '../interfaces/ITranslationError'
 
+interface IChunkSettings {
+  maxWordsPerChunk: number
+  maxSegmentsPerChunk: number
+}
+
 class AsyncTranslator {
-  private maxCharactersInBatch: number;
-  private batchSize: number;
+  private static readonly MAX_WORDS_PER_CHUNK = 1000
+  private static readonly MAX_SEGMENTS_PER_CHUNK = 20
   private concurrency: number;
   private queue: TranslationQueue;
   private cancelToken: CancelTokenSource;
@@ -37,14 +42,28 @@ class AsyncTranslator {
     private readonly translationCache:TranslationCache,
     private readonly uiLocalization: BehaviorSubject<ILocalizedLanguage>
   ) {
-    this.maxCharactersInBatch = 1000
-    this.batchSize = 20
     this.concurrency = 1
     this.translationRetries = 3
     this.queue = null
     this.cancelToken = null
 
     this.logger = new Logger(pluginOptions.debug, 'AsyncTranslator')
+  }
+
+  private getChunkSettings (): IChunkSettings {
+    return {
+      maxWordsPerChunk: AsyncTranslator.MAX_WORDS_PER_CHUNK,
+      maxSegmentsPerChunk: AsyncTranslator.MAX_SEGMENTS_PER_CHUNK
+    }
+  }
+
+  private countWords (text:string) {
+    const normalized = text.trim()
+    if (normalized.length === 0) {
+      return 0
+    }
+
+    return normalized.split(/\s+/).length
   }
 
   /**
@@ -203,7 +222,8 @@ class AsyncTranslator {
   }
 
   private onTranslationItemDiscovered (items: Array<TranslationTextRange>, priority: TranslationPriority) {
-    const batches = this.getBatches(items)
+    const chunkSettings = this.getChunkSettings()
+    const batches = this.getBatches(items, chunkSettings)
     this.batchesCount = batches.length;
 
     if (batches.length > 0) {
@@ -248,9 +268,9 @@ class AsyncTranslator {
   }
 
   /**
-   * Split all translatable texts into batches with max fixed size text in it
+    * Split all translatable texts into chunks by max words or max segments.
    */
-  private getBatches (translationItems:Array<TranslationTextRange>) {
+    private getBatches (translationItems:Array<TranslationTextRange>, chunkSettings:IChunkSettings) {
     const translatableItems: Array<ITranslatableItem> = []
     let translatableItem:ITranslatableItem
 
@@ -287,28 +307,40 @@ class AsyncTranslator {
 
     const batches:Array<Array<ITranslatableItem>> = []
     let batch:Array<ITranslatableItem> = []
-    let batchSize:number = 0
-    let charactersInBatch:number = 0
+    let wordsInBatch:number = 0
+    let segmentsInBatch:number = 0
 
     translatableItems.forEach(translatableItem => {
-      if (batchSize < this.batchSize) {
-        batch.push(translatableItem)
-        batchSize++
-        charactersInBatch += translatableItem.text.length
+      const itemWordCount = this.countWords(translatableItem.text)
+      const nextSegmentCount = segmentsInBatch + 1
+      const nextWordCount = wordsInBatch + itemWordCount
+
+      const reachedSegmentLimit = segmentsInBatch > 0 && nextSegmentCount > chunkSettings.maxSegmentsPerChunk
+      const reachedWordLimit = wordsInBatch > 0 && nextWordCount > chunkSettings.maxWordsPerChunk
+
+      if (reachedSegmentLimit || reachedWordLimit) {
+        batches.push(batch)
+        batch = []
+        wordsInBatch = 0
+        segmentsInBatch = 0
       }
 
+      batch.push(translatableItem)
+      segmentsInBatch++
+      wordsInBatch += itemWordCount
+
       if (
-        batchSize === this.batchSize ||
-        charactersInBatch >= this.maxCharactersInBatch
+        segmentsInBatch >= chunkSettings.maxSegmentsPerChunk ||
+        wordsInBatch >= chunkSettings.maxWordsPerChunk
       ) {
         batches.push(batch)
         batch = []
-        batchSize = 0
-        charactersInBatch = 0
+        wordsInBatch = 0
+        segmentsInBatch = 0
       }
     })
 
-    if (batchSize > 0) {
+    if (batch.length > 0) {
       batches.push(batch)
     }
     return batches
