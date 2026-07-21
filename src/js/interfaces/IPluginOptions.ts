@@ -50,11 +50,6 @@ export interface IPluginOptions{
     autoTranslate: boolean,
 
     /**
-     * Translate whole page immediately, without waiting while content is in screen view
-     */
-    translateWholePage: boolean,
-
-    /**
      * Translation scheduling mode.
      * chunked - default incremental translation with chunk limits.
      * single-batch - collect and translate all discovered segments in a single request.

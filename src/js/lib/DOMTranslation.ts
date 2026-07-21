@@ -1084,7 +1084,7 @@ class DOMTranslation {
     mode: TranslationElementMode
   ) {
     const singleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH
-    const forceVisibility = (this.pluginOptions.translation.translateWholePage || singleBatchMode) && mode === TranslationElementMode.VISIBLE_ELEMENTS;
+    const forceVisibility = singleBatchMode && mode === TranslationElementMode.VISIBLE_ELEMENTS;
 
     this.collectTextElementsChunked(
       translatableParentElements,

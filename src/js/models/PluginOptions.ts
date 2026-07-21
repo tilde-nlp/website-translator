@@ -13,7 +13,6 @@ export const pluginOptions: IPluginOptions = {
   },
   translation: {
     autoTranslate: true,
-    translateWholePage: false,
     mode: TranslationMode.CHUNKED,
     // systems: null,
     targetLanguages: null,
