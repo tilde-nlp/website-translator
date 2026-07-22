@@ -16,13 +16,14 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v5
         with:
-          node-version: 16
+          node-version: 20
           registry-url: https://registry.npmjs.org/
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -52,9 +53,3 @@ jobs:
         run: npm publish --access public --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-
-      - name: Show published version
-        run: |
-          echo "Published @tilde-nlp/website-translator@${PACKAGE_VERSION}"
-          echo "Beta URL: https://unpkg.com/@tilde-nlp/website-translator@beta/dist/widget.js"
-          echo "Version URL: https://unpkg.com/@tilde-nlp/website-translator@${PACKAGE_VERSION}/dist/widget.js"
