@@ -34,7 +34,8 @@ class AsyncTranslator {
   private itemsTotal:number;
   private retryTimeout = 1000;
   private batchesCount: number;
-  private translationFinishedEvent = new Event("translation-finished");
+  private static readonly TRANSLATION_FINISHED_EVENT = 'translation-finished'
+  private translationFinishedDispatched: boolean
   private pendingTextRangesByKey: Map<Node, TranslationTextRange>
   private pendingTextFlushTimer: ReturnType<typeof setTimeout> | null
   private pendingWholeSiteRangesByKey: Map<Node, TranslationTextRange>
@@ -59,6 +60,7 @@ class AsyncTranslator {
     this.pendingWholeSiteRangesByKey = new Map<Node, TranslationTextRange>()
     this.pendingWholeSiteFlushTimer = null
     this.singleBatchQueued = false
+    this.translationFinishedDispatched = false
 
     this.logger = new Logger(pluginOptions.debug, 'AsyncTranslator')
   }
@@ -108,6 +110,7 @@ class AsyncTranslator {
     this.pendingTextRangesByKey.clear()
     this.pendingWholeSiteRangesByKey.clear()
     this.singleBatchQueued = false
+    this.translationFinishedDispatched = false
     if (this.pendingWholeSiteFlushTimer) {
       clearTimeout(this.pendingWholeSiteFlushTimer)
       this.pendingWholeSiteFlushTimer = null
@@ -159,6 +162,7 @@ class AsyncTranslator {
     this.pendingTextRangesByKey.clear()
     this.pendingWholeSiteRangesByKey.clear()
     this.singleBatchQueued = false
+    this.translationFinishedDispatched = false
     if (this.pendingWholeSiteFlushTimer) {
       clearTimeout(this.pendingWholeSiteFlushTimer)
       this.pendingWholeSiteFlushTimer = null
@@ -257,11 +261,17 @@ class AsyncTranslator {
     if (this.itemsTotal === 0) {
       return 1
     }
-    if (this.batchesCount === 0 && (this.itemsTranslated / this.itemsTotal) === 1) {
-      document.dispatchEvent(this.translationFinishedEvent);
+
+    const progress = this.itemsTranslated / this.itemsTotal
+    const isSingleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH
+    const canEmitFinished = isSingleBatchMode || this.batchesCount === 0
+
+    if (!this.translationFinishedDispatched && canEmitFinished && progress === 1) {
+      document.dispatchEvent(new Event(AsyncTranslator.TRANSLATION_FINISHED_EVENT));
+      this.translationFinishedDispatched = true
     }
-    
-    return this.itemsTranslated / this.itemsTotal
+
+    return progress
   }
 
   private onTranslationItemDiscovered (items: Array<TranslationTextRange>, priority: TranslationPriority) {
