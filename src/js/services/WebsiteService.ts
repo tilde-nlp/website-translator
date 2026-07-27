@@ -27,7 +27,7 @@ class WebsiteService {
         languages: []
       }
       if (this.pluginOptions.api.version === 1) {
-        const response = await axios.get<IWebsite>(`${this.pluginOptions.api.url}/api/translate/website/${this.pluginOptions.api.clientId}`)
+        const response = await axios.get<IWebsite>(`${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}`)
         website.srcLang = response.data.sourceLanguage
         website.languages = response.data.targetLanguages
       }
