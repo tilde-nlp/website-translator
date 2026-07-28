@@ -36,9 +36,9 @@ class AsyncTranslator {
   private batchesCount: number;
   private static readonly TRANSLATION_FINISHED_EVENT = 'translation-finished'
   private translationFinishedDispatched: boolean
-  private pendingTextRangesByKey: Map<Node, TranslationTextRange>
+  private pendingTextRanges: Array<TranslationTextRange>
   private pendingTextFlushTimer: ReturnType<typeof setTimeout> | null
-  private pendingWholeSiteRangesByKey: Map<Node, TranslationTextRange>
+  private pendingWholeSiteRanges: Array<TranslationTextRange>
   private pendingWholeSiteFlushTimer: ReturnType<typeof setTimeout> | null
   private singleBatchQueued: boolean
 
@@ -55,9 +55,9 @@ class AsyncTranslator {
     this.translationRetries = 3
     this.queue = null
     this.cancelToken = null
-    this.pendingTextRangesByKey = new Map<Node, TranslationTextRange>()
+    this.pendingTextRanges = []
     this.pendingTextFlushTimer = null
-    this.pendingWholeSiteRangesByKey = new Map<Node, TranslationTextRange>()
+    this.pendingWholeSiteRanges = []
     this.pendingWholeSiteFlushTimer = null
     this.singleBatchQueued = false
     this.translationFinishedDispatched = false
@@ -107,8 +107,8 @@ class AsyncTranslator {
 
     this.itemsTranslated = 0
     this.itemsTotal = 0
-    this.pendingTextRangesByKey.clear()
-    this.pendingWholeSiteRangesByKey.clear()
+    this.pendingTextRanges = []
+    this.pendingWholeSiteRanges = []
     this.singleBatchQueued = false
     this.translationFinishedDispatched = false
     if (this.pendingWholeSiteFlushTimer) {
@@ -159,8 +159,8 @@ class AsyncTranslator {
       clearTimeout(this.pendingTextFlushTimer)
       this.pendingTextFlushTimer = null
     }
-    this.pendingTextRangesByKey.clear()
-    this.pendingWholeSiteRangesByKey.clear()
+    this.pendingTextRanges = []
+    this.pendingWholeSiteRanges = []
     this.singleBatchQueued = false
     this.translationFinishedDispatched = false
     if (this.pendingWholeSiteFlushTimer) {
@@ -294,13 +294,10 @@ class AsyncTranslator {
     }
 
     for (const item of items) {
-      const itemKey = item.startMarker || item.element
-      if (itemKey) {
-        this.pendingWholeSiteRangesByKey.set(itemKey, item)
-      }
+      this.pendingWholeSiteRanges.push(item)
     }
 
-    if (this.pendingWholeSiteRangesByKey.size === 0) {
+    if (this.pendingWholeSiteRanges.length === 0) {
       return
     }
 
@@ -316,12 +313,12 @@ class AsyncTranslator {
   }
 
   private flushWholeSiteSingleBatch () {
-    if (this.singleBatchQueued || this.pendingWholeSiteRangesByKey.size === 0) {
+    if (this.singleBatchQueued || this.pendingWholeSiteRanges.length === 0) {
       return
     }
 
-    const allItems = [...this.pendingWholeSiteRangesByKey.values()]
-    this.pendingWholeSiteRangesByKey.clear()
+    const allItems = [...this.pendingWholeSiteRanges]
+    this.pendingWholeSiteRanges = []
 
     const chunkSettings = this.getSeoChunkSettings()
     const batches = this.getBatches(allItems, chunkSettings)
@@ -340,13 +337,10 @@ class AsyncTranslator {
 
   private enqueueTextItemsWithMinimumBatch (items: Array<TranslationTextRange>) {
     for (const item of items) {
-      const itemKey = item.startMarker || item.element
-      if (itemKey) {
-        this.pendingTextRangesByKey.set(itemKey, item)
-      }
+      this.pendingTextRanges.push(item)
     }
 
-    const pendingItems = [...this.pendingTextRangesByKey.values()]
+    const pendingItems = [...this.pendingTextRanges]
     const pendingSegmentCount = this.countTranslatableItems(pendingItems)
 
     if (pendingSegmentCount >= AsyncTranslator.MIN_SEGMENTS_BEFORE_FLUSH) {
@@ -370,12 +364,12 @@ class AsyncTranslator {
   }
 
   private flushPendingTextItems () {
-    if (this.pendingTextRangesByKey.size === 0) {
+    if (this.pendingTextRanges.length === 0) {
       return
     }
 
-    const pendingItems = [...this.pendingTextRangesByKey.values()]
-    this.pendingTextRangesByKey.clear()
+    const pendingItems = [...this.pendingTextRanges]
+    this.pendingTextRanges = []
 
     this.enqueueDiscoveredItems(pendingItems, TranslationPriority.Text)
   }
