@@ -25,6 +25,7 @@ class AsyncTranslator {
   private static readonly MAX_SEGMENTS_PER_CHUNK = 20
   private static readonly MIN_SEGMENTS_BEFORE_FLUSH = 10
   private static readonly MIN_SEGMENTS_FLUSH_INTERVAL_MS = 5000
+  private static readonly SINGLE_BATCH_DISCOVERY_DELAY_MS = 5000
   private concurrency: number;
   private queue: TranslationQueue;
   private cancelToken: CancelTokenSource;
@@ -309,7 +310,7 @@ class AsyncTranslator {
     this.pendingWholeSiteFlushTimer = setTimeout(() => {
       this.pendingWholeSiteFlushTimer = null
       this.flushWholeSiteSingleBatch()
-    }, 0)
+    }, AsyncTranslator.SINGLE_BATCH_DISCOVERY_DELAY_MS)
   }
 
   private flushWholeSiteSingleBatch () {

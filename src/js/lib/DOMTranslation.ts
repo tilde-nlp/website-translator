@@ -32,7 +32,7 @@ const RAW_TEXT_NODE_WRAPPER_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-RAW-TXT`
 const TEXT_MARKER_START_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-S`
 const TEXT_MARKER_END_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-E`
 
-const SCROLL_IDLE_DEBOUNCE_MS = 500
+const SINGLE_BATCH_DISCOVERY_DELAY_MS = 5000
 const PREFETCH_VIEWPORTS_AHEAD = 3
 
 class DOMTranslation {
@@ -56,7 +56,7 @@ class DOMTranslation {
 
   private mutationObserver: PausableMutationObserver
   private onWindowScrollBound: () => void
-  private scrollWatchDebounceTimer: ReturnType<typeof setTimeout> | null
+  private singleBatchDiscoveryStopTimer: ReturnType<typeof setTimeout> | null
 
   constructor (
     pluginOptions: IPluginOptions,
@@ -74,7 +74,7 @@ class DOMTranslation {
     this.pluginOptions = pluginOptions
     this.xmlSerializer = new XMLSerializer()
     this.onWindowScrollBound = this.onWindowScroll.bind(this)
-    this.scrollWatchDebounceTimer = null
+    this.singleBatchDiscoveryStopTimer = null
 
     this.mutationObserver = new PausableMutationObserver(this.pluginOptions, this.onMutationObserved.bind(this))
   }
@@ -85,9 +85,9 @@ class DOMTranslation {
   public restoreDOM () {
     this.mutationObserver.stop()
     window.removeEventListener('scroll', this.onWindowScrollBound)
-    if (this.scrollWatchDebounceTimer) {
-      clearTimeout(this.scrollWatchDebounceTimer)
-      this.scrollWatchDebounceTimer = null
+    if (this.singleBatchDiscoveryStopTimer) {
+      clearTimeout(this.singleBatchDiscoveryStopTimer)
+      this.singleBatchDiscoveryStopTimer = null
     }
 
     this.restorePartialDocument()
@@ -110,7 +110,10 @@ class DOMTranslation {
     this.translatableAttributeElements = []
     this.translatableElementRanges = []
     this.translatableElements = new Set<HTMLElement>()
-    this.scrollWatchDebounceTimer = null
+    if (this.singleBatchDiscoveryStopTimer) {
+      clearTimeout(this.singleBatchDiscoveryStopTimer)
+      this.singleBatchDiscoveryStopTimer = null
+    }
 
     this.translateMetadata()
     this.watchTransaltableContent()
@@ -120,18 +123,7 @@ class DOMTranslation {
   }
 
   private onWindowScroll () {
-    this.scheduleWatchTranslatableContent()
-  }
-
-  private scheduleWatchTranslatableContent () {
-    if (this.scrollWatchDebounceTimer) {
-      clearTimeout(this.scrollWatchDebounceTimer)
-    }
-
-    this.scrollWatchDebounceTimer = setTimeout(() => {
-      this.scrollWatchDebounceTimer = null
-      this.watchTransaltableContent()
-    }, SCROLL_IDLE_DEBOUNCE_MS)
+    this.watchTransaltableContent()
   }
 
   /**
@@ -385,7 +377,7 @@ class DOMTranslation {
       }
     }
     else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-      this.scheduleWatchTranslatableContent()
+      this.watchTransaltableContent()
     }
   }
 
@@ -403,13 +395,20 @@ class DOMTranslation {
     this.onTranslationItemsDiscovered(translationRanges, TranslationPriority.Text)
 
     if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
+      this.scheduleSingleBatchDiscoveryStop()
+    }
+  }
+
+  private scheduleSingleBatchDiscoveryStop () {
+    if (this.singleBatchDiscoveryStopTimer) {
+      clearTimeout(this.singleBatchDiscoveryStopTimer)
+    }
+
+    this.singleBatchDiscoveryStopTimer = setTimeout(() => {
+      this.singleBatchDiscoveryStopTimer = null
       this.mutationObserver.stop()
       window.removeEventListener('scroll', this.onWindowScrollBound)
-      if (this.scrollWatchDebounceTimer) {
-        clearTimeout(this.scrollWatchDebounceTimer)
-        this.scrollWatchDebounceTimer = null
-      }
-    }
+    }, SINGLE_BATCH_DISCOVERY_DELAY_MS)
   }
 
   private prepareNextTranslationRanges (
