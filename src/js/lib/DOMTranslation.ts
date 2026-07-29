@@ -57,6 +57,7 @@ class DOMTranslation {
   private mutationObserver: PausableMutationObserver
   private onWindowScrollBound: () => void
   private singleBatchDiscoveryStopTimer: ReturnType<typeof setTimeout> | null
+  private watchContentFrameHandle: number | null
 
   constructor (
     pluginOptions: IPluginOptions,
@@ -75,6 +76,7 @@ class DOMTranslation {
     this.xmlSerializer = new XMLSerializer()
     this.onWindowScrollBound = this.onWindowScroll.bind(this)
     this.singleBatchDiscoveryStopTimer = null
+    this.watchContentFrameHandle = null
 
     this.mutationObserver = new PausableMutationObserver(this.pluginOptions, this.onMutationObserved.bind(this))
   }
@@ -85,6 +87,10 @@ class DOMTranslation {
   public restoreDOM () {
     this.mutationObserver.stop()
     window.removeEventListener('scroll', this.onWindowScrollBound)
+    if (this.watchContentFrameHandle !== null) {
+      cancelAnimationFrame(this.watchContentFrameHandle)
+      this.watchContentFrameHandle = null
+    }
     if (this.singleBatchDiscoveryStopTimer) {
       clearTimeout(this.singleBatchDiscoveryStopTimer)
       this.singleBatchDiscoveryStopTimer = null
@@ -110,6 +116,10 @@ class DOMTranslation {
     this.translatableAttributeElements = []
     this.translatableElementRanges = []
     this.translatableElements = new Set<HTMLElement>()
+    if (this.watchContentFrameHandle !== null) {
+      cancelAnimationFrame(this.watchContentFrameHandle)
+      this.watchContentFrameHandle = null
+    }
     if (this.singleBatchDiscoveryStopTimer) {
       clearTimeout(this.singleBatchDiscoveryStopTimer)
       this.singleBatchDiscoveryStopTimer = null
@@ -123,7 +133,18 @@ class DOMTranslation {
   }
 
   private onWindowScroll () {
-    this.watchTransaltableContent()
+    this.scheduleWatchTranslatableContent()
+  }
+
+  private scheduleWatchTranslatableContent () {
+    if (this.watchContentFrameHandle !== null) {
+      return
+    }
+
+    this.watchContentFrameHandle = requestAnimationFrame(() => {
+      this.watchContentFrameHandle = null
+      this.watchTransaltableContent()
+    })
   }
 
   /**
@@ -377,7 +398,7 @@ class DOMTranslation {
       }
     }
     else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-      this.watchTransaltableContent()
+      this.scheduleWatchTranslatableContent()
     }
   }
 
@@ -408,6 +429,10 @@ class DOMTranslation {
       this.singleBatchDiscoveryStopTimer = null
       this.mutationObserver.stop()
       window.removeEventListener('scroll', this.onWindowScrollBound)
+      if (this.watchContentFrameHandle !== null) {
+        cancelAnimationFrame(this.watchContentFrameHandle)
+        this.watchContentFrameHandle = null
+      }
     }, SINGLE_BATCH_DISCOVERY_DELAY_MS)
   }
 
