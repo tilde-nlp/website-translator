@@ -47,6 +47,7 @@ class DOMTranslation {
   private onTranslationEnter: EventListenerOrEventListenerObject
   private onTranslationLeave: EventListenerOrEventListenerObject
   private onTranslationItemsDiscovered: (items: Array<TranslationTextRange>, priority: TranslationPriority)=>void
+  private onSingleBatchDiscoveryCompleted: (() => void) | null
 
   private logger:Logger
   private pluginOptions: IPluginOptions
@@ -77,6 +78,7 @@ class DOMTranslation {
     this.onWindowScrollBound = this.onWindowScroll.bind(this)
     this.singleBatchDiscoveryStopTimer = null
     this.watchContentFrameHandle = null
+    this.onSingleBatchDiscoveryCompleted = null
 
     this.mutationObserver = new PausableMutationObserver(this.pluginOptions, this.onMutationObserved.bind(this))
   }
@@ -95,6 +97,7 @@ class DOMTranslation {
       clearTimeout(this.singleBatchDiscoveryStopTimer)
       this.singleBatchDiscoveryStopTimer = null
     }
+    this.onSingleBatchDiscoveryCompleted = null
 
     this.restorePartialDocument()
   }
@@ -106,9 +109,11 @@ class DOMTranslation {
    */
   public prepareDOM (
     targetLanguage: string,
-    onTranslationItemsDiscovered: (items: Array<TranslationTextRange>, priority:TranslationPriority)=>void
+    onTranslationItemsDiscovered: (items: Array<TranslationTextRange>, priority:TranslationPriority)=>void,
+    onSingleBatchDiscoveryCompleted: (() => void) | null = null
   ) {
     this.onTranslationItemsDiscovered = onTranslationItemsDiscovered
+    this.onSingleBatchDiscoveryCompleted = onSingleBatchDiscoveryCompleted
     this.markedNodesWithId = new Set<HTMLElement>()
 
     this.translatedSegments = new Map<Node, ITranslatedSegment>()
@@ -432,6 +437,9 @@ class DOMTranslation {
       if (this.watchContentFrameHandle !== null) {
         cancelAnimationFrame(this.watchContentFrameHandle)
         this.watchContentFrameHandle = null
+      }
+      if (this.onSingleBatchDiscoveryCompleted) {
+        this.onSingleBatchDiscoveryCompleted()
       }
     }, SINGLE_BATCH_DISCOVERY_DELAY_MS)
   }

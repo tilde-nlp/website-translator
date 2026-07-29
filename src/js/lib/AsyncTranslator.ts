@@ -25,7 +25,6 @@ class AsyncTranslator {
   private static readonly MAX_SEGMENTS_PER_CHUNK = 20
   private static readonly MIN_SEGMENTS_BEFORE_FLUSH = 10
   private static readonly MIN_SEGMENTS_FLUSH_INTERVAL_MS = 5000
-  private static readonly SINGLE_BATCH_DISCOVERY_DELAY_MS = 5000
   private concurrency: number;
   private queue: TranslationQueue;
   private cancelToken: CancelTokenSource;
@@ -40,8 +39,8 @@ class AsyncTranslator {
   private pendingTextRanges: Array<TranslationTextRange>
   private pendingTextFlushTimer: ReturnType<typeof setTimeout> | null
   private pendingWholeSiteRanges: Array<TranslationTextRange>
-  private pendingWholeSiteFlushTimer: ReturnType<typeof setTimeout> | null
   private singleBatchQueued: boolean
+  private singleBatchDiscoveryCompleted: boolean
 
   constructor (
     private readonly websiteService:WebsiteService,
@@ -59,8 +58,8 @@ class AsyncTranslator {
     this.pendingTextRanges = []
     this.pendingTextFlushTimer = null
     this.pendingWholeSiteRanges = []
-    this.pendingWholeSiteFlushTimer = null
     this.singleBatchQueued = false
+    this.singleBatchDiscoveryCompleted = false
     this.translationFinishedDispatched = false
 
     this.logger = new Logger(pluginOptions.debug, 'AsyncTranslator')
@@ -111,11 +110,8 @@ class AsyncTranslator {
     this.pendingTextRanges = []
     this.pendingWholeSiteRanges = []
     this.singleBatchQueued = false
+    this.singleBatchDiscoveryCompleted = false
     this.translationFinishedDispatched = false
-    if (this.pendingWholeSiteFlushTimer) {
-      clearTimeout(this.pendingWholeSiteFlushTimer)
-      this.pendingWholeSiteFlushTimer = null
-    }
     if (this.pendingTextFlushTimer) {
       clearTimeout(this.pendingTextFlushTimer)
       this.pendingTextFlushTimer = null
@@ -142,7 +138,8 @@ class AsyncTranslator {
 
     this.domTranslator.prepareDOM(
       targetLanguage,
-      this.onTranslationItemDiscovered.bind(this)
+      this.onTranslationItemDiscovered.bind(this),
+      this.onSingleBatchDiscoveryCompleted.bind(this)
     )
 
     await this.queue.drain()
@@ -163,11 +160,8 @@ class AsyncTranslator {
     this.pendingTextRanges = []
     this.pendingWholeSiteRanges = []
     this.singleBatchQueued = false
+    this.singleBatchDiscoveryCompleted = false
     this.translationFinishedDispatched = false
-    if (this.pendingWholeSiteFlushTimer) {
-      clearTimeout(this.pendingWholeSiteFlushTimer)
-      this.pendingWholeSiteFlushTimer = null
-    }
 
     if (this.queue !== null) {
       this.queue.kill()
@@ -289,6 +283,11 @@ class AsyncTranslator {
     this.enqueueDiscoveredItems(items, priority)
   }
 
+  private onSingleBatchDiscoveryCompleted () {
+    this.singleBatchDiscoveryCompleted = true
+    this.flushWholeSiteSingleBatch()
+  }
+
   private enqueueWholeSiteSingleBatch (items: Array<TranslationTextRange>) {
     if (this.singleBatchQueued || !items || items.length === 0) {
       return
@@ -302,15 +301,9 @@ class AsyncTranslator {
       return
     }
 
-    // Let metadata + visible content discovery complete before emitting one merged request.
-    if (this.pendingWholeSiteFlushTimer) {
-      clearTimeout(this.pendingWholeSiteFlushTimer)
-    }
-
-    this.pendingWholeSiteFlushTimer = setTimeout(() => {
-      this.pendingWholeSiteFlushTimer = null
+    if (this.singleBatchDiscoveryCompleted) {
       this.flushWholeSiteSingleBatch()
-    }, AsyncTranslator.SINGLE_BATCH_DISCOVERY_DELAY_MS)
+    }
   }
 
   private flushWholeSiteSingleBatch () {
