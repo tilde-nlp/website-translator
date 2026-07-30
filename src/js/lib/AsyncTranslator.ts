@@ -21,8 +21,8 @@ interface IChunkSettings {
 }
 
 class AsyncTranslator {
-  private static readonly MAX_WORDS_PER_CHUNK = 1000
-  private static readonly MAX_SEGMENTS_PER_CHUNK = 20
+  private static readonly MAX_WORDS_PER_CHUNK = 2000
+  private static readonly MAX_SEGMENTS_PER_CHUNK = 40
   private static readonly MIN_SEGMENTS_BEFORE_FLUSH = 10
   private static readonly MIN_SEGMENTS_FLUSH_INTERVAL_MS = 5000
   private concurrency: number;
