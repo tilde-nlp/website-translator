@@ -418,10 +418,6 @@ class DOMTranslation {
 
     const translationRanges = this.prepareNextTranslationRanges(translationRoots, TranslationElementMode.VISIBLE_ELEMENTS)
 
-    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
-      this.logger.debug(`Single-batch discovery pass found ${translationRanges.length} ranges`)
-    }
-
     this.onTranslationItemsDiscovered(translationRanges, TranslationPriority.Text)
 
     if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
@@ -435,15 +431,6 @@ class DOMTranslation {
     }
 
     this.singleBatchDiscoveryStopTimer = setTimeout(() => {
-      if (this.watchContentFrameHandle !== null) {
-        // A discovery pass is queued for this frame; process it first so late DOM updates are not dropped.
-        this.logger.debug('Single-batch discovery timeout hit with pending frame; forcing final discovery pass before completion')
-        cancelAnimationFrame(this.watchContentFrameHandle)
-        this.watchContentFrameHandle = null
-        this.watchTransaltableContent()
-        return
-      }
-
       this.singleBatchDiscoveryStopTimer = null
       this.mutationObserver.stop()
       window.removeEventListener('scroll', this.onWindowScrollBound)
@@ -452,7 +439,6 @@ class DOMTranslation {
         this.watchContentFrameHandle = null
       }
       if (this.onSingleBatchDiscoveryCompleted) {
-        this.logger.debug('Single-batch discovery completed after inactivity window')
         this.onSingleBatchDiscoveryCompleted()
       }
     }, SINGLE_BATCH_DISCOVERY_DELAY_MS)
