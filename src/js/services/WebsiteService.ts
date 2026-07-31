@@ -97,10 +97,14 @@ class WebsiteService {
       return result.data
     }
 
-    private buildDocumentFromRepresentatives (representatives: Array<ITranslatableItem>) {
-      return representatives
+    private buildDocumentFromTranslationItems (translationItems: Array<ITranslatableItem>) {
+      return translationItems
         .map((item, index) => `<g${index + 1}>${item.text}</g${index + 1}>`)
         .join('\n')
+    }
+
+    private createAlignmentError (reason:string) {
+      return new Error(`alignment-broken:${reason}`)
     }
 
     private parseGroupedDocument (translatedDocument:string, expectedCount:number) {
@@ -114,7 +118,7 @@ class WebsiteService {
       }
 
       if (matches.length !== expectedCount) {
-        throw new Error('alignment-broken')
+        throw this.createAlignmentError(`group-count-mismatch:expected-${expectedCount}:actual-${matches.length}`)
       }
 
       for (const match of matches) {
@@ -124,7 +128,7 @@ class WebsiteService {
         const sid = Number(sidMatch?.[1])
 
         if (!sidMatch || Number.isNaN(sid)) {
-          throw new Error('alignment-broken')
+          throw this.createAlignmentError(`invalid-sid:group-${id}`)
         }
 
         idToTranslation.set(id, {
@@ -135,7 +139,7 @@ class WebsiteService {
 
       for (let index = 1; index <= expectedCount; index++) {
         if (!idToTranslation.has(index)) {
-          throw new Error('alignment-broken')
+          throw this.createAlignmentError(`missing-group:${index}`)
         }
       }
 
@@ -148,10 +152,10 @@ class WebsiteService {
       }
 
       const isSeoBatch = batch.every(item => this.isSeoType(item))
-      const document = this.buildDocumentFromRepresentatives(batch)
+      const groupedDocument = this.buildDocumentFromTranslationItems(batch)
       const translated = await this.postTranslations([
         {
-          text: document,
+          text: groupedDocument,
           meta: {
             seo: isSeoBatch,
             tag: 'BATCH',
@@ -163,7 +167,7 @@ class WebsiteService {
 
       const translatedDocument = translated?.[0]?.translation
       if (typeof translatedDocument !== 'string') {
-        throw new Error('alignment-broken')
+        throw this.createAlignmentError('missing-translation-document')
       }
 
       const idToTranslation = this.parseGroupedDocument(translatedDocument, batch.length)

@@ -14,17 +14,14 @@ import TranslationCache from './TranslationCache'
 import { TranslationPriority } from '../enums/TranslationPriority'
 import { ITranslationError } from '../interfaces/ITranslationError'
 import { TranslationMode } from '../enums/TranslationMode'
-
-interface IChunkSettings {
-  maxWordsPerChunk: number
-  maxSegmentsPerChunk: number
-}
+import IChunkSettings from '../interfaces/IChunkSettings'
 
 class AsyncTranslator {
   private static readonly MAX_WORDS_PER_CHUNK = 2000
   private static readonly MAX_SEGMENTS_PER_CHUNK = 40
   private static readonly MIN_SEGMENTS_BEFORE_FLUSH = 10
   private static readonly MIN_SEGMENTS_FLUSH_INTERVAL_MS = 5000
+  private static readonly TRANSLATION_FINISHED_EVENT = 'translation-finished'
   private concurrency: number;
   private queue: TranslationQueue;
   private cancelToken: CancelTokenSource;
@@ -34,7 +31,6 @@ class AsyncTranslator {
   private itemsTotal:number;
   private retryTimeout = 1000;
   private batchesCount: number;
-  private static readonly TRANSLATION_FINISHED_EVENT = 'translation-finished'
   private translationFinishedDispatched: boolean
   private pendingTextRanges: Array<TranslationTextRange>
   private pendingTextFlushTimer: ReturnType<typeof setTimeout> | null
@@ -112,10 +108,7 @@ class AsyncTranslator {
     this.singleBatchQueued = false
     this.singleBatchDiscoveryCompleted = false
     this.translationFinishedDispatched = false
-    if (this.pendingTextFlushTimer) {
-      clearTimeout(this.pendingTextFlushTimer)
-      this.pendingTextFlushTimer = null
-    }
+    this.clearPendingTextFlushTimer()
 
     const localCancelToken = (this.cancelToken = axios.CancelToken.source())
 
@@ -153,10 +146,7 @@ class AsyncTranslator {
      */
   public cancel () {
     this.logger.debug('Canceling previous translations')
-    if (this.pendingTextFlushTimer) {
-      clearTimeout(this.pendingTextFlushTimer)
-      this.pendingTextFlushTimer = null
-    }
+    this.clearPendingTextFlushTimer()
     this.pendingTextRanges = []
     this.pendingWholeSiteRanges = []
     this.singleBatchQueued = false
@@ -329,6 +319,21 @@ class AsyncTranslator {
     this.onProgress(this.getProgress())
   }
 
+  private clearPendingTextFlushTimer () {
+    if (this.pendingTextFlushTimer) {
+      clearTimeout(this.pendingTextFlushTimer)
+      this.pendingTextFlushTimer = null
+    }
+  }
+
+  private schedulePendingTextFlush () {
+    this.clearPendingTextFlushTimer()
+    this.pendingTextFlushTimer = setTimeout(() => {
+      this.pendingTextFlushTimer = null
+      this.flushPendingTextItems()
+    }, AsyncTranslator.MIN_SEGMENTS_FLUSH_INTERVAL_MS)
+  }
+
   private enqueueTextItemsWithMinimumBatch (items: Array<TranslationTextRange>) {
     for (const item of items) {
       this.pendingTextRanges.push(item)
@@ -338,23 +343,13 @@ class AsyncTranslator {
     const pendingSegmentCount = this.countTranslatableItems(pendingItems)
 
     if (pendingSegmentCount >= AsyncTranslator.MIN_SEGMENTS_BEFORE_FLUSH) {
-      if (this.pendingTextFlushTimer) {
-        clearTimeout(this.pendingTextFlushTimer)
-        this.pendingTextFlushTimer = null
-      }
+      this.clearPendingTextFlushTimer()
       this.flushPendingTextItems()
       return
     }
 
     // Under threshold: flush only after inactivity window.
-    if (this.pendingTextFlushTimer) {
-      clearTimeout(this.pendingTextFlushTimer)
-    }
-
-    this.pendingTextFlushTimer = setTimeout(() => {
-      this.pendingTextFlushTimer = null
-      this.flushPendingTextItems()
-    }, AsyncTranslator.MIN_SEGMENTS_FLUSH_INTERVAL_MS)
+    this.schedulePendingTextFlush()
   }
 
   private flushPendingTextItems () {
