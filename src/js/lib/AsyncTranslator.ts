@@ -175,14 +175,44 @@ class AsyncTranslator {
     targetLanguage:string,
     priority: TranslationPriority
   ) {
+    const deduplicatedBatch = this.buildDeduplicatedBatch(batch, targetLanguage)
+    const translationResolution = this.buildTranslationResolution(deduplicatedBatch.uniqueBatch, targetLanguage)
+
     for (let retry = 0; retry < this.translationRetries; retry++) {
       try {
         // TODO: what about iframe urls?
         const url = document.location.pathname
 
-        const translations = await this.websiteService.translate(batch, targetLanguage, url, localCancelToken.token)
+        if (translationResolution.missingItems.length > 0) {
+          const translatedMissingItems = await this.websiteService.translate(
+            translationResolution.missingItems,
+            targetLanguage,
+            url,
+            localCancelToken.token
+          )
 
-        this.processTranslation(batch, translations, targetLanguage, processedTranslations)
+          translatedMissingItems.forEach((translatedItem, index) => {
+            const uniqueBatchIndex = translationResolution.missingIndexes[index]
+            if (uniqueBatchIndex === undefined) {
+              return
+            }
+
+            translationResolution.resolvedTranslations[uniqueBatchIndex] = translatedItem
+
+            const sourceItem = deduplicatedBatch.uniqueBatch[uniqueBatchIndex]
+            const cacheKey = this.getTranslationCacheKey(sourceItem)
+            if (typeof translatedItem?.translation === 'string') {
+              this.translationCache.set(cacheKey, targetLanguage, translatedItem.translation)
+            }
+          })
+        }
+
+        const expandedTranslations = this.expandDeduplicatedTranslations(
+          translationResolution.resolvedTranslations,
+          deduplicatedBatch.sourceIndexToUniqueIndex
+        )
+
+        this.processTranslation(batch, expandedTranslations, targetLanguage, processedTranslations)
 
         this.itemsTranslated++
         this.onProgress(this.getProgress())
@@ -580,6 +610,91 @@ class AsyncTranslator {
       else {
         this.logger.error(`Translation item type: '${element.type}' not recognized`)
       }
+    })
+  }
+
+  private buildDeduplicatedBatch (batch:Array<ITranslatableItem>, targetLanguage:string) {
+    const uniqueBatch:Array<ITranslatableItem> = []
+    const sourceIndexToUniqueIndex:Array<number> = []
+    const keyToUniqueIndex = new Map<string, number>()
+
+    batch.forEach((item, sourceIndex) => {
+      const deduplicationKey = this.getDeduplicationKey(item, targetLanguage)
+      let uniqueIndex = keyToUniqueIndex.get(deduplicationKey)
+
+      if (uniqueIndex === undefined) {
+        uniqueIndex = uniqueBatch.length
+        uniqueBatch.push(item)
+        keyToUniqueIndex.set(deduplicationKey, uniqueIndex)
+      }
+
+      sourceIndexToUniqueIndex[sourceIndex] = uniqueIndex
+    })
+
+    return {
+      uniqueBatch,
+      sourceIndexToUniqueIndex
+    }
+  }
+
+  private getDeduplicationKey (item:ITranslatableItem, targetLanguage:string) {
+    const cacheKey = this.getTranslationCacheKey(item)
+
+    return `${targetLanguage}|${cacheKey}`
+  }
+
+  private getTranslationCacheKey (item:ITranslatableItem) {
+    const normalizedText = item.text
+      .trim()
+      .replace(/\s+/g, ' ')
+
+    return `${item.type}|${item.attributeName || ''}|${normalizedText}`
+  }
+
+  private buildTranslationResolution (uniqueBatch:Array<ITranslatableItem>, targetLanguage:string) {
+    const resolvedTranslations:Array<any> = new Array(uniqueBatch.length)
+    const missingItems:Array<ITranslatableItem> = []
+    const missingIndexes:Array<number> = []
+
+    uniqueBatch.forEach((item, index) => {
+      const cacheKey = this.getTranslationCacheKey(item)
+      const cachedTranslation = this.translationCache.get(cacheKey, targetLanguage)
+
+      if (typeof cachedTranslation === 'string') {
+        resolvedTranslations[index] = {
+          segmentId: 0,
+          translation: cachedTranslation
+        }
+        return
+      }
+
+      missingItems.push(item)
+      missingIndexes.push(index)
+    })
+
+    return {
+      resolvedTranslations,
+      missingItems,
+      missingIndexes
+    }
+  }
+
+  private expandDeduplicatedTranslations (
+    translatedUniqueBatch:Array<any>,
+    sourceIndexToUniqueIndex:Array<number>
+  ) {
+    return sourceIndexToUniqueIndex.map(uniqueIndex => {
+      const translated = translatedUniqueBatch[uniqueIndex]
+
+      if (!translated) {
+        this.logger.warn(`Missing translated value for deduplicated item index '${uniqueIndex}'`)
+        return {
+          segmentId: 0,
+          translation: ''
+        }
+      }
+
+      return translated
     })
   }
 }
