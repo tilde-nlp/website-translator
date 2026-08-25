@@ -1,6 +1,7 @@
 import { IPluginOptions } from '../interfaces/IPluginOptions'
 import { PluginUILanguageType } from '../enums/PluginUILanguageType'
 import { PluginToolbarPositionType } from '../enums/ToolbarPositionType'
+import { TranslationMode } from '../enums/TranslationMode'
 
 export const pluginOptions: IPluginOptions = {
   sourceLanguage: 'en',
@@ -12,7 +13,7 @@ export const pluginOptions: IPluginOptions = {
   },
   translation: {
     autoTranslate: true,
-    translateWholePage: false,
+    mode: TranslationMode.CHUNKED,
     // systems: null,
     targetLanguages: null,
     translateOnlyAllowedTags: false,

@@ -18,9 +18,12 @@ class WebsiteService {
       this.pluginOptions = pluginOptions
     }
 
+    private static readonly GROUP_TAG_REGEX = /<g(\d+)\b([^>]*)>([\s\S]*?)<\/g\1>/g
+    private static readonly GROUP_TAG_SID_REGEX = /\bsid\s*=\s*["']?([^"'\s>]+)["']?/i
+
     async getWebsite () {
       const website:IWebsiteConfiguration = {
-        srcLang: null,
+        srcLang: '',
         languages: []
       }
       if (this.pluginOptions.api.version === 1) {
@@ -48,42 +51,41 @@ class WebsiteService {
     }
 
     async translate (batch: Array<ITranslatableItem>, targetLanguage:string, pageUrl:string, cancelToken: CancelToken) {
+      return await this.translateUsingGroupedDocument(batch, targetLanguage, pageUrl, cancelToken)
+    }
+
+    private isAttributeType (item: ITranslatableItem) {
+      return item.type === TranslatableItemType.ATTRIBUTE || item.type === TranslatableItemType.ATTRIBUTE_SEO
+    }
+
+    private isSeoType (item: ITranslatableItem) {
+      return item.type === TranslatableItemType.ELEMENT_SEO || item.type === TranslatableItemType.ATTRIBUTE_SEO
+    }
+
+    private stripHtmlToPlainText (html:string) {
+      const tmpElement = document.createElement('div')
+      tmpElement.innerHTML = html
+      return (tmpElement.textContent || '').trim()
+    }
+
+    private buildUrlAndPayload (texts: Array<{text: string, meta: any}>, targetLanguage:string, pageUrl:string) {
       const data = {
         lang: targetLanguage,
         URL: pageUrl,
-        texts: batch.map(item => {
-          // This is temporary solution
-          let isSEO = false
-          if (item.type === TranslatableItemType.ELEMENT_SEO || item.type === TranslatableItemType.ATTRIBUTE_SEO) {
-            isSEO = true
-          }
+        texts: texts
+      }
 
-          return {
-            text: item.text,
-            meta: {
-              seo: isSEO,
-              tag: item.tagName,
-              attr: item.attributeName,
-              refAttr: item.description
-            }
-          }
-        })
-      }
-      let url:string
-      if (this.pluginOptions.api.version === 1) {
-        url = `${this.pluginOptions.api.url}/api/translate/website/${this.pluginOptions.api.clientId}/translate`
-      }
-      else if (this.pluginOptions.api.version <= 3 ) {
-        data.lang = data.lang.toUpperCase()
-        url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate`
-      }
-      else {
-        throw Error(`API version '${this.pluginOptions.api.version}' not recognized`)
-      }
+      const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate/batch`
+
+      return { url, data }
+    }
+
+    private async postTranslations (texts: Array<{text: string, meta: any}>, targetLanguage:string, pageUrl:string, cancelToken: CancelToken) {
+      const request = this.buildUrlAndPayload(texts, targetLanguage, pageUrl)
 
       const result = await axios.post<Array<ITranslation>>(
-        url,
-        data,
+        request.url,
+        request.data,
         {
           cancelToken: cancelToken,
           headers: {
@@ -94,6 +96,96 @@ class WebsiteService {
 
       return result.data
     }
+
+    private buildDocumentFromTranslationItems (translationItems: Array<ITranslatableItem>) {
+      return translationItems
+        .map((item, index) => `<g${index + 1}>${item.text}</g${index + 1}>`)
+        .join('\n')
+    }
+
+    private createAlignmentError (reason:string) {
+      return new Error(`alignment-broken:${reason}`)
+    }
+
+    private parseGroupedDocument (translatedDocument:string, expectedCount:number) {
+      const idToTranslation = new Map<number, {translation: string, segmentId: number}>()
+      const regex = new RegExp(WebsiteService.GROUP_TAG_REGEX.source, 'g')
+      const matches: RegExpExecArray[] = []
+      let match: RegExpExecArray | null
+
+      while ((match = regex.exec(translatedDocument)) !== null) {
+        matches.push(match)
+      }
+
+      if (matches.length !== expectedCount) {
+        throw this.createAlignmentError(`group-count-mismatch:expected-${expectedCount}:actual-${matches.length}`)
+      }
+
+      for (const match of matches) {
+        const id = Number(match[1])
+        const attributes = match[2] || ''
+        const sidMatch = attributes.match(WebsiteService.GROUP_TAG_SID_REGEX)
+        const sid = Number(sidMatch?.[1])
+
+        if (!sidMatch || Number.isNaN(sid)) {
+          throw this.createAlignmentError(`invalid-sid:group-${id}`)
+        }
+
+        idToTranslation.set(id, {
+          translation: (match[3] || '').trim(),
+          segmentId: sid
+        })
+      }
+
+      for (let index = 1; index <= expectedCount; index++) {
+        if (!idToTranslation.has(index)) {
+          throw this.createAlignmentError(`missing-group:${index}`)
+        }
+      }
+
+      return idToTranslation
+    }
+
+    private async translateUsingGroupedDocument (batch: Array<ITranslatableItem>, targetLanguage:string, pageUrl:string, cancelToken: CancelToken) {
+      if (batch.length === 0) {
+        return []
+      }
+
+      const isSeoBatch = batch.every(item => this.isSeoType(item))
+      const groupedDocument = this.buildDocumentFromTranslationItems(batch)
+      const translated = await this.postTranslations([
+        {
+          text: groupedDocument,
+          meta: {
+            seo: isSeoBatch,
+            tag: 'BATCH',
+            attr: null,
+            refAttr: null
+          }
+        }
+      ], targetLanguage, pageUrl, cancelToken)
+
+      const translatedDocument = translated?.[0]?.translation
+      if (typeof translatedDocument !== 'string') {
+        throw this.createAlignmentError('missing-translation-document')
+      }
+
+      const idToTranslation = this.parseGroupedDocument(translatedDocument, batch.length)
+
+      return batch.map((item, index) => {
+        const translatedItem = idToTranslation.get(index + 1)
+        let translatedText = translatedItem?.translation
+        if (this.isAttributeType(item)) {
+          translatedText = this.stripHtmlToPlainText(translatedText || '')
+        }
+
+        return {
+          segmentId: translatedItem?.segmentId || 0,
+          translation: translatedText || ''
+        }
+      })
+    }
+
 }
 
 export default WebsiteService

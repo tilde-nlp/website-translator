@@ -13,10 +13,15 @@ import { ILocalizedLanguage } from '../interfaces/ILocalizedLanguage'
 import TranslationCache from './TranslationCache'
 import { TranslationPriority } from '../enums/TranslationPriority'
 import { ITranslationError } from '../interfaces/ITranslationError'
+import { TranslationMode } from '../enums/TranslationMode'
+import IChunkSettings from '../interfaces/IChunkSettings'
 
 class AsyncTranslator {
-  private maxCharactersInBatch: number;
-  private batchSize: number;
+  private static readonly MAX_WORDS_PER_CHUNK = 2000
+  private static readonly MAX_SEGMENTS_PER_CHUNK = 40
+  private static readonly MIN_SEGMENTS_BEFORE_FLUSH = 10
+  private static readonly MIN_SEGMENTS_FLUSH_INTERVAL_MS = 5000
+  private static readonly TRANSLATION_FINISHED_EVENT = 'translation-finished'
   private concurrency: number;
   private queue: TranslationQueue;
   private cancelToken: CancelTokenSource;
@@ -26,7 +31,12 @@ class AsyncTranslator {
   private itemsTotal:number;
   private retryTimeout = 1000;
   private batchesCount: number;
-  private translationFinishedEvent = new Event("translation-finished");
+  private translationFinishedDispatched: boolean
+  private pendingTextRanges: Array<TranslationTextRange>
+  private pendingTextFlushTimer: ReturnType<typeof setTimeout> | null
+  private pendingWholeSiteRanges: Array<TranslationTextRange>
+  private singleBatchQueued: boolean
+  private singleBatchDiscoveryCompleted: boolean
 
   constructor (
     private readonly websiteService:WebsiteService,
@@ -37,14 +47,41 @@ class AsyncTranslator {
     private readonly translationCache:TranslationCache,
     private readonly uiLocalization: BehaviorSubject<ILocalizedLanguage>
   ) {
-    this.maxCharactersInBatch = 1000
-    this.batchSize = 20
     this.concurrency = 1
     this.translationRetries = 3
     this.queue = null
     this.cancelToken = null
+    this.pendingTextRanges = []
+    this.pendingTextFlushTimer = null
+    this.pendingWholeSiteRanges = []
+    this.singleBatchQueued = false
+    this.singleBatchDiscoveryCompleted = false
+    this.translationFinishedDispatched = false
 
     this.logger = new Logger(pluginOptions.debug, 'AsyncTranslator')
+  }
+
+  private getChunkSettings (): IChunkSettings {
+    return {
+      maxWordsPerChunk: AsyncTranslator.MAX_WORDS_PER_CHUNK,
+      maxSegmentsPerChunk: AsyncTranslator.MAX_SEGMENTS_PER_CHUNK
+    }
+  }
+
+  private getSeoChunkSettings (): IChunkSettings {
+    return {
+      maxWordsPerChunk: Number.MAX_SAFE_INTEGER,
+      maxSegmentsPerChunk: Number.MAX_SAFE_INTEGER
+    }
+  }
+
+  private countWords (text:string) {
+    const normalized = text.trim()
+    if (normalized.length === 0) {
+      return 0
+    }
+
+    return normalized.split(/\s+/).length
   }
 
   /**
@@ -66,6 +103,12 @@ class AsyncTranslator {
 
     this.itemsTranslated = 0
     this.itemsTotal = 0
+    this.pendingTextRanges = []
+    this.pendingWholeSiteRanges = []
+    this.singleBatchQueued = false
+    this.singleBatchDiscoveryCompleted = false
+    this.translationFinishedDispatched = false
+    this.clearPendingTextFlushTimer()
 
     const localCancelToken = (this.cancelToken = axios.CancelToken.source())
 
@@ -88,7 +131,8 @@ class AsyncTranslator {
 
     this.domTranslator.prepareDOM(
       targetLanguage,
-      this.onTranslationItemDiscovered.bind(this)
+      this.onTranslationItemDiscovered.bind(this),
+      this.onSingleBatchDiscoveryCompleted.bind(this)
     )
 
     await this.queue.drain()
@@ -102,6 +146,13 @@ class AsyncTranslator {
      */
   public cancel () {
     this.logger.debug('Canceling previous translations')
+    this.clearPendingTextFlushTimer()
+    this.pendingTextRanges = []
+    this.pendingWholeSiteRanges = []
+    this.singleBatchQueued = false
+    this.singleBatchDiscoveryCompleted = false
+    this.translationFinishedDispatched = false
+
     if (this.queue !== null) {
       this.queue.kill()
     }
@@ -124,14 +175,44 @@ class AsyncTranslator {
     targetLanguage:string,
     priority: TranslationPriority
   ) {
+    const deduplicatedBatch = this.buildDeduplicatedBatch(batch, targetLanguage)
+    const translationResolution = this.buildTranslationResolution(deduplicatedBatch.uniqueBatch, targetLanguage)
+
     for (let retry = 0; retry < this.translationRetries; retry++) {
       try {
         // TODO: what about iframe urls?
         const url = document.location.pathname
 
-        const translations = await this.websiteService.translate(batch, targetLanguage, url, localCancelToken.token)
+        if (translationResolution.missingItems.length > 0) {
+          const translatedMissingItems = await this.websiteService.translate(
+            translationResolution.missingItems,
+            targetLanguage,
+            url,
+            localCancelToken.token
+          )
 
-        this.processTranslation(batch, translations, targetLanguage, processedTranslations)
+          translatedMissingItems.forEach((translatedItem, index) => {
+            const uniqueBatchIndex = translationResolution.missingIndexes[index]
+            if (uniqueBatchIndex === undefined) {
+              return
+            }
+
+            translationResolution.resolvedTranslations[uniqueBatchIndex] = translatedItem
+
+            const sourceItem = deduplicatedBatch.uniqueBatch[uniqueBatchIndex]
+            const cacheKey = this.getTranslationCacheKey(sourceItem)
+            if (typeof translatedItem?.translation === 'string') {
+              this.translationCache.set(cacheKey, targetLanguage, translatedItem.translation)
+            }
+          })
+        }
+
+        const expandedTranslations = this.expandDeduplicatedTranslations(
+          translationResolution.resolvedTranslations,
+          deduplicatedBatch.sourceIndexToUniqueIndex
+        )
+
+        this.processTranslation(batch, expandedTranslations, targetLanguage, processedTranslations)
 
         this.itemsTranslated++
         this.onProgress(this.getProgress())
@@ -195,28 +276,143 @@ class AsyncTranslator {
     if (this.itemsTotal === 0) {
       return 1
     }
-    if (this.batchesCount === 0 && (this.itemsTranslated / this.itemsTotal) === 1) {
-      document.dispatchEvent(this.translationFinishedEvent);
+
+    const progress = this.itemsTranslated / this.itemsTotal
+    const isSingleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH
+    const canEmitFinished = isSingleBatchMode || this.batchesCount === 0
+
+    if (!this.translationFinishedDispatched && canEmitFinished && progress === 1) {
+      document.dispatchEvent(new Event(AsyncTranslator.TRANSLATION_FINISHED_EVENT));
+      this.translationFinishedDispatched = true
     }
-    
-    return this.itemsTranslated / this.itemsTotal
+
+    return progress
   }
 
   private onTranslationItemDiscovered (items: Array<TranslationTextRange>, priority: TranslationPriority) {
-    const batches = this.getBatches(items)
+    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
+      this.enqueueWholeSiteSingleBatch(items)
+      return
+    }
+
+    if (priority === TranslationPriority.Text) {
+      this.enqueueTextItemsWithMinimumBatch(items)
+      return
+    }
+
+    this.enqueueDiscoveredItems(items, priority)
+  }
+
+  private onSingleBatchDiscoveryCompleted () {
+    this.singleBatchDiscoveryCompleted = true
+    this.flushWholeSiteSingleBatch()
+  }
+
+  private enqueueWholeSiteSingleBatch (items: Array<TranslationTextRange>) {
+    if (this.singleBatchQueued || !items || items.length === 0) {
+      return
+    }
+
+    for (const item of items) {
+      this.pendingWholeSiteRanges.push(item)
+    }
+
+    if (this.pendingWholeSiteRanges.length === 0) {
+      return
+    }
+
+    if (this.singleBatchDiscoveryCompleted) {
+      this.flushWholeSiteSingleBatch()
+    }
+  }
+
+  private flushWholeSiteSingleBatch () {
+    if (this.singleBatchQueued || this.pendingWholeSiteRanges.length === 0) {
+      return
+    }
+
+    const allItems = [...this.pendingWholeSiteRanges]
+    this.pendingWholeSiteRanges = []
+
+    const chunkSettings = this.getSeoChunkSettings()
+    const batches = this.getBatches(allItems, chunkSettings)
+    if (batches.length === 0) {
+      return
+    }
+
+    const mergedBatch = batches.reduce((acc, batch) => acc.concat(batch), [] as ITranslatableItem[])
+    this.queue.addItem(mergedBatch, TranslationPriority.SEO)
+    this.itemsTotal += 1
+    this.batchesCount = 1
+    this.singleBatchQueued = true
+
+    this.onProgress(this.getProgress())
+  }
+
+  private clearPendingTextFlushTimer () {
+    if (this.pendingTextFlushTimer) {
+      clearTimeout(this.pendingTextFlushTimer)
+      this.pendingTextFlushTimer = null
+    }
+  }
+
+  private schedulePendingTextFlush () {
+    this.clearPendingTextFlushTimer()
+    this.pendingTextFlushTimer = setTimeout(() => {
+      this.pendingTextFlushTimer = null
+      this.flushPendingTextItems()
+    }, AsyncTranslator.MIN_SEGMENTS_FLUSH_INTERVAL_MS)
+  }
+
+  private enqueueTextItemsWithMinimumBatch (items: Array<TranslationTextRange>) {
+    for (const item of items) {
+      this.pendingTextRanges.push(item)
+    }
+
+    const pendingItems = [...this.pendingTextRanges]
+    const pendingSegmentCount = this.countTranslatableItems(pendingItems)
+
+    if (pendingSegmentCount >= AsyncTranslator.MIN_SEGMENTS_BEFORE_FLUSH) {
+      this.clearPendingTextFlushTimer()
+      this.flushPendingTextItems()
+      return
+    }
+
+    // Under threshold: flush only after inactivity window.
+    this.schedulePendingTextFlush()
+  }
+
+  private flushPendingTextItems () {
+    if (this.pendingTextRanges.length === 0) {
+      return
+    }
+
+    const pendingItems = [...this.pendingTextRanges]
+    this.pendingTextRanges = []
+
+    this.enqueueDiscoveredItems(pendingItems, TranslationPriority.Text)
+  }
+
+  private enqueueDiscoveredItems (items: Array<TranslationTextRange>, priority: TranslationPriority) {
+    const chunkSettings = priority === TranslationPriority.SEO
+      ? this.getSeoChunkSettings()
+      : this.getChunkSettings()
+    const batches = this.getBatches(items, chunkSettings)
     this.batchesCount = batches.length;
 
     if (batches.length > 0) {
-      const queueBatches = this.queue.getItems()
+      if (priority === TranslationPriority.Text) {
+        const queueBatches = this.queue.getItems()
 
-      for (const batch of queueBatches) {
-        this.cancelBatch(batch)
-      }
+        for (const batch of queueBatches) {
+          this.cancelBatch(batch)
+        }
 
-      if (this.queue.size() > 0) {
-        const itemsRemoved = this.queue.clear(TranslationPriority.Text)
+        if (this.queue.size() > 0) {
+          const itemsRemoved = this.queue.clear(TranslationPriority.Text)
 
-        this.itemsTotal -= itemsRemoved
+          this.itemsTotal -= itemsRemoved
+        }
       }
 
       for (const batch of batches) {
@@ -247,22 +443,45 @@ class AsyncTranslator {
     return htmlString
   }
 
+  private countTranslatableItems (translationItems:Array<TranslationTextRange>) {
+    let count = 0
+
+    translationItems.forEach(element => {
+      if (element.type === TranslatableItemType.ELEMENT || element.type === TranslatableItemType.ELEMENT_SEO) {
+        if (this.minimizeText(element.html).trim().length > 0) {
+          count++
+        }
+      }
+      else {
+        element.attributes.forEach(attribute => {
+          if (this.minimizeText(attribute.translationAtttibuteValue).trim().length > 0) {
+            count++
+          }
+        })
+      }
+    })
+
+    return count
+  }
+
   /**
-   * Split all translatable texts into batches with max fixed size text in it
+    * Split all translatable texts into chunks by max words or max segments.
    */
-  private getBatches (translationItems:Array<TranslationTextRange>) {
+  private buildTranslatableItems (translationItems:Array<TranslationTextRange>) {
     const translatableItems: Array<ITranslatableItem> = []
     let translatableItem:ITranslatableItem
 
     translationItems.forEach(element => {
+      const resolvedTagName = element.startMarker?.parentElement?.tagName || element.element?.tagName || ''
+
       if (element.type === TranslatableItemType.ELEMENT || element.type === TranslatableItemType.ELEMENT_SEO) {
         translatableItem = {
           translatableItem: element,
           type: element.type,
           attributeName: null,
-          description: element.type === TranslatableItemType.ELEMENT ? null : element.startMarker.parentElement.tagName,
+          description: element.type === TranslatableItemType.ELEMENT ? null : resolvedTagName,
           text: this.minimizeText(element.html),
-          tagName: element.startMarker.parentElement.tagName
+          tagName: resolvedTagName
         }
         if (translatableItem.text.trim().length > 0) {
           translatableItems.push(translatableItem)
@@ -276,7 +495,7 @@ class AsyncTranslator {
             attributeName: attribute.translationAtttibuteName,
             description: attribute.descriptionAttributeValue,
             text: this.minimizeText(attribute.translationAtttibuteValue),
-            tagName: element.element.tagName
+            tagName: resolvedTagName
           }
           if (translatableItem.text.trim().length > 0) {
             translatableItems.push(translatableItem)
@@ -285,30 +504,48 @@ class AsyncTranslator {
       }
     })
 
+    return translatableItems
+  }
+
+  private getBatches (translationItems:Array<TranslationTextRange>, chunkSettings:IChunkSettings) {
+    const translatableItems = this.buildTranslatableItems(translationItems)
+
     const batches:Array<Array<ITranslatableItem>> = []
     let batch:Array<ITranslatableItem> = []
-    let batchSize:number = 0
-    let charactersInBatch:number = 0
+    let wordsInBatch:number = 0
+    let segmentsInBatch:number = 0
 
     translatableItems.forEach(translatableItem => {
-      if (batchSize < this.batchSize) {
-        batch.push(translatableItem)
-        batchSize++
-        charactersInBatch += translatableItem.text.length
+      const itemWordCount = this.countWords(translatableItem.text)
+      const nextSegmentCount = segmentsInBatch + 1
+      const nextWordCount = wordsInBatch + itemWordCount
+
+      const reachedSegmentLimit = segmentsInBatch > 0 && nextSegmentCount > chunkSettings.maxSegmentsPerChunk
+      const reachedWordLimit = wordsInBatch > 0 && nextWordCount > chunkSettings.maxWordsPerChunk
+
+      if (reachedSegmentLimit || reachedWordLimit) {
+        batches.push(batch)
+        batch = []
+        wordsInBatch = 0
+        segmentsInBatch = 0
       }
 
+      batch.push(translatableItem)
+      segmentsInBatch++
+      wordsInBatch += itemWordCount
+
       if (
-        batchSize === this.batchSize ||
-        charactersInBatch >= this.maxCharactersInBatch
+        segmentsInBatch >= chunkSettings.maxSegmentsPerChunk ||
+        wordsInBatch >= chunkSettings.maxWordsPerChunk
       ) {
         batches.push(batch)
         batch = []
-        batchSize = 0
-        charactersInBatch = 0
+        wordsInBatch = 0
+        segmentsInBatch = 0
       }
     })
 
-    if (batchSize > 0) {
+    if (batch.length > 0) {
       batches.push(batch)
     }
     return batches
@@ -373,6 +610,91 @@ class AsyncTranslator {
       else {
         this.logger.error(`Translation item type: '${element.type}' not recognized`)
       }
+    })
+  }
+
+  private buildDeduplicatedBatch (batch:Array<ITranslatableItem>, targetLanguage:string) {
+    const uniqueBatch:Array<ITranslatableItem> = []
+    const sourceIndexToUniqueIndex:Array<number> = []
+    const keyToUniqueIndex = new Map<string, number>()
+
+    batch.forEach((item, sourceIndex) => {
+      const deduplicationKey = this.getDeduplicationKey(item, targetLanguage)
+      let uniqueIndex = keyToUniqueIndex.get(deduplicationKey)
+
+      if (uniqueIndex === undefined) {
+        uniqueIndex = uniqueBatch.length
+        uniqueBatch.push(item)
+        keyToUniqueIndex.set(deduplicationKey, uniqueIndex)
+      }
+
+      sourceIndexToUniqueIndex[sourceIndex] = uniqueIndex
+    })
+
+    return {
+      uniqueBatch,
+      sourceIndexToUniqueIndex
+    }
+  }
+
+  private getDeduplicationKey (item:ITranslatableItem, targetLanguage:string) {
+    const cacheKey = this.getTranslationCacheKey(item)
+
+    return `${targetLanguage}|${cacheKey}`
+  }
+
+  private getTranslationCacheKey (item:ITranslatableItem) {
+    const normalizedText = item.text
+      .trim()
+      .replace(/\s+/g, ' ')
+
+    return `${item.type}|${item.attributeName || ''}|${normalizedText}`
+  }
+
+  private buildTranslationResolution (uniqueBatch:Array<ITranslatableItem>, targetLanguage:string) {
+    const resolvedTranslations:Array<any> = new Array(uniqueBatch.length)
+    const missingItems:Array<ITranslatableItem> = []
+    const missingIndexes:Array<number> = []
+
+    uniqueBatch.forEach((item, index) => {
+      const cacheKey = this.getTranslationCacheKey(item)
+      const cachedTranslation = this.translationCache.get(cacheKey, targetLanguage)
+
+      if (typeof cachedTranslation === 'string') {
+        resolvedTranslations[index] = {
+          segmentId: 0,
+          translation: cachedTranslation
+        }
+        return
+      }
+
+      missingItems.push(item)
+      missingIndexes.push(index)
+    })
+
+    return {
+      resolvedTranslations,
+      missingItems,
+      missingIndexes
+    }
+  }
+
+  private expandDeduplicatedTranslations (
+    translatedUniqueBatch:Array<any>,
+    sourceIndexToUniqueIndex:Array<number>
+  ) {
+    return sourceIndexToUniqueIndex.map(uniqueIndex => {
+      const translated = translatedUniqueBatch[uniqueIndex]
+
+      if (!translated) {
+        this.logger.warn(`Missing translated value for deduplicated item index '${uniqueIndex}'`)
+        return {
+          segmentId: 0,
+          translation: ''
+        }
+      }
+
+      return translated
     })
   }
 }

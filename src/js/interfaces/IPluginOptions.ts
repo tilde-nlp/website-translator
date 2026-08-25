@@ -2,6 +2,7 @@
 
 import { PluginUILanguageType } from '../enums/PluginUILanguageType'
 import { PluginToolbarPositionType } from '../enums/ToolbarPositionType'
+import { TranslationMode } from '../enums/TranslationMode'
 
 export interface IPluginOptions{
     /**
@@ -49,9 +50,11 @@ export interface IPluginOptions{
     autoTranslate: boolean,
 
     /**
-     * Translate whole page immediately, without waiting while content is in screen view
+     * Translation scheduling mode.
+     * chunked - default incremental translation with chunk limits.
+     * single-batch - collect and translate all discovered segments in a single request.
      */
-    translateWholePage: boolean,
+    mode: TranslationMode,
 
     targetLanguages:Array<string>
     /**
