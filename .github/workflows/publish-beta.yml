@@ -1,9 +1,6 @@
 name: Publish Beta Package
 
 on:
-  push:
-    branches:
-      - feature/batch-translation-grouped-sid
   workflow_dispatch:
 
 concurrency:
