@@ -7,6 +7,7 @@ import IConfiguration from '../interfaces/services/websiteService/v2/IConfigurat
 import IConfiguration3 from '../interfaces/services/websiteService/v3/IConfiguration'
 import IWebsiteConfiguration from '../interfaces/services/websiteService/IWebsiteConfiguration'
 import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
+import IWordCountPageReportRequest from '../interfaces/services/websiteService/IWordCountPageReportRequest'
 import { normalizeLanguageCode } from '../Common'
 
 class WebsiteService {
@@ -52,6 +53,26 @@ class WebsiteService {
 
     async translate (batch: Array<ITranslatableItem>, targetLanguage:string, pageUrl:string, cancelToken: CancelToken) {
       return await this.translateUsingGroupedDocument(batch, targetLanguage, pageUrl, cancelToken)
+    }
+
+    async reportWordCountPage (segments: Array<string>, pageUrl:string, cancelToken: CancelToken) {
+      const data:IWordCountPageReportRequest = {
+        Uri: pageUrl,
+        Segments: segments
+      }
+
+      const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/pages`
+
+      await axios.post(
+        url,
+        data,
+        {
+          cancelToken: cancelToken,
+          headers: {
+            "X-Origin": window.location.href,
+          }
+        },
+      )
     }
 
     private isAttributeType (item: ITranslatableItem) {
