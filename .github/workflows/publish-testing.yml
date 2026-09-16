@@ -1,7 +1,9 @@
 name: Publish Testing Package
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - feature/word-count
 
 concurrency:
   group: publish-npm-testing
