@@ -61,7 +61,7 @@ class WebsiteService {
         Segments: segments
       }
 
-      const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/pages`
+      const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/word-count/${this.pluginOptions.api.clientId}/pages`
 
       await axios.post(
         url,
