@@ -420,7 +420,7 @@ class DOMTranslation {
 
     this.onTranslationItemsDiscovered(translationRanges, TranslationPriority.Text)
 
-    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
+    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH || this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT) {
       this.scheduleSingleBatchDiscoveryStop()
     }
   }
@@ -1115,7 +1115,7 @@ class DOMTranslation {
     sourceLanguage:string,
     mode: TranslationElementMode
   ) {
-    const singleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH
+    const singleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH || this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT
     const forceVisibility = singleBatchMode && mode === TranslationElementMode.VISIBLE_ELEMENTS;
 
     this.collectTextElementsChunked(
