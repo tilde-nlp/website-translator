@@ -24,6 +24,7 @@ import { Logger } from './src/js/Logger'
 import { DataStorage } from './src/js/DataStorage'
 import { PluginUILanguageType } from './src/js/enums/PluginUILanguageType'
 import { PluginToolbarPositionType } from './src/js/enums/ToolbarPositionType'
+import { TranslationMode } from './src/js/enums/TranslationMode'
 import { IInternalUiOptions } from './src/js/interfaces/IInternalUiOptions'
 import { ILanguageInfo } from './src/js/interfaces/ILanguageInfo'
 import { ILocalizedLanguage } from './src/js/interfaces/ILocalizedLanguage'
@@ -338,6 +339,7 @@ function cancel () {
 }
 
 async function translate (language:string): Promise<any> {
+  const isWordCountMode = pluginOptions.translation.mode === TranslationMode.WORD_COUNT
   const isDefaultLanguage = language === pluginOptions.sourceLanguage || language === pluginOptions.currentLanguage
   const nextLanguageIsThirdParty = pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
   const currLanguageIsThirdParty = pluginOptions.translation.thirdPartyTranslationLanguages.includes(pluginOptions.currentLanguage)
@@ -356,7 +358,7 @@ async function translate (language:string): Promise<any> {
   languageSelect.silentSelect(language)
   switchWindowLanguage(language) // If language comes after source language redirect, it will have this source language so change it.
 
-  if (pluginOptions.currentLanguage === language) {
+  if (pluginOptions.currentLanguage === language && !isWordCountMode) {
     return [Promise.resolve()]
   }
 
@@ -399,7 +401,7 @@ async function translate (language:string): Promise<any> {
   languageSelect.silentSelect(language)
   changeLanguage(language)
 
-  if (language === pluginOptions.sourceLanguage) {
+  if (language === pluginOptions.sourceLanguage && !isWordCountMode) {
     return [Promise.resolve()]
   }
 
@@ -805,7 +807,7 @@ async function Translate (languageCode: string) {
     return
   }
 
-  if (languageCode === pluginOptions.sourceLanguage) {
+  if (languageCode === pluginOptions.sourceLanguage && pluginOptions.translation.mode !== TranslationMode.WORD_COUNT) {
     logger.debug('Translating to plugin source language...')
     CancelAndRestore()
     return [Promise.resolve()]
@@ -955,7 +957,12 @@ async function Initialize () {
 
     createLanguageMenu()
     seoTool.applyLinkedPages(null, availableLocales)
-    await checkAutoTranslate()
+    if (pluginOptions.translation.mode === TranslationMode.WORD_COUNT) {
+      await translate(pluginOptions.sourceLanguage)
+    }
+    else {
+      await checkAutoTranslate()
+    }
 
     pluginInitializationComplete = true
   }

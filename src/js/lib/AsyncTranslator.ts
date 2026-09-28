@@ -175,6 +175,7 @@ class AsyncTranslator {
     targetLanguage:string,
     priority: TranslationPriority
   ) {
+    const isWordCountMode = this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT
     const deduplicatedBatch = this.buildDeduplicatedBatch(batch, targetLanguage)
     const translationResolution = this.buildTranslationResolution(deduplicatedBatch.uniqueBatch, targetLanguage)
 
@@ -183,36 +184,45 @@ class AsyncTranslator {
         // TODO: what about iframe urls?
         const url = document.location.pathname
 
-        if (translationResolution.missingItems.length > 0) {
-          const translatedMissingItems = await this.websiteService.translate(
-            translationResolution.missingItems,
-            targetLanguage,
+        if (isWordCountMode) {
+          await this.websiteService.reportWordCountPage(
+            batch.map(item => item.text),
             url,
             localCancelToken.token
           )
-
-          translatedMissingItems.forEach((translatedItem, index) => {
-            const uniqueBatchIndex = translationResolution.missingIndexes[index]
-            if (uniqueBatchIndex === undefined) {
-              return
-            }
-
-            translationResolution.resolvedTranslations[uniqueBatchIndex] = translatedItem
-
-            const sourceItem = deduplicatedBatch.uniqueBatch[uniqueBatchIndex]
-            const cacheKey = this.getTranslationCacheKey(sourceItem)
-            if (typeof translatedItem?.translation === 'string') {
-              this.translationCache.set(cacheKey, targetLanguage, translatedItem.translation)
-            }
-          })
         }
+        else {
+          if (translationResolution.missingItems.length > 0) {
+            const translatedMissingItems = await this.websiteService.translate(
+              translationResolution.missingItems,
+              targetLanguage,
+              url,
+              localCancelToken.token
+            )
 
-        const expandedTranslations = this.expandDeduplicatedTranslations(
-          translationResolution.resolvedTranslations,
-          deduplicatedBatch.sourceIndexToUniqueIndex
-        )
+            translatedMissingItems.forEach((translatedItem, index) => {
+              const uniqueBatchIndex = translationResolution.missingIndexes[index]
+              if (uniqueBatchIndex === undefined) {
+                return
+              }
 
-        this.processTranslation(batch, expandedTranslations, targetLanguage, processedTranslations)
+              translationResolution.resolvedTranslations[uniqueBatchIndex] = translatedItem
+
+              const sourceItem = deduplicatedBatch.uniqueBatch[uniqueBatchIndex]
+              const cacheKey = this.getTranslationCacheKey(sourceItem)
+              if (typeof translatedItem?.translation === 'string') {
+                this.translationCache.set(cacheKey, targetLanguage, translatedItem.translation)
+              }
+            })
+          }
+
+          const expandedTranslations = this.expandDeduplicatedTranslations(
+            translationResolution.resolvedTranslations,
+            deduplicatedBatch.sourceIndexToUniqueIndex
+          )
+
+          this.processTranslation(batch, expandedTranslations, targetLanguage, processedTranslations)
+        }
 
         this.itemsTranslated++
         this.onProgress(this.getProgress())
@@ -278,7 +288,7 @@ class AsyncTranslator {
     }
 
     const progress = this.itemsTranslated / this.itemsTotal
-    const isSingleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH
+    const isSingleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH || this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT
     const canEmitFinished = isSingleBatchMode || this.batchesCount === 0
 
     if (!this.translationFinishedDispatched && canEmitFinished && progress === 1) {
@@ -290,7 +300,7 @@ class AsyncTranslator {
   }
 
   private onTranslationItemDiscovered (items: Array<TranslationTextRange>, priority: TranslationPriority) {
-    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH) {
+    if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH || this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT) {
       this.enqueueWholeSiteSingleBatch(items)
       return
     }
