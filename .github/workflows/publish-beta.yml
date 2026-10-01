@@ -32,7 +32,7 @@ jobs:
 
       - name: Set unique beta version
         run: |
-          npm version "8.1.0-beta.${GITHUB_RUN_NUMBER}" --no-git-tag-version
+          npm version "8.2.0-beta.${GITHUB_RUN_NUMBER}" --no-git-tag-version
           VERSION=$(node -p "require('./package.json').version")
           echo "PACKAGE_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Publishing beta version: $VERSION"
