@@ -1,0 +1,55 @@
+:root {
+	background: #f8faf8;
+	color: #17211d;
+	font-family: 'Trebuchet MS', Verdana, sans-serif;
+	font-size: 16px;
+	letter-spacing: 0;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input { font: inherit; }
+h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3.7rem); line-height: 1.05; margin: .25rem 0 1rem; }
+h2 { font-size: 1.35rem; }
+p { line-height: 1.65; }
+a { color: #075f67; }
+
+button,
+.button-link {
+	background: #087f74;
+	border: 1px solid #087f74;
+	border-radius: 4px;
+	color: #fff;
+	cursor: pointer;
+	display: inline-block;
+	padding: .58rem .85rem;
+	text-decoration: none;
+}
+
+button:hover, .button-link:hover { background: #075f58; }
+button:disabled { cursor: wait; opacity: .6; }
+.button-link.secondary { background: transparent; color: #075f67; }
+.button-row { display: flex; flex-wrap: wrap; gap: .6rem; }
+.page-heading { border-bottom: 1px solid #bdc9c2; margin-bottom: 2rem; padding-bottom: 1.5rem; }
+.eyebrow { color: #a43d24; font-size: .78rem; font-weight: 700; text-transform: uppercase; }
+.test-section { margin: 1.5rem 0; }
+.sample-block { background: #fff; border: 1px solid #cbd6d0; border-left: 4px solid #d05c3d; border-radius: 4px; padding: 1rem; }
+.sample-block h2, .sample-block h3 { margin-top: 0; }
+.product-grid, .dynamic-list, .attribute-grid, .iframe-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 1.5rem 0; }
+.product-grid button, .product-grid a { margin-right: .5rem; margin-top: .5rem; }
+.controls-grid { align-items: end; display: grid; gap: 1rem; grid-template-columns: minmax(220px, 1fr) auto; }
+label { display: grid; gap: .35rem; font-weight: 700; }
+input { border: 1px solid #82968b; border-radius: 4px; min-width: 0; padding: .65rem; }
+.status { background: #edf2ef; border-left: 3px solid #087f74; padding: .6rem; }
+.attribute-grid article { display: flex; flex-direction: column; gap: .75rem; }
+.attribute-grid img { height: 120px; object-fit: contain; width: 100%; }
+.attribute-target { border-bottom: 1px dashed #17211d; padding: .5rem 0; }
+.raw-values dl { display: grid; gap: .4rem 1rem; grid-template-columns: auto 1fr; }
+.raw-values dt { font-weight: 700; }
+.raw-values dd { margin: 0; overflow-wrap: anywhere; }
+iframe { background: #fff; border: 1px solid #82968b; height: 210px; width: 100%; }
+
+@media (max-width: 700px) {
+	.controls-grid { grid-template-columns: 1fr; }
+}

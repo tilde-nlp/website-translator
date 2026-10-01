@@ -1,0 +1,30 @@
+{
+  "id": "spa-test-site.json",
+  "languageDirections": [
+    { "srcLang": "en", "trgLang": "bg", "domain": "general" },
+    { "srcLang": "en", "trgLang": "hr", "domain": "general" },
+    { "srcLang": "en", "trgLang": "cs", "domain": "general" },
+    { "srcLang": "en", "trgLang": "da", "domain": "general" },
+    { "srcLang": "en", "trgLang": "nl", "domain": "general" },
+    { "srcLang": "en", "trgLang": "et", "domain": "general" },
+    { "srcLang": "en", "trgLang": "fi", "domain": "general" },
+    { "srcLang": "en", "trgLang": "fr", "domain": "general" },
+    { "srcLang": "en", "trgLang": "de", "domain": "general" },
+    { "srcLang": "en", "trgLang": "el", "domain": "general" },
+    { "srcLang": "en", "trgLang": "hu", "domain": "general" },
+    { "srcLang": "en", "trgLang": "ga", "domain": "general" },
+    { "srcLang": "en", "trgLang": "it", "domain": "general" },
+    { "srcLang": "en", "trgLang": "lv", "domain": "general" },
+    { "srcLang": "en", "trgLang": "lt", "domain": "general" },
+    { "srcLang": "en", "trgLang": "mt", "domain": "general" },
+    { "srcLang": "en", "trgLang": "pl", "domain": "general" },
+    { "srcLang": "en", "trgLang": "pt", "domain": "general" },
+    { "srcLang": "en", "trgLang": "ro", "domain": "general" },
+    { "srcLang": "en", "trgLang": "sk", "domain": "general" },
+    { "srcLang": "en", "trgLang": "sl", "domain": "general" },
+    { "srcLang": "en", "trgLang": "es", "domain": "general" },
+    { "srcLang": "en", "trgLang": "sv", "domain": "general" },
+    { "srcLang": "en", "trgLang": "ru", "domain": "general" }
+  ],
+  "siteUrls": ["http://localhost:4200"]
+}

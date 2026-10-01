@@ -1,0 +1,15 @@
+<header class="app-header" translate="no">
+  <a class="brand" routerLink="/home">Translator SPA Lab</a>
+  <nav aria-label="Test scenarios">
+    @for (item of navigation; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
+    }
+  </nav>
+  <div class="website-translator"></div>
+</header>
+
+<main>
+  <router-outlet />
+</main>
+
+<app-debug-panel />

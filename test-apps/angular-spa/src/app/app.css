@@ -1,0 +1,52 @@
+.app-header {
+  align-items: center;
+  background: #17211d;
+  color: #fff;
+  display: grid;
+  gap: 0.9rem 1.5rem;
+  grid-template-columns: auto 1fr auto;
+  padding: 0.9rem clamp(1rem, 3vw, 2.5rem);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  color: #fff;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+nav a {
+  color: #cbd8d1;
+  padding: 0.35rem 0.55rem;
+  text-decoration: none;
+}
+
+nav a.active,
+nav a:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+main {
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 2rem clamp(1rem, 4vw, 3rem) 15rem;
+}
+
+@media (max-width: 900px) {
+  .app-header {
+    grid-template-columns: 1fr;
+    position: static;
+  }
+}
