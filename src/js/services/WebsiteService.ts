@@ -5,13 +5,17 @@ import { ITranslatableItem } from '../interfaces/ITranslatableItem'
 import { ITranslation } from '../interfaces/services/websiteService/ITranslation'
 import IConfiguration from '../interfaces/services/websiteService/v2/IConfiguration'
 import IConfiguration3 from '../interfaces/services/websiteService/v3/IConfiguration'
+import ICachedWidgetToken from '../interfaces/services/websiteService/ICachedWidgetToken'
 import IWebsiteConfiguration from '../interfaces/services/websiteService/IWebsiteConfiguration'
 import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
+import IWidgetTokenResponse from '../interfaces/services/websiteService/IWidgetTokenResponse'
 import IWordCountPageReportRequest from '../interfaces/services/websiteService/IWordCountPageReportRequest'
 import { normalizeLanguageCode } from '../Common'
 
 class WebsiteService {
     private pluginOptions:IPluginOptions
+    private readonly widgetTokens = new Map<string, ICachedWidgetToken>()
+    private readonly widgetTokenRequests = new Map<string, Promise<ICachedWidgetToken>>()
 
     constructor (
       pluginOptions:IPluginOptions
@@ -21,6 +25,9 @@ class WebsiteService {
 
     private static readonly GROUP_TAG_REGEX = /<g(\d+)\b([^>]*)>([\s\S]*?)<\/g\1>/g
     private static readonly GROUP_TAG_SID_REGEX = /\bsid\s*=\s*["']?([^"'\s>]+)["']?/i
+    private static readonly TRANSLATE_BATCH_SCOPE = 'translate:batch'
+    private static readonly WORD_COUNT_SCOPE = 'word-count:ingest'
+    private static readonly TOKEN_REFRESH_SKEW_MS = 30000
 
     async getWebsite () {
       const website:IWebsiteConfiguration = {
@@ -63,15 +70,104 @@ class WebsiteService {
 
       const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/word-count/${this.pluginOptions.api.clientId}/pages`
 
-      await axios.post(
+      await this.postProtected(
+        url,
+        data,
+        WebsiteService.WORD_COUNT_SCOPE,
+        cancelToken
+      )
+    }
+
+    private getWidgetTokenCacheKey (scope:string) {
+      return `${this.pluginOptions.api.clientId}:${scope}`
+    }
+
+    private async requestWidgetToken (scope:string) {
+      const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate/widget-token?scope=${encodeURIComponent(scope)}`
+      const response = await axios.post<IWidgetTokenResponse>(
+        url,
+        undefined,
+        {
+          headers: {
+            'X-Origin': window.location.origin
+          }
+        }
+      )
+
+      const refreshSkew = Math.min(WebsiteService.TOKEN_REFRESH_SKEW_MS, response.data.expires_in * 100)
+      return {
+        accessToken: response.data.access_token,
+        expiresAt: Date.now() + response.data.expires_in * 1000 - refreshSkew
+      }
+    }
+
+    private async getWidgetToken (scope:string, forceRefresh = false) {
+      const cacheKey = this.getWidgetTokenCacheKey(scope)
+      const cachedToken = this.widgetTokens.get(cacheKey)
+      if (!forceRefresh && cachedToken && cachedToken.expiresAt > Date.now()) {
+        return cachedToken
+      }
+
+      const pendingRequest = this.widgetTokenRequests.get(cacheKey)
+      if (pendingRequest) {
+        return await pendingRequest
+      }
+
+      const tokenRequest = this.requestWidgetToken(scope)
+      this.widgetTokenRequests.set(cacheKey, tokenRequest)
+
+      try {
+        const token = await tokenRequest
+        this.widgetTokens.set(cacheKey, token)
+        return token
+      }
+      finally {
+        if (this.widgetTokenRequests.get(cacheKey) === tokenRequest) {
+          this.widgetTokenRequests.delete(cacheKey)
+        }
+      }
+    }
+
+    private invalidateWidgetToken (scope:string, accessToken:string) {
+      const cacheKey = this.getWidgetTokenCacheKey(scope)
+      if (this.widgetTokens.get(cacheKey)?.accessToken === accessToken) {
+        this.widgetTokens.delete(cacheKey)
+      }
+    }
+
+    private async postProtected<T> (url:string, data:any, scope:string, cancelToken:CancelToken) {
+      const token = await this.getWidgetToken(scope)
+
+      try {
+        return await this.postWithWidgetToken<T>(url, data, token, cancelToken)
+      }
+      catch (error) {
+        if ((error as any)?.response?.status !== 401) {
+          throw error
+        }
+
+        this.invalidateWidgetToken(scope, token.accessToken)
+        const refreshedToken = await this.getWidgetToken(scope)
+        return await this.postWithWidgetToken<T>(url, data, refreshedToken, cancelToken)
+      }
+    }
+
+    private async postWithWidgetToken<T> (
+      url:string,
+      data:any,
+      token:ICachedWidgetToken,
+      cancelToken:CancelToken
+    ) {
+      return await axios.post<T>(
         url,
         data,
         {
           cancelToken: cancelToken,
           headers: {
-            "X-Origin": window.location.href,
+            Authorization: `Bearer ${token.accessToken}`,
+            'X-Origin': window.location.origin
           }
-        },
+        }
       )
     }
 
@@ -98,21 +194,20 @@ class WebsiteService {
 
       const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate/batch`
 
-      return { url, data }
+      return {
+        url,
+        data
+      }
     }
 
     private async postTranslations (texts: Array<{text: string, meta: any}>, targetLanguage:string, pageUrl:string, cancelToken: CancelToken) {
       const request = this.buildUrlAndPayload(texts, targetLanguage, pageUrl)
 
-      const result = await axios.post<Array<ITranslation>>(
+      const result = await this.postProtected<Array<ITranslation>>(
         request.url,
         request.data,
-        {
-          cancelToken: cancelToken,
-          headers: {
-            "X-Origin": window.location.href,
-          }
-        },
+        WebsiteService.TRANSLATE_BATCH_SCOPE,
+        cancelToken
       )
 
       return result.data
@@ -206,7 +301,5 @@ class WebsiteService {
         }
       })
     }
-
 }
-
 export default WebsiteService
