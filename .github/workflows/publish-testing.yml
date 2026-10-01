@@ -1,9 +1,7 @@
 name: Publish Testing Package
 
 on:
-  push:
-    branches:
-      - feature/use-api-token
+  workflow_dispatch:
 
 concurrency:
   group: publish-npm-testing
