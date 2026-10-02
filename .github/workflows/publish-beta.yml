@@ -1,9 +1,7 @@
 name: Publish Beta Package
 
 on:
-  push:
-    branches:
-      - main-v2
+  workflow_dispatch:
 
 concurrency:
   group: publish-npm-beta
