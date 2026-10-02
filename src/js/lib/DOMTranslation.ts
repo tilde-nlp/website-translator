@@ -401,6 +401,17 @@ class DOMTranslation {
         nextElement.remove()
         wrapper.remove()
       }
+
+      this.scheduleWatchTranslatableContent()
+    }
+    else if (mutation.type === 'attributes') {
+      const element = mutation.target as HTMLElement
+      const attributeName = mutation.attributeName
+
+      if (attributeName && this.isTranslatableAttribute(element, attributeName)) {
+        element.removeAttribute(this.getTranslationOriginalAttribute(attributeName))
+        this.scheduleWatchTranslatableContent()
+      }
     }
     else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
       this.scheduleWatchTranslatableContent()
@@ -559,6 +570,15 @@ class DOMTranslation {
       this.getAttributesFromCandidate(element, TranslationAttributeCandidates.get(null), attributes)
     }
     return attributes
+  }
+
+  private isTranslatableAttribute (element: HTMLElement, attributeName: string) {
+    const candidates = [
+      ...(TranslationAttributeCandidates.get(element.nodeName) || []),
+      ...(TranslationAttributeCandidates.get(null) || [])
+    ]
+
+    return candidates.some(candidate => candidate.translatableAttribute === attributeName)
   }
 
   private getAttributesFromCandidate (element: HTMLElement, attributeCandidates: IAttributeCandidate[], attributes:Array<ITranslationAttribute>) {

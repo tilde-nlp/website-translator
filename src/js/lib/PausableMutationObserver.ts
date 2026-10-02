@@ -12,6 +12,7 @@ export class PausableMutationObserver {
     private running:boolean
     private lockLevel: number
     private config:MutationObserverInit = {
+      attributes: true,
       characterData: true,
       childList: true,
       subtree: true
