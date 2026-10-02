@@ -1,4 +1,5 @@
 import { Component, ElementRef, inject, OnDestroy, signal } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ScenarioStateService } from '../shared/scenario-state.service';
 
 @Component({
@@ -25,7 +26,7 @@ import { ScenarioStateService } from '../shared/scenario-state.service';
       @for (frame of frames(); track frame.id) {
         <article class="sample-block">
           <h2>{{ frame.label }}</h2>
-          <iframe [attr.src]="frame.src" [title]="frame.label"></iframe>
+          <iframe [src]="frame.src" [title]="frame.label"></iframe>
         </article>
       }
       @if (lateSourceVisible()) {
@@ -44,16 +45,18 @@ import { ScenarioStateService } from '../shared/scenario-state.service';
 export class IframesComponent implements OnDestroy {
   private readonly state = inject(ScenarioStateService);
   private readonly element = inject(ElementRef<HTMLElement>);
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly timers: ReturnType<typeof setTimeout>[] = [];
   private nextId = 1;
-  protected readonly frames = signal<{ id: number; label: string; src: string }[]>([]);
+  protected readonly frames = signal<{ id: number; label: string; src: SafeResourceUrl }[]>([]);
   protected readonly lateSourceVisible = signal(false);
 
   constructor() { this.state.activate('iframes'); }
   ngOnDestroy(): void { this.timers.forEach(timer => clearTimeout(timer)); }
 
   protected insertIframe(): void {
-    this.frames.update(frames => [...frames, { id: this.nextId++, label: 'Dynamically inserted same-origin frame', src: '/iframe-content.html?fixture=dynamic' }]);
+    const src = this.sanitizer.bypassSecurityTrustResourceUrl('/iframe-content.html?fixture=dynamic');
+    this.frames.update(frames => [...frames, { id: this.nextId++, label: 'Dynamically inserted same-origin frame', src }]);
     this.state.setDynamicItemCount(this.frames().length);
   }
 

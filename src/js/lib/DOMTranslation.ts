@@ -43,6 +43,7 @@ class DOMTranslation {
   private markedNodesWithId: Set<HTMLElement>
   private translatableElements: Set<HTMLElement>
   private registredIframes: Map<HTMLElement, HTMLElement> = new Map<HTMLElement, HTMLElement>()
+  private registeredIframeLoadElements: Set<HTMLIFrameElement> = new Set<HTMLIFrameElement>()
 
   private onTranslationEnter: EventListenerOrEventListenerObject
   private onTranslationLeave: EventListenerOrEventListenerObject
@@ -89,6 +90,11 @@ class DOMTranslation {
   public restoreDOM () {
     this.mutationObserver.stop()
     window.removeEventListener('scroll', this.onWindowScrollBound)
+    for (const iframe of this.registeredIframeLoadElements) {
+      iframe.removeEventListener('load', this.onIframeLoad)
+    }
+    this.registeredIframeLoadElements.clear()
+    this.registredIframes.clear()
     if (this.watchContentFrameHandle !== null) {
       cancelAnimationFrame(this.watchContentFrameHandle)
       this.watchContentFrameHandle = null
@@ -150,6 +156,36 @@ class DOMTranslation {
       this.watchContentFrameHandle = null
       this.watchTransaltableContent()
     })
+  }
+
+  private onIframeLoad = (event: Event) => {
+    const iframe = event.currentTarget as HTMLIFrameElement
+
+    for (const [documentElement, registeredIframe] of this.registredIframes) {
+      if (registeredIframe === iframe) {
+        this.registredIframes.delete(documentElement)
+      }
+    }
+
+    this.scheduleWatchTranslatableContent()
+  }
+
+  private registerIframeLoad (iframe: HTMLIFrameElement) {
+    if (!this.registeredIframeLoadElements.has(iframe)) {
+      iframe.addEventListener('load', this.onIframeLoad)
+      this.registeredIframeLoadElements.add(iframe)
+    }
+  }
+
+  private registerAddedIframeLoads (node: Node) {
+    if (node.nodeName.toLowerCase() === 'iframe') {
+      this.registerIframeLoad(node as HTMLIFrameElement)
+    }
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as HTMLElement
+      element.querySelectorAll('iframe').forEach(iframe => this.registerIframeLoad(iframe))
+    }
   }
 
   /**
@@ -414,6 +450,7 @@ class DOMTranslation {
       }
     }
     else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+      mutation.addedNodes.forEach(node => this.registerAddedIframeLoads(node))
       this.scheduleWatchTranslatableContent()
     }
   }
@@ -1181,11 +1218,12 @@ class DOMTranslation {
         return false
       }
 
+      const iframePrefetchWindowBottom = closestIframe.clientHeight * (1 + PREFETCH_VIEWPORTS_AHEAD)
       const elementIsInVisibleIframe =
         position.x + position.width > 0 &&
         position.y + position.height > 0 &&
         position.x < closestIframe.clientWidth &&
-        position.y < closestIframe.scrollHeight
+        position.y < iframePrefetchWindowBottom
 
       if (!elementIsInVisibleIframe) {
         return false
@@ -1294,21 +1332,26 @@ class DOMTranslation {
         }
       }
 
-      if (element.nodeName.toLowerCase() === 'iframe' && DOMExtensions.canAccessIframe(element)) {
-        this.registredIframes.set(element.contentDocument.documentElement, element)
-        const frameDocument = element.contentDocument.documentElement
+      if (element.nodeName.toLowerCase() === 'iframe') {
+        const iframe = element as HTMLIFrameElement
+        this.registerIframeLoad(iframe)
 
-        this.collectTextElementsChunked(
-          translatableParentElements,
-          translatableElements,
-          frameDocument,
-          sourceLanguage,
-          currentSourceLangSame,
-          currentIsTranslatable,
-          mode,
-          forceVisibility,
-          currentParent
-        )
+        if (DOMExtensions.canAccessIframe(iframe)) {
+          this.registredIframes.set(iframe.contentDocument.documentElement, iframe)
+          const frameDocument = iframe.contentDocument.documentElement
+
+          this.collectTextElementsChunked(
+            translatableParentElements,
+            translatableElements,
+            frameDocument,
+            sourceLanguage,
+            currentSourceLangSame,
+            currentIsTranslatable,
+            mode,
+            forceVisibility,
+            currentParent
+          )
+        }
       }
       else {
         if (!this.skipElement(element)) {
