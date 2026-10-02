@@ -8,10 +8,18 @@
 
 # Website Translator
 
-[![Node.js Package](https://github.com/tilde-nlp/website-translator/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/tilde-nlp/website-translator/actions/workflows/npm-publish.yml)
+[![Publish Beta Package](https://github.com/tilde-nlp/website-translator/actions/workflows/publish-beta.yml/badge.svg)](https://github.com/tilde-nlp/website-translator/actions/workflows/publish-beta.yml)
 
 Quickly scale up from one language to a dozen!
 No coding, manual translation, or duplicated webpages! Simply select the target languages and  Website Translator will instantly translate the content. For quality control, you can review and edit translations with a visual editor.
+
+Versions `8.x` are currently published under the npm `beta` dist-tag. See the [changelog](changelog.md) for release details.
+
+```bash
+npm install @tilde-nlp/website-translator@beta
+```
+
+This installs the version currently assigned to npm's `beta` dist-tag. The tag is updated to the newest beta build after each successful beta publication. For reproducible installations, pin a full version such as `8.2.0-beta.42`.
 
 # Usage
 
