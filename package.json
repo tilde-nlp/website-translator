@@ -26,8 +26,8 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "lint": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin **/*.ts",
-    "lint:fix": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin **/*.ts --fix",
+    "lint": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin index.ts src/**/*.ts",
+    "lint:fix": "standardx --parser @typescript-eslint/parser --plugin @typescript-eslint/eslint-plugin index.ts src/**/*.ts --fix",
     "test": "jest --runInBand",
     "patch-version": "node auto_version_patch.js",
     "build:prod": "webpack --mode production",
@@ -42,6 +42,7 @@
     "ifdef-loader": "^2.3.2",
     "jest": "^27.5.1",
     "node-sass": "^7.0.1",
+    "sass": "^1.105.1",
     "sass-loader": "^12.6.0",
     "standardx": "^7.0.0",
     "style-loader": "^3.3.1",

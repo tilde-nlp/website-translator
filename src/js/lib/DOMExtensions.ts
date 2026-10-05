@@ -61,6 +61,29 @@ export class DOMExtensions {
     return result
   }
 
+  public static selectObservableRoots () {
+    const roots: Node[] = []
+
+    const collectRoots = (root: Document | ShadowRoot) => {
+      roots.push(root instanceof Document ? root.documentElement : root)
+
+      root.querySelectorAll('*').forEach(element => {
+        if (element.shadowRoot) {
+          collectRoots(element.shadowRoot)
+        }
+      })
+
+      root.querySelectorAll('iframe').forEach(iframe => {
+        if (DOMExtensions.canAccessIframe(iframe)) {
+          collectRoots(iframe.contentDocument)
+        }
+      })
+    }
+
+    collectRoots(document)
+    return roots
+  }
+
   /**
    * Check if element is visible in current Viewport
    * @param element

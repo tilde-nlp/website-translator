@@ -9,5 +9,8 @@
       "allowSyntheticDefaultImports": true,
       "moduleResolution": "node",
       "sourceMap": true
-    }
+    },
+    "exclude": [
+      "test-apps"
+    ]
   }

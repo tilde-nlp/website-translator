@@ -21,6 +21,7 @@ import IAttributeCandidate from '../interfaces/IAttributeCandidate'
 import { TranslationPriority } from '../enums/TranslationPriority'
 import { PausableMutationObserver } from './PausableMutationObserver'
 import { TranslationMode } from '../enums/TranslationMode'
+import { DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS } from '../models/PluginOptions'
 
 const WEBSITE_TRANSLATOR_PREFIX = 'TMT-WTW'
 
@@ -32,7 +33,6 @@ const RAW_TEXT_NODE_WRAPPER_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-RAW-TXT`
 const TEXT_MARKER_START_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-S`
 const TEXT_MARKER_END_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-E`
 
-const SINGLE_BATCH_DISCOVERY_DELAY_MS = 5000
 const PREFETCH_VIEWPORTS_AHEAD = 3
 
 class DOMTranslation {
@@ -43,6 +43,7 @@ class DOMTranslation {
   private markedNodesWithId: Set<HTMLElement>
   private translatableElements: Set<HTMLElement>
   private registredIframes: Map<HTMLElement, HTMLElement> = new Map<HTMLElement, HTMLElement>()
+  private registeredIframeLoadElements: Set<HTMLIFrameElement> = new Set<HTMLIFrameElement>()
 
   private onTranslationEnter: EventListenerOrEventListenerObject
   private onTranslationLeave: EventListenerOrEventListenerObject
@@ -88,7 +89,13 @@ class DOMTranslation {
    */
   public restoreDOM () {
     this.mutationObserver.stop()
+    this.mutationObserver.clearRoots()
     window.removeEventListener('scroll', this.onWindowScrollBound)
+    for (const iframe of this.registeredIframeLoadElements) {
+      iframe.removeEventListener('load', this.onIframeLoad)
+    }
+    this.registeredIframeLoadElements.clear()
+    this.registredIframes.clear()
     if (this.watchContentFrameHandle !== null) {
       cancelAnimationFrame(this.watchContentFrameHandle)
       this.watchContentFrameHandle = null
@@ -150,6 +157,36 @@ class DOMTranslation {
       this.watchContentFrameHandle = null
       this.watchTransaltableContent()
     })
+  }
+
+  private onIframeLoad = (event: Event) => {
+    const iframe = event.currentTarget as HTMLIFrameElement
+
+    for (const [documentElement, registeredIframe] of this.registredIframes) {
+      if (registeredIframe === iframe) {
+        this.registredIframes.delete(documentElement)
+      }
+    }
+
+    this.scheduleWatchTranslatableContent()
+  }
+
+  private registerIframeLoad (iframe: HTMLIFrameElement) {
+    if (!this.registeredIframeLoadElements.has(iframe)) {
+      iframe.addEventListener('load', this.onIframeLoad)
+      this.registeredIframeLoadElements.add(iframe)
+    }
+  }
+
+  private registerAddedIframeLoads (node: Node) {
+    if (node.nodeName.toLowerCase() === 'iframe') {
+      this.registerIframeLoad(node as HTMLIFrameElement)
+    }
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as HTMLElement
+      element.querySelectorAll('iframe').forEach(iframe => this.registerIframeLoad(iframe))
+    }
   }
 
   /**
@@ -401,13 +438,28 @@ class DOMTranslation {
         nextElement.remove()
         wrapper.remove()
       }
+
+      this.scheduleWatchTranslatableContent()
+    }
+    else if (mutation.type === 'attributes') {
+      const element = mutation.target as HTMLElement
+      const attributeName = mutation.attributeName
+
+      if (attributeName && this.isTranslatableAttribute(element, attributeName)) {
+        element.removeAttribute(this.getTranslationOriginalAttribute(attributeName))
+        this.scheduleWatchTranslatableContent()
+      }
     }
     else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+      mutation.addedNodes.forEach(node => this.registerAddedIframeLoads(node))
+      this.mutationObserver.observeNewRoots()
       this.scheduleWatchTranslatableContent()
     }
   }
 
   private watchTransaltableContent () {
+    this.mutationObserver.observeNewRoots()
+
     let translationRoots = []
     if (this.pluginOptions.translation.translateOnlyAllowedTags) {
       translationRoots = DOMExtensions.selectDOMElements('[translate="yes"]')
@@ -430,6 +482,11 @@ class DOMTranslation {
       clearTimeout(this.singleBatchDiscoveryStopTimer)
     }
 
+    const configuredDelay = this.pluginOptions.translation.dynamicContentDiscoveryDelayMs
+    const discoveryDelay = Number.isFinite(configuredDelay) && configuredDelay >= 0
+      ? configuredDelay
+      : DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS
+
     this.singleBatchDiscoveryStopTimer = setTimeout(() => {
       this.singleBatchDiscoveryStopTimer = null
       this.mutationObserver.stop()
@@ -441,7 +498,7 @@ class DOMTranslation {
       if (this.onSingleBatchDiscoveryCompleted) {
         this.onSingleBatchDiscoveryCompleted()
       }
-    }, SINGLE_BATCH_DISCOVERY_DELAY_MS)
+    }, discoveryDelay)
   }
 
   private prepareNextTranslationRanges (
@@ -559,6 +616,15 @@ class DOMTranslation {
       this.getAttributesFromCandidate(element, TranslationAttributeCandidates.get(null), attributes)
     }
     return attributes
+  }
+
+  private isTranslatableAttribute (element: HTMLElement, attributeName: string) {
+    const candidates = [
+      ...(TranslationAttributeCandidates.get(element.nodeName) || []),
+      ...(TranslationAttributeCandidates.get(null) || [])
+    ]
+
+    return candidates.some(candidate => candidate.translatableAttribute === attributeName)
   }
 
   private getAttributesFromCandidate (element: HTMLElement, attributeCandidates: IAttributeCandidate[], attributes:Array<ITranslationAttribute>) {
@@ -712,7 +778,7 @@ class DOMTranslation {
           }
 
           // If element is not removed from dom yet
-          if (range.startMarker.ownerDocument.contains(range.startMarker)) {
+          if (range.startMarker.isConnected) {
             for (let current = range.startMarker; current !== range.endMarker;) {
               const nextElement = current.nextSibling as HTMLElement
               this.unwrapTextNodes(current)
@@ -1161,11 +1227,12 @@ class DOMTranslation {
         return false
       }
 
+      const iframePrefetchWindowBottom = closestIframe.clientHeight * (1 + PREFETCH_VIEWPORTS_AHEAD)
       const elementIsInVisibleIframe =
         position.x + position.width > 0 &&
         position.y + position.height > 0 &&
         position.x < closestIframe.clientWidth &&
-        position.y < closestIframe.scrollHeight
+        position.y < iframePrefetchWindowBottom
 
       if (!elementIsInVisibleIframe) {
         return false
@@ -1274,21 +1341,26 @@ class DOMTranslation {
         }
       }
 
-      if (element.nodeName.toLowerCase() === 'iframe' && DOMExtensions.canAccessIframe(element)) {
-        this.registredIframes.set(element.contentDocument.documentElement, element)
-        const frameDocument = element.contentDocument.documentElement
+      if (element.nodeName.toLowerCase() === 'iframe') {
+        const iframe = element as HTMLIFrameElement
+        this.registerIframeLoad(iframe)
 
-        this.collectTextElementsChunked(
-          translatableParentElements,
-          translatableElements,
-          frameDocument,
-          sourceLanguage,
-          currentSourceLangSame,
-          currentIsTranslatable,
-          mode,
-          forceVisibility,
-          currentParent
-        )
+        if (DOMExtensions.canAccessIframe(iframe)) {
+          this.registredIframes.set(iframe.contentDocument.documentElement, iframe)
+          const frameDocument = iframe.contentDocument.documentElement
+
+          this.collectTextElementsChunked(
+            translatableParentElements,
+            translatableElements,
+            frameDocument,
+            sourceLanguage,
+            currentSourceLangSame,
+            currentIsTranslatable,
+            mode,
+            forceVisibility,
+            currentParent
+          )
+        }
       }
       else {
         if (!this.skipElement(element)) {
@@ -1319,6 +1391,21 @@ class DOMTranslation {
                 currentParent
               )
             })
+          }
+
+          if (element.shadowRoot) {
+            this.mutationObserver.observeRoot(element.shadowRoot)
+            this.collectTextElementsChunked(
+              translatableParentElements,
+              translatableElements,
+              element.shadowRoot,
+              sourceLanguage,
+              currentSourceLangSame,
+              currentIsTranslatable,
+              mode,
+              forceVisibility,
+              element.shadowRoot
+            )
           }
         }
       }

@@ -78,6 +78,22 @@ Default language selector can be displayed as a dropdown or a list of buttons th
 </html>
 ```
 
+## Configure dynamic content discovery
+
+`single-batch` and `word-count` modes wait for an inactivity window before completing dynamic content discovery. The window restarts whenever another discovery pass runs and defaults to 5000 ms.
+
+Set `dynamicContentDiscoveryDelayMs` before initialization to accommodate the website's loading behaviour:
+
+```HTML
+<script>
+   WebsiteTranslator.Options.translation.mode = "single-batch";
+   WebsiteTranslator.Options.translation.dynamicContentDiscoveryDelayMs = 10000;
+   WebsiteTranslator.Initialize();
+</script>
+```
+
+The same setting applies when `mode` is `"word-count"`. Set it to `0` to complete discovery immediately after the initial pass. Invalid or negative values use the 5000 ms default.
+
 # Browser support
 
 <!--
