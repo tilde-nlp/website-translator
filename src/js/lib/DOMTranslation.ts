@@ -89,6 +89,7 @@ class DOMTranslation {
    */
   public restoreDOM () {
     this.mutationObserver.stop()
+    this.mutationObserver.clearRoots()
     window.removeEventListener('scroll', this.onWindowScrollBound)
     for (const iframe of this.registeredIframeLoadElements) {
       iframe.removeEventListener('load', this.onIframeLoad)
@@ -451,11 +452,14 @@ class DOMTranslation {
     }
     else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
       mutation.addedNodes.forEach(node => this.registerAddedIframeLoads(node))
+      this.mutationObserver.observeNewRoots()
       this.scheduleWatchTranslatableContent()
     }
   }
 
   private watchTransaltableContent () {
+    this.mutationObserver.observeNewRoots()
+
     let translationRoots = []
     if (this.pluginOptions.translation.translateOnlyAllowedTags) {
       translationRoots = DOMExtensions.selectDOMElements('[translate="yes"]')
@@ -769,7 +773,7 @@ class DOMTranslation {
           }
 
           // If element is not removed from dom yet
-          if (range.startMarker.ownerDocument.contains(range.startMarker)) {
+          if (range.startMarker.isConnected) {
             for (let current = range.startMarker; current !== range.endMarker;) {
               const nextElement = current.nextSibling as HTMLElement
               this.unwrapTextNodes(current)
@@ -1382,6 +1386,21 @@ class DOMTranslation {
                 currentParent
               )
             })
+          }
+
+          if (element.shadowRoot) {
+            this.mutationObserver.observeRoot(element.shadowRoot)
+            this.collectTextElementsChunked(
+              translatableParentElements,
+              translatableElements,
+              element.shadowRoot,
+              sourceLanguage,
+              currentSourceLangSame,
+              currentIsTranslatable,
+              mode,
+              forceVisibility,
+              element.shadowRoot
+            )
           }
         }
       }

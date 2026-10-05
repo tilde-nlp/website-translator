@@ -5,6 +5,8 @@ import { DOMExtensions } from './DOMExtensions'
 export class PausableMutationObserver {
     private logger: Logger
     private mutationObservers: Array<MutationObserver>
+    private observedRoots: Set<Node>
+    private knownRoots: Set<Node>
     private onMutationObserved: (element: MutationRecord) => void
 
     /** If Mutation observer is started manually,
@@ -24,6 +26,8 @@ export class PausableMutationObserver {
     ) {
       this.logger = new Logger(pluginOptions.debug, 'PausableMutationObserver')
       this.mutationObservers = []
+      this.observedRoots = new Set<Node>()
+      this.knownRoots = new Set<Node>()
       this.onMutationObserved = onMutationDiscovered
       this.lockLevel = 0
     }
@@ -57,7 +61,47 @@ export class PausableMutationObserver {
           mutationObserver.disconnect()
         }
         this.mutationObservers = []
+        this.observedRoots.clear()
       }
+    }
+
+    public observeNewRoots () {
+      if (!this.running) {
+        return
+      }
+
+      for (const node of DOMExtensions.selectObservableRoots()) {
+        this.observeRoot(node)
+      }
+    }
+
+    public observeRoot (node: Node) {
+      this.knownRoots.add(node)
+
+      if (!this.running) {
+        return
+      }
+
+      if (this.observedRoots.has(node)) {
+        return
+      }
+
+      const observer = new MutationObserver((mutationsList:MutationRecord[]) => {
+        for (const mutation of mutationsList) {
+          if (this.lockLevel === 0) {
+            this.onMutationObserved(mutation)
+          }
+        }
+      })
+
+      observer.observe(node, this.config)
+      this.mutationObservers.push(observer)
+      this.observedRoots.add(node)
+    }
+
+    public clearRoots () {
+      this.knownRoots.clear()
+      this.observedRoots.clear()
     }
 
     public start () {
@@ -66,22 +110,8 @@ export class PausableMutationObserver {
         // this.logger.info('start listen')
         this.running = true
 
-        const htmlNodes = DOMExtensions.selectDOMElements('html')
-
-        for (const node of htmlNodes) {
-          const observer = new MutationObserver((mutationsList:MutationRecord[], observer) => {
-            for (const mutation of mutationsList) {
-              if (this.lockLevel === 0) {
-                this.onMutationObserved(mutation)
-              }
-            }
-          })
-
-          // Start observing the target node for configured mutations
-          observer.observe(node, this.config)
-
-          this.mutationObservers.push(observer)
-        }
+        this.knownRoots.forEach(node => this.observeRoot(node))
+        this.observeNewRoots()
       }
     }
 }

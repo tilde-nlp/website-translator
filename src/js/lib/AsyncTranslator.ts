@@ -375,6 +375,10 @@ class AsyncTranslator {
   }
 
   private enqueueTextItemsWithMinimumBatch (items: Array<TranslationTextRange>) {
+    if (!items || items.length === 0) {
+      return
+    }
+
     for (const item of items) {
       this.pendingTextRanges.push(item)
     }
