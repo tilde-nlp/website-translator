@@ -4,6 +4,21 @@ All notable changes to the Website Translator Widget are documented here.
 
 These release iterations are published under the npm `beta` dist-tag.
 
+## [8.3.0]
+
+### Added
+
+- Added support for translating content in open Shadow DOM roots, including nested roots and dynamically inserted or replaced content.
+- Added observation of dynamically created Shadow DOM roots and same-origin iframe documents.
+- Added the `translation.dynamicContentDiscoveryDelayMs` integration option for configuring the inactivity window in single-batch and word-count modes.
+
+### Changed
+
+- Improved discovery and restoration of dynamically updated SPA content and translatable attributes.
+- Improved translation of dynamically loaded same-origin iframes.
+- Preserved the existing 5000 ms dynamic content discovery delay as the default.
+- Prevented empty discovery passes from postponing pending dynamic translation batches.
+
 ## [8.2.0]
 
 ### Added
