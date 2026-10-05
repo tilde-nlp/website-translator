@@ -89,7 +89,7 @@ export class LanguageMenu implements ILanguageSelect {
           menuText.textContent = getLanguageName(this.currentLangCode, this.pluginOptions, this.uiLocalization)
           if (this.pluginOptions.ui.showLanguagesInNativeLanguage) {
             menuText.setAttribute('lang', this.currentLangCode)
-          }          
+          }
           selectedItem.setAttribute('aria-label', this.uiLocalization.value.labels.selectLanguage)
         }
       })
@@ -97,7 +97,7 @@ export class LanguageMenu implements ILanguageSelect {
 
     const menuArrow = document.createElement('img')
     menuArrow.classList.add('menu-arrow')
-    menuArrow.alt = ""
+    menuArrow.alt = ''
     menuArrow.src = this.internalOptions.ui.icons.menuIcon
     menuArrow.setAttribute('role', 'presentation')
 
@@ -146,9 +146,9 @@ export class LanguageMenu implements ILanguageSelect {
       this.subscriptions.push(
         this.uiLocalization.subscribe({
           next: () => {
-            const languageName = getLanguageName(item.langCode, this.pluginOptions, this.uiLocalization);
-            optionText.textContent = languageName;
-            option.title = languageName;
+            const languageName = getLanguageName(item.langCode, this.pluginOptions, this.uiLocalization)
+            optionText.textContent = languageName
+            option.title = languageName
             if (this.pluginOptions.ui.showLanguagesInNativeLanguage) {
               optionText.setAttribute('lang', item.langCode)
             }
@@ -169,8 +169,8 @@ export class LanguageMenu implements ILanguageSelect {
       if (item.machineTranslated) {
         const img = document.createElement('img')
         img.src = settingsIcon
-        img.alt = ""
-        img.role = "presentation"
+        img.alt = ''
+        img.role = 'presentation'
 
         this.subscriptions.push(
           this.uiLocalization.subscribe({

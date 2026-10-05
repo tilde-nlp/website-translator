@@ -292,7 +292,7 @@ class AsyncTranslator {
     const canEmitFinished = isSingleBatchMode || this.batchesCount === 0
 
     if (!this.translationFinishedDispatched && canEmitFinished && progress === 1) {
-      document.dispatchEvent(new Event(AsyncTranslator.TRANSLATION_FINISHED_EVENT));
+      document.dispatchEvent(new Event(AsyncTranslator.TRANSLATION_FINISHED_EVENT))
       this.translationFinishedDispatched = true
     }
 
@@ -412,7 +412,7 @@ class AsyncTranslator {
       ? this.getSeoChunkSettings()
       : this.getChunkSettings()
     const batches = this.getBatches(items, chunkSettings)
-    this.batchesCount = batches.length;
+    this.batchesCount = batches.length
 
     if (batches.length > 0) {
       if (priority === TranslationPriority.Text) {
@@ -437,7 +437,7 @@ class AsyncTranslator {
       this.onProgress(this.getProgress())
     }
     else {
-      this.batchesCount = 0;
+      this.batchesCount = 0
       this.onProgress(this.getProgress())
     }
   }

@@ -8,7 +8,7 @@
 // https://developers.google.com/search/docs/advanced/crawling/managing-multi-regional-sites?hl=en&ref_topic=2370587&visit_id=637414822196199164-1055925763&rd=1
 import { IPluginOptions } from '../interfaces/IPluginOptions'
 import { Logger } from '../Logger'
-import { pluginOptions } from '../models/PluginOptions';
+import { pluginOptions } from '../models/PluginOptions'
 import { DOMExtensions } from './DOMExtensions'
 
 const ORIGINAL_URL_ATTR = 'wt-attr-original-url'
@@ -89,11 +89,11 @@ export class SearchEngineOptimization {
    * @param restore - whether to restore/keep the original canonical url even if currentLocale changes
    */
   private markCanonicalUrl (doc: Document, currentLocale: string, restore = false) {
-    let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    let link = doc.querySelector('link[rel="canonical"]') as HTMLLinkElement
 
     if (!pluginOptions.seo.setCanonicalUrl) {
       // keeps the original canonical link if setCanonicalUrl is turned off
-      restore = true;
+      restore = true
     }
 
     if (!link && doc.head !== null) {
@@ -109,7 +109,7 @@ export class SearchEngineOptimization {
       }
       else {
         const localizedUrl = this.localizeUrl(new URL(doc.URL), currentLocale)
-  
+
         if (!link.hasAttribute(ORIGINAL_URL_ATTR)) {
           link.setAttribute(ORIGINAL_URL_ATTR, link.href || doc.location.href)
         }
@@ -132,7 +132,7 @@ export class SearchEngineOptimization {
           link.rel = 'alternate'
           link.hreflang = locale
           link.href = localizedUrl
-  
+
           doc.head.appendChild(link)
         }
       }

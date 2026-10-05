@@ -19,7 +19,7 @@ function getLanguageName (
 ):string {
   // TODO: maybe more sophisticated language name here taking into account country code
   const resolvedLangCode = normalizeLanguageCode(langCode)
-  const fallbackLangCode = resolvedLangCode.split("-")[0];
+  const fallbackLangCode = resolvedLangCode.split('-')[0]
 
   let language:ILanguage
   if (pluginOptions.ui.showLanguagesInNativeLanguage) {
@@ -29,7 +29,7 @@ function getLanguageName (
     }
     else {
       if (languageCodes[fallbackLangCode]) {
-        return languageCodes[fallbackLangCode].nativeName;
+        return languageCodes[fallbackLangCode].nativeName
       }
       return langCode
     }
@@ -47,7 +47,7 @@ function getLanguageName (
       }
       else {
         if (languageCodes[fallbackLangCode]) {
-          return languageCodes[fallbackLangCode].name;
+          return languageCodes[fallbackLangCode].name
         }
         return langCode
       }

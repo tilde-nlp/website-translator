@@ -45,6 +45,14 @@ const pluginVersion = require('./src/js/PluginVersion')
 const STORAGE_KEY_AUTOTRANSLATE = 'website-translator-autotranslate-system'
 const STORAGE_KEY_TRANSLATE_ONCE_NEXT = 'website-translator-translate-once-system'
 
+function getTranslationErrorMessage (translationError: ITranslationError): string {
+  if (typeof translationError.ErrorMessage === 'string') {
+    return translationError.ErrorMessage
+  }
+
+  return translationError.ErrorMessage?.error?.message || null
+}
+
 const internalUiOptions:IInternalUiOptions = {
   ui: {
     branding: {
@@ -163,56 +171,56 @@ function translationEnter (e:MouseEvent) {
         sentenceHightlight.removeSentenceHighlight()
         sentenceHightlight.applySentenceHighlight(element, selectedSentenceInfo.translatedRange)
 
-          tooltip.dataset.originalHtml = selectedSentenceInfo.originalHTML
-          tooltip.dataset.translatedHtml = selectedSentenceInfo.translatedHTML
-          tooltip.dataset.segmentId = `${selectedSentenceInfo.segmentId}`
+        tooltip.dataset.originalHtml = selectedSentenceInfo.originalHTML
+        tooltip.dataset.translatedHtml = selectedSentenceInfo.translatedHTML
+        tooltip.dataset.segmentId = `${selectedSentenceInfo.segmentId}`
 
-          tooltip.querySelector('.original').childNodes.forEach(item => item.remove())
+        tooltip.querySelector('.original').childNodes.forEach(item => item.remove())
 
-          const suggestion = document.createElement('div')
-          suggestion.innerHTML = selectedSentenceInfo.originalHTML
-          tooltip.querySelector('.original').appendChild(suggestion)
+        const suggestion = document.createElement('div')
+        suggestion.innerHTML = selectedSentenceInfo.originalHTML
+        tooltip.querySelector('.original').appendChild(suggestion)
 
-          tooltip.classList.toggle('footer-visible', pluginOptions.ui.showPopupTranslationProvider)
-          tooltip.classList.toggle('original-text-visible', pluginOptions.ui.showPopup)
+        tooltip.classList.toggle('footer-visible', pluginOptions.ui.showPopupTranslationProvider)
+        tooltip.classList.toggle('original-text-visible', pluginOptions.ui.showPopup)
 
-          const mouseInIframe = mouseRelativeToIframe(e)
-          const toolbar = document.querySelector('.website-translator-toolbar')
-          const elementRectangle = selectedSentenceInfo.translatedRange.getBoundingClientRect()
-          const tooltipRectangle = tooltip.getBoundingClientRect()
+        const mouseInIframe = mouseRelativeToIframe(e)
+        const toolbar = document.querySelector('.website-translator-toolbar')
+        const elementRectangle = selectedSentenceInfo.translatedRange.getBoundingClientRect()
+        const tooltipRectangle = tooltip.getBoundingClientRect()
 
-          const tooltipPosition = {
-            top: mouseInIframe.top,
-            left: mouseInIframe.left + elementRectangle.left
-          }
+        const tooltipPosition = {
+          top: mouseInIframe.top,
+          left: mouseInIframe.left + elementRectangle.left
+        }
 
-          const freeVerticalSpaceBelow = window.innerHeight - (
-            mouseInIframe.top +
+        const freeVerticalSpaceBelow = window.innerHeight - (
+          mouseInIframe.top +
             elementRectangle.top +
             elementRectangle.height +
             toolbar.getBoundingClientRect().height
-          )
+        )
 
-          // For displaying tooltip not right after or before text
-          const marginToText = 8
+        // For displaying tooltip not right after or before text
+        const marginToText = 8
 
-          // If there is not enough space for tooltip below the translation element, display it above
-          if (freeVerticalSpaceBelow < tooltipRectangle.height) {
-            tooltipPosition.top += elementRectangle.top - tooltipRectangle.height - marginToText
-          }
-          else {
-            tooltipPosition.top += elementRectangle.top + elementRectangle.height + marginToText
-          }
-
-          const horizontalTooltipMargin = 5
-          if (tooltipPosition.left + tooltipRectangle.width + horizontalTooltipMargin > window.innerWidth) {
-            tooltipPosition.left += window.innerWidth - tooltipPosition.left - tooltipRectangle.width - horizontalTooltipMargin
-          }
-          tooltipPosition.left = Math.max(tooltipPosition.left, horizontalTooltipMargin)
-
-          tooltip.style.top = `${tooltipPosition.top}px`
-          tooltip.style.left = `${tooltipPosition.left}px`
+        // If there is not enough space for tooltip below the translation element, display it above
+        if (freeVerticalSpaceBelow < tooltipRectangle.height) {
+          tooltipPosition.top += elementRectangle.top - tooltipRectangle.height - marginToText
         }
+        else {
+          tooltipPosition.top += elementRectangle.top + elementRectangle.height + marginToText
+        }
+
+        const horizontalTooltipMargin = 5
+        if (tooltipPosition.left + tooltipRectangle.width + horizontalTooltipMargin > window.innerWidth) {
+          tooltipPosition.left += window.innerWidth - tooltipPosition.left - tooltipRectangle.width - horizontalTooltipMargin
+        }
+        tooltipPosition.left = Math.max(tooltipPosition.left, horizontalTooltipMargin)
+
+        tooltip.style.top = `${tooltipPosition.top}px`
+        tooltip.style.left = `${tooltipPosition.left}px`
+      }
     }
   }, pluginOptions.ui.tooltipShowDelay)
 }
@@ -929,7 +937,7 @@ async function Initialize () {
           uiLocalization.value.alerts.errors.translation,
           'danger',
           uiLocalization,
-          error.ErrorMessage["error"]["message"]
+          getTranslationErrorMessage(error)
         )
       },
       translationCache,

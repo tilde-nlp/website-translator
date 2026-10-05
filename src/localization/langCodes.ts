@@ -374,8 +374,8 @@ const languageCodes: { [Key: string]: ILanguage} = {
     nativeName: '𞄀𞄩𞄰'
   },
   hne: {
-    name: "Chhattisgarhi",
-    nativeName: "छत्तीसगढ़ी"
+    name: 'Chhattisgarhi',
+    nativeName: 'छत्तीसगढ़ी'
   },
   ho: {
     name: 'Hiri Motu',
@@ -386,8 +386,8 @@ const languageCodes: { [Key: string]: ILanguage} = {
     nativeName: 'Hrvatski'
   },
   hsb: {
-    name: "Upper Sorbian",
-    nativeName: "Hornjoserbšćina"
+    name: 'Upper Sorbian',
+    nativeName: 'Hornjoserbšćina'
   },
   ht: {
     name: 'Haitian',

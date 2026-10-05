@@ -1116,7 +1116,7 @@ class DOMTranslation {
       }
     }
     for (const range of translationRanges) {
-      const isSeo = TranslationElementCandidates.get(range.startMarker.parentElement.tagName)?.type === TranslatableItemType.ELEMENT_SEO;
+      const isSeo = TranslationElementCandidates.get(range.startMarker.parentElement.tagName)?.type === TranslatableItemType.ELEMENT_SEO
 
       range.visibleInCurrentView = DOMExtensions.elementIsVisible(range.startMarker, this.registredIframes)
       range.type = isSeo ? TranslatableItemType.ELEMENT_SEO : TranslatableItemType.ELEMENT
@@ -1182,7 +1182,7 @@ class DOMTranslation {
     mode: TranslationElementMode
   ) {
     const singleBatchMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH || this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT
-    const forceVisibility = singleBatchMode && mode === TranslationElementMode.VISIBLE_ELEMENTS;
+    const forceVisibility = singleBatchMode && mode === TranslationElementMode.VISIBLE_ELEMENTS
 
     this.collectTextElementsChunked(
       translatableParentElements,

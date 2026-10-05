@@ -1,4 +1,4 @@
-/* eslint no-console: "warn" */
+/* eslint no-console: "off" */
 import languages from '../../localization/localization'
 
 export class TextLocalization {
@@ -52,7 +52,7 @@ export class TextLocalization {
 
   private pause (msec:number) {
     return new Promise(
-      (resolve, reject) => {
+      (resolve) => {
         setTimeout(resolve, msec || 1000)
       }
     )
