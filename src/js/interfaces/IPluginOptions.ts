@@ -56,6 +56,13 @@ export interface IPluginOptions{
      */
     mode: TranslationMode,
 
+    /**
+     * Inactivity window before dynamic content discovery completes in single-batch and word-count modes.
+     * The window restarts whenever another discovery pass runs.
+     * @default 5000
+     */
+    dynamicContentDiscoveryDelayMs?: number,
+
     targetLanguages:Array<string>
     /**
      * Translate only tags and their children which have [translate="yes"] attribute

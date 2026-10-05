@@ -21,6 +21,7 @@ import IAttributeCandidate from '../interfaces/IAttributeCandidate'
 import { TranslationPriority } from '../enums/TranslationPriority'
 import { PausableMutationObserver } from './PausableMutationObserver'
 import { TranslationMode } from '../enums/TranslationMode'
+import { DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS } from '../models/PluginOptions'
 
 const WEBSITE_TRANSLATOR_PREFIX = 'TMT-WTW'
 
@@ -32,7 +33,6 @@ const RAW_TEXT_NODE_WRAPPER_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-RAW-TXT`
 const TEXT_MARKER_START_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-S`
 const TEXT_MARKER_END_TAG = `${WEBSITE_TRANSLATOR_PREFIX}-TXT-E`
 
-const SINGLE_BATCH_DISCOVERY_DELAY_MS = 5000
 const PREFETCH_VIEWPORTS_AHEAD = 3
 
 class DOMTranslation {
@@ -482,6 +482,11 @@ class DOMTranslation {
       clearTimeout(this.singleBatchDiscoveryStopTimer)
     }
 
+    const configuredDelay = this.pluginOptions.translation.dynamicContentDiscoveryDelayMs
+    const discoveryDelay = Number.isFinite(configuredDelay) && configuredDelay >= 0
+      ? configuredDelay
+      : DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS
+
     this.singleBatchDiscoveryStopTimer = setTimeout(() => {
       this.singleBatchDiscoveryStopTimer = null
       this.mutationObserver.stop()
@@ -493,7 +498,7 @@ class DOMTranslation {
       if (this.onSingleBatchDiscoveryCompleted) {
         this.onSingleBatchDiscoveryCompleted()
       }
-    }, SINGLE_BATCH_DISCOVERY_DELAY_MS)
+    }, discoveryDelay)
   }
 
   private prepareNextTranslationRanges (

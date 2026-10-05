@@ -3,6 +3,8 @@ import { PluginUILanguageType } from '../enums/PluginUILanguageType'
 import { PluginToolbarPositionType } from '../enums/ToolbarPositionType'
 import { TranslationMode } from '../enums/TranslationMode'
 
+export const DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS = 5000
+
 export const pluginOptions: IPluginOptions = {
   sourceLanguage: 'en',
   currentLanguage: null,
@@ -14,6 +16,7 @@ export const pluginOptions: IPluginOptions = {
   translation: {
     autoTranslate: true,
     mode: TranslationMode.CHUNKED,
+    dynamicContentDiscoveryDelayMs: DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS,
     // systems: null,
     targetLanguages: null,
     translateOnlyAllowedTags: false,
