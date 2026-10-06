@@ -99,4 +99,43 @@ describe('DOMTranslation dynamic content discovery timing', () => {
 
     translator.restoreDOM()
   })
+
+  it('ignores delayed discovery completion after the execution becomes stale', () => {
+    let executionIsCurrent = true
+    const onCompleted = jest.fn()
+    const translator = new DOMTranslation(
+      createOptions(TranslationMode.SINGLE_BATCH, 25),
+      jest.fn(),
+      jest.fn(),
+      null
+    )
+
+    translator.prepareDOM('lv', jest.fn(), onCompleted, () => executionIsCurrent)
+    executionIsCurrent = false
+    jest.advanceTimersByTime(25)
+
+    expect(onCompleted).not.toHaveBeenCalled()
+    translator.restoreDOM()
+  })
+
+  it('ignores scheduled animation-frame scans after the execution becomes stale', () => {
+    let executionIsCurrent = true
+    const onDiscovered = jest.fn()
+    const translator = new DOMTranslation(
+      createOptions(TranslationMode.SINGLE_BATCH, 25),
+      jest.fn(),
+      jest.fn(),
+      null
+    )
+
+    translator.prepareDOM('lv', onDiscovered, jest.fn(), () => executionIsCurrent)
+    const initialDiscoveryCount = onDiscovered.mock.calls.length
+
+    window.dispatchEvent(new Event('scroll'))
+    executionIsCurrent = false
+    jest.advanceTimersByTime(20)
+
+    expect(onDiscovered).toHaveBeenCalledTimes(initialDiscoveryCount)
+    translator.restoreDOM()
+  })
 })

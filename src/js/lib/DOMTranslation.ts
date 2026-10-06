@@ -60,6 +60,7 @@ class DOMTranslation {
   private onWindowScrollBound: () => void
   private singleBatchDiscoveryStopTimer: ReturnType<typeof setTimeout> | null
   private watchContentFrameHandle: number | null
+  private isExecutionCurrent: (() => boolean) | null
 
   constructor (
     pluginOptions: IPluginOptions,
@@ -80,6 +81,7 @@ class DOMTranslation {
     this.singleBatchDiscoveryStopTimer = null
     this.watchContentFrameHandle = null
     this.onSingleBatchDiscoveryCompleted = null
+    this.isExecutionCurrent = null
 
     this.mutationObserver = new PausableMutationObserver(this.pluginOptions, this.onMutationObserved.bind(this))
   }
@@ -105,6 +107,7 @@ class DOMTranslation {
       this.singleBatchDiscoveryStopTimer = null
     }
     this.onSingleBatchDiscoveryCompleted = null
+    this.isExecutionCurrent = null
 
     this.restorePartialDocument()
   }
@@ -117,10 +120,12 @@ class DOMTranslation {
   public prepareDOM (
     targetLanguage: string,
     onTranslationItemsDiscovered: (items: Array<TranslationTextRange>, priority:TranslationPriority)=>void,
-    onSingleBatchDiscoveryCompleted: (() => void) | null = null
+    onSingleBatchDiscoveryCompleted: (() => void) | null = null,
+    isExecutionCurrent: (() => boolean) | null = null
   ) {
     this.onTranslationItemsDiscovered = onTranslationItemsDiscovered
     this.onSingleBatchDiscoveryCompleted = onSingleBatchDiscoveryCompleted
+    this.isExecutionCurrent = isExecutionCurrent
     this.markedNodesWithId = new Set<HTMLElement>()
 
     this.translatedSegments = new Map<Node, ITranslatedSegment>()
@@ -153,8 +158,13 @@ class DOMTranslation {
       return
     }
 
+    const isExecutionCurrent = this.isExecutionCurrent
     this.watchContentFrameHandle = requestAnimationFrame(() => {
       this.watchContentFrameHandle = null
+      if (isExecutionCurrent !== this.isExecutionCurrent ||
+        (isExecutionCurrent && !isExecutionCurrent())) {
+        return
+      }
       this.watchTransaltableContent()
     })
   }
@@ -424,6 +434,10 @@ class DOMTranslation {
   }
 
   private onMutationObserved (mutation: MutationRecord) {
+    if (this.isExecutionCurrent && !this.isExecutionCurrent()) {
+      return
+    }
+
     if (mutation.type === 'characterData') {
       const wrapper = mutation.target.parentElement
       const prevElement = wrapper.previousSibling
@@ -458,6 +472,10 @@ class DOMTranslation {
   }
 
   private watchTransaltableContent () {
+    if (this.isExecutionCurrent && !this.isExecutionCurrent()) {
+      return
+    }
+
     this.mutationObserver.observeNewRoots()
 
     let translationRoots = []
@@ -487,8 +505,13 @@ class DOMTranslation {
       ? configuredDelay
       : DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS
 
+    const isExecutionCurrent = this.isExecutionCurrent
     this.singleBatchDiscoveryStopTimer = setTimeout(() => {
       this.singleBatchDiscoveryStopTimer = null
+      if (isExecutionCurrent !== this.isExecutionCurrent ||
+        (isExecutionCurrent && !isExecutionCurrent())) {
+        return
+      }
       this.mutationObserver.stop()
       window.removeEventListener('scroll', this.onWindowScrollBound)
       if (this.watchContentFrameHandle !== null) {

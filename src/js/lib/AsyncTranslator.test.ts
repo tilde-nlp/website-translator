@@ -92,6 +92,7 @@ function createHarness (mode: TranslationMode) {
     cancel: () => translator.cancel(),
     completeDiscovery: () => onDiscoveryCompleted(),
     discover: (ranges: TranslationTextRange[]) => onDiscovered(ranges, TranslationPriority.Text),
+    navigate: () => translator.onNavigation(),
     service
   }
 }
@@ -204,20 +205,59 @@ describe('AsyncTranslator crawler discovery completion', () => {
     expect(onCrawlerComplete).not.toHaveBeenCalled()
   })
 
-  it('does not fire when execution is cancelled', async () => {
+  it('does not modify the DOM or fire completion after navigation invalidates the execution', async () => {
     const response = deferred<any[]>()
     const harness = createHarness(TranslationMode.SINGLE_BATCH)
+    const range = createRange('Cancelled')
     harness.service.translate.mockReturnValue(response.promise)
 
-    harness.discover([createRange('Cancelled')])
+    harness.discover([range])
     harness.completeDiscovery()
-    harness.cancel()
+    harness.navigate()
     response.resolve([{
       translation: 'Atcelts',
       segmentId: 1
     }])
     await new Promise(resolve => setTimeout(resolve, 0))
 
+    expect(range.element.textContent).toBe('Cancelled')
     expect(onCrawlerComplete).not.toHaveBeenCalled()
+  })
+
+  it('does not start queued batches after navigation invalidates the execution', async () => {
+    const response = deferred<any[]>()
+    const harness = createHarness(TranslationMode.CHUNKED)
+    const ranges = Array.from({ length: 41 }, (_, index) => createRange(`Item ${index}`))
+    harness.service.translate.mockReturnValue(response.promise)
+
+    harness.discover(ranges)
+    await waitFor(() => harness.service.translate.mock.calls.length === 1)
+    harness.navigate()
+    response.resolve(Array.from({ length: 40 }, (_, index) => ({
+      translation: `Translated ${index}`,
+      segmentId: index
+    })))
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(harness.service.translate).toHaveBeenCalledTimes(1)
+    expect(ranges.every((range, index) => range.element.textContent === `Item ${index}`)).toBe(true)
+  })
+
+  it('does not flush delayed text after navigation invalidates the execution', () => {
+    jest.useFakeTimers()
+    const harness = createHarness(TranslationMode.CHUNKED)
+    const range = createRange('Pending text')
+    harness.service.translate.mockResolvedValue([{
+      translation: 'Gaidošs teksts',
+      segmentId: 1
+    }])
+
+    harness.discover([range])
+    harness.navigate()
+    jest.advanceTimersByTime(5000)
+
+    expect(harness.service.translate).not.toHaveBeenCalled()
+    expect(range.element.textContent).toBe('Pending text')
+    jest.useRealTimers()
   })
 })

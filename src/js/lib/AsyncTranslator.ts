@@ -40,6 +40,7 @@ class AsyncTranslator {
   private singleBatchDiscoveryCompleted: boolean
   private crawlerDiscoveryCompleteDispatched: boolean
   private executionFailed: boolean
+  private navigationGeneration: number
 
   constructor (
     private readonly websiteService:WebsiteService,
@@ -62,6 +63,7 @@ class AsyncTranslator {
     this.translationFinishedDispatched = false
     this.crawlerDiscoveryCompleteDispatched = false
     this.executionFailed = false
+    this.navigationGeneration = 0
 
     this.logger = new Logger(pluginOptions.debug, 'AsyncTranslator')
   }
@@ -118,6 +120,7 @@ class AsyncTranslator {
     this.clearPendingTextFlushTimer()
 
     const localCancelToken = (this.cancelToken = axios.CancelToken.source())
+    const navigationGeneration = this.navigationGeneration
 
     this.domTranslator.applyUrlLocalization(targetLanguage)
 
@@ -129,6 +132,7 @@ class AsyncTranslator {
           batch,
           processedTranslations,
           localCancelToken,
+          navigationGeneration,
           targetLanguage,
           priority
         )
@@ -138,8 +142,14 @@ class AsyncTranslator {
 
     this.domTranslator.prepareDOM(
       targetLanguage,
-      this.onTranslationItemDiscovered.bind(this),
-      () => this.onSingleBatchDiscoveryCompleted(localCancelToken)
+      (items, priority) => this.onTranslationItemDiscovered(
+        items,
+        priority,
+        localCancelToken,
+        navigationGeneration
+      ),
+      () => this.onSingleBatchDiscoveryCompleted(localCancelToken, navigationGeneration),
+      () => this.isExecutionCurrent(localCancelToken, navigationGeneration)
     )
 
     await this.queue.drain()
@@ -173,6 +183,10 @@ class AsyncTranslator {
     this.domTranslator.applyUrlLocalization()
   }
 
+  public onNavigation () {
+    this.navigationGeneration++
+  }
+
   /**
      * Callback when translation batch is scheduled for translation
      */
@@ -181,9 +195,15 @@ class AsyncTranslator {
     batch:ITranslatableItem[],
     processedTranslations:Map<string, IDomTranslation>,
     localCancelToken:CancelTokenSource,
+    navigationGeneration:number,
     targetLanguage:string,
     priority: TranslationPriority
   ) {
+    if (!this.isExecutionCurrent(localCancelToken, navigationGeneration)) {
+      queue.onItemProcessed()
+      return
+    }
+
     const isWordCountMode = this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT
     const deduplicatedBatch = this.buildDeduplicatedBatch(batch, targetLanguage)
     const translationResolution = this.buildTranslationResolution(deduplicatedBatch.uniqueBatch, targetLanguage)
@@ -199,6 +219,10 @@ class AsyncTranslator {
             url,
             localCancelToken.token
           )
+          if (!this.isExecutionCurrent(localCancelToken, navigationGeneration)) {
+            queue.onItemProcessed()
+            return
+          }
         }
         else {
           if (translationResolution.missingItems.length > 0) {
@@ -208,6 +232,10 @@ class AsyncTranslator {
               url,
               localCancelToken.token
             )
+            if (!this.isExecutionCurrent(localCancelToken, navigationGeneration)) {
+              queue.onItemProcessed()
+              return
+            }
 
             translatedMissingItems.forEach((translatedItem, index) => {
               const uniqueBatchIndex = translationResolution.missingIndexes[index]
@@ -239,6 +267,10 @@ class AsyncTranslator {
         break
       }
       catch (err) {
+        if (!this.isExecutionCurrent(localCancelToken, navigationGeneration)) {
+          queue.onItemProcessed()
+          return
+        }
         if (axios.isCancel(err)) {
           return
         }
@@ -291,7 +323,7 @@ class AsyncTranslator {
       }
     }
 
-    this.queue.onItemProcessed()
+    queue.onItemProcessed()
     this.dispatchCrawlerDiscoveryComplete(localCancelToken)
   }
 
@@ -312,21 +344,37 @@ class AsyncTranslator {
     return progress
   }
 
-  private onTranslationItemDiscovered (items: Array<TranslationTextRange>, priority: TranslationPriority) {
+  private onTranslationItemDiscovered (
+    items: Array<TranslationTextRange>,
+    priority: TranslationPriority,
+    localCancelToken: CancelTokenSource,
+    navigationGeneration: number
+  ) {
+    if (!this.isExecutionCurrent(localCancelToken, navigationGeneration)) {
+      return
+    }
+
     if (this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH || this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT) {
       this.enqueueWholeSiteSingleBatch(items)
       return
     }
 
     if (priority === TranslationPriority.Text) {
-      this.enqueueTextItemsWithMinimumBatch(items)
+      this.enqueueTextItemsWithMinimumBatch(items, localCancelToken, navigationGeneration)
       return
     }
 
     this.enqueueDiscoveredItems(items, priority)
   }
 
-  private onSingleBatchDiscoveryCompleted (localCancelToken: CancelTokenSource) {
+  private onSingleBatchDiscoveryCompleted (
+    localCancelToken: CancelTokenSource,
+    navigationGeneration: number
+  ) {
+    if (!this.isExecutionCurrent(localCancelToken, navigationGeneration)) {
+      return
+    }
+
     this.singleBatchDiscoveryCompleted = true
     this.flushWholeSiteSingleBatch()
     this.dispatchCrawlerDiscoveryComplete(localCancelToken)
@@ -345,6 +393,12 @@ class AsyncTranslator {
 
     document.dispatchEvent(new CustomEvent(AsyncTranslator.CRAWLER_DISCOVERY_COMPLETE_EVENT))
     this.crawlerDiscoveryCompleteDispatched = true
+  }
+
+  private isExecutionCurrent (localCancelToken: CancelTokenSource, navigationGeneration: number) {
+    return navigationGeneration === this.navigationGeneration &&
+      localCancelToken === this.cancelToken &&
+      !localCancelToken.token.reason
   }
 
   private enqueueWholeSiteSingleBatch (items: Array<TranslationTextRange>) {
@@ -395,15 +449,25 @@ class AsyncTranslator {
     }
   }
 
-  private schedulePendingTextFlush () {
+  private schedulePendingTextFlush (
+    localCancelToken: CancelTokenSource,
+    navigationGeneration: number
+  ) {
     this.clearPendingTextFlushTimer()
     this.pendingTextFlushTimer = setTimeout(() => {
       this.pendingTextFlushTimer = null
+      if (!this.isExecutionCurrent(localCancelToken, navigationGeneration)) {
+        return
+      }
       this.flushPendingTextItems()
     }, AsyncTranslator.MIN_SEGMENTS_FLUSH_INTERVAL_MS)
   }
 
-  private enqueueTextItemsWithMinimumBatch (items: Array<TranslationTextRange>) {
+  private enqueueTextItemsWithMinimumBatch (
+    items: Array<TranslationTextRange>,
+    localCancelToken: CancelTokenSource,
+    navigationGeneration: number
+  ) {
     if (!items || items.length === 0) {
       return
     }
@@ -422,7 +486,7 @@ class AsyncTranslator {
     }
 
     // Under threshold: flush only after inactivity window.
-    this.schedulePendingTextFlush()
+    this.schedulePendingTextFlush(localCancelToken, navigationGeneration)
   }
 
   private flushPendingTextItems () {

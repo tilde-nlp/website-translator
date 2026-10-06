@@ -838,6 +838,8 @@ function CancelAndRestore () {
 }
 
 function handleNavigation () {
+  translationHelper.onNavigation()
+
   const language = targetLanguage.value
   const isWordCountMode = pluginOptions.translation.mode === TranslationMode.WORD_COUNT
   const isWidgetTranslation = language !== pluginOptions.sourceLanguage &&
