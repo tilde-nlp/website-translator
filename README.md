@@ -94,6 +94,26 @@ Set `dynamicContentDiscoveryDelayMs` before initialization to accommodate the we
 
 The same setting applies when `mode` is `"word-count"`. Set it to `0` to complete discovery immediately after the initial pass. Invalid or negative values use the 5000 ms default.
 
+## Configure language URL persistence
+
+By default, language changes preserve the existing behaviour: the widget stores the selected language in the `lang` query parameter and creates a browser history entry.
+
+The `lang` parameter also gives each translated language a distinct URL that search engines can discover. The widget uses these URLs when localizing links and generating canonical and `hreflang` metadata. Use `"push"` or `"replace"` when translated variants should remain discoverable through `?lang=...` URLs.
+
+SPAs can update the parameter without adding history entries, or leave routing entirely to the host application:
+
+```HTML
+<script>
+   // Use "replace" to keep ?lang=lv without creating a history entry.
+   WebsiteTranslator.Options.translation.languageUrlMode = "replace";
+
+   // Use "none" to prevent the widget from reading or writing ?lang and from adding it to links.
+   WebsiteTranslator.Options.translation.languageUrlMode = "none";
+</script>
+```
+
+Use `"none"` only when the host application owns language routing or translated pages should not be indexed separately. When using `"none"` for indexable translated pages, the host application must provide stable localized URLs and the corresponding canonical and `hreflang` metadata. Otherwise, search engines may not discover or correctly associate translated variants.
+
 # Browser support
 
 <!--

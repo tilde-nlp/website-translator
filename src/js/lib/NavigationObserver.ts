@@ -37,6 +37,22 @@ export class NavigationObserver {
     window.removeEventListener('hashchange', this.notifyIfRouteChanged)
   }
 
+  public updateUrl (url: string, mode: 'push' | 'replace') {
+    const nextUrl = new URL(url, window.location.href)
+    const nextRoute = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+    if (nextRoute === this.currentRoute) {
+      return
+    }
+
+    if (mode === 'replace') {
+      this.originalReplaceState.call(window.history, {}, '', url)
+    }
+    else {
+      this.originalPushState.call(window.history, {}, '', url)
+    }
+    this.currentRoute = this.getCurrentRoute()
+  }
+
   private readonly notifyIfRouteChanged = () => {
     const nextRoute = this.getCurrentRoute()
     if (nextRoute === this.currentRoute) {

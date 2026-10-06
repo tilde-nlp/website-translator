@@ -263,7 +263,9 @@ async function checkAutoTranslate () {
   }
   else if (pluginOptions.translation.autoTranslate) {
     const urlParams = new URLSearchParams(window.location.search)
-    const urlParamLanguage = urlParams.get('lang')
+    const urlParamLanguage = pluginOptions.translation.languageUrlMode === 'none'
+      ? null
+      : urlParams.get('lang')
 
     // Take language from url if this is not source language,
     // because this may be redirect instead of language request.
@@ -683,6 +685,11 @@ function setCurrentWindowLanguage () {
 }
 
 function switchWindowLanguage (language:string) {
+  const languageUrlMode = pluginOptions.translation.languageUrlMode || 'push'
+  if (languageUrlMode === 'none') {
+    return
+  }
+
   const url = new URL(window.location.href)
   if (language) {
     url.searchParams.set('lang', language)
@@ -690,7 +697,19 @@ function switchWindowLanguage (language:string) {
   else {
     url.searchParams.delete('lang')
   }
-  window.history.pushState({}, '', url.href)
+  if (url.href === window.location.href) {
+    return
+  }
+
+  if (navigationObserver) {
+    navigationObserver.updateUrl(url.href, languageUrlMode)
+  }
+  else if (languageUrlMode === 'replace') {
+    window.history.replaceState({}, '', url.href)
+  }
+  else {
+    window.history.pushState({}, '', url.href)
+  }
 }
 
 function restore () {

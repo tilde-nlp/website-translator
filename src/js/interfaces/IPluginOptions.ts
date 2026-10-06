@@ -63,6 +63,15 @@ export interface IPluginOptions{
      */
     dynamicContentDiscoveryDelayMs?: number,
 
+    /**
+     * How the selected language is persisted in the page URL.
+     * push - update the lang query parameter and create a history entry (legacy default).
+     * replace - update the lang query parameter without creating a history entry.
+     * none - leave the host URL and links unchanged.
+     * @default push
+     */
+    languageUrlMode?: 'push' | 'replace' | 'none',
+
     targetLanguages:Array<string>
     /**
      * Translate only tags and their children which have [translate="yes"] attribute

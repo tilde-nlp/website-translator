@@ -17,6 +17,7 @@ export const pluginOptions: IPluginOptions = {
     autoTranslate: true,
     mode: TranslationMode.CHUNKED,
     dynamicContentDiscoveryDelayMs: DEFAULT_DYNAMIC_CONTENT_DISCOVERY_DELAY_MS,
+    languageUrlMode: 'push',
     // systems: null,
     targetLanguages: null,
     translateOnlyAllowedTags: false,

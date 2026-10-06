@@ -38,4 +38,34 @@ describe('NavigationObserver', () => {
 
     expect(onNavigate).toHaveBeenCalledTimes(1)
   })
+
+  it('replaces a widget-owned URL without notifying navigation or adding history', () => {
+    const historyLength = window.history.length
+
+    observer.updateUrl('/page?hostState=preserved&lang=lv#section', 'replace')
+
+    expect(window.location.pathname).toBe('/page')
+    expect(window.location.search).toBe('?hostState=preserved&lang=lv')
+    expect(window.location.hash).toBe('#section')
+    expect(window.history.length).toBe(historyLength)
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
+
+  it('preserves legacy push history without notifying host navigation', () => {
+    const historyLength = window.history.length
+
+    observer.updateUrl('/page?lang=lv', 'push')
+
+    expect(window.history.length).toBe(historyLength + 1)
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
+
+  it('does not add history for an unchanged widget-owned URL', () => {
+    const historyLength = window.history.length
+
+    observer.updateUrl('/page', 'push')
+
+    expect(window.history.length).toBe(historyLength)
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
 })

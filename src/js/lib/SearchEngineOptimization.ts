@@ -170,7 +170,7 @@ export class SearchEngineOptimization {
    * @param locale
    */
   private localizeUrl (url:URL, locale: string):string {
-    if (locale) {
+    if (locale && pluginOptions.translation.languageUrlMode !== 'none') {
       url.searchParams.set('lang', locale)
     }
     return url.href

@@ -6,6 +6,7 @@ interface WebsiteTranslatorApi {
   Options: {
     api: { clientId: string; url: string };
     debug: boolean;
+    translation: { languageUrlMode: 'push' | 'replace' | 'none' };
     ui: { toolbarPosition: string };
   };
   Initialize(): Promise<void>;
@@ -28,6 +29,7 @@ export class WidgetBootstrapService {
       widget.Options.debug = true;
       widget.Options.api.clientId = widgetConfig.websiteId;
       widget.Options.api.url = widgetConfig.apiUrl;
+      widget.Options.translation.languageUrlMode = 'none';
       widget.Options.ui.toolbarPosition = 'top';
       void widget.Initialize();
     };
