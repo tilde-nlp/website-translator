@@ -22,6 +22,7 @@ class AsyncTranslator {
   private static readonly MIN_SEGMENTS_BEFORE_FLUSH = 10
   private static readonly MIN_SEGMENTS_FLUSH_INTERVAL_MS = 5000
   private static readonly TRANSLATION_FINISHED_EVENT = 'translation-finished'
+  private static readonly CRAWLER_DISCOVERY_COMPLETE_EVENT = 'wt-crawler-discovery-complete'
   private concurrency: number;
   private queue: TranslationQueue;
   private cancelToken: CancelTokenSource;
@@ -37,6 +38,8 @@ class AsyncTranslator {
   private pendingWholeSiteRanges: Array<TranslationTextRange>
   private singleBatchQueued: boolean
   private singleBatchDiscoveryCompleted: boolean
+  private crawlerDiscoveryCompleteDispatched: boolean
+  private executionFailed: boolean
 
   constructor (
     private readonly websiteService:WebsiteService,
@@ -57,6 +60,8 @@ class AsyncTranslator {
     this.singleBatchQueued = false
     this.singleBatchDiscoveryCompleted = false
     this.translationFinishedDispatched = false
+    this.crawlerDiscoveryCompleteDispatched = false
+    this.executionFailed = false
 
     this.logger = new Logger(pluginOptions.debug, 'AsyncTranslator')
   }
@@ -108,6 +113,8 @@ class AsyncTranslator {
     this.singleBatchQueued = false
     this.singleBatchDiscoveryCompleted = false
     this.translationFinishedDispatched = false
+    this.crawlerDiscoveryCompleteDispatched = false
+    this.executionFailed = false
     this.clearPendingTextFlushTimer()
 
     const localCancelToken = (this.cancelToken = axios.CancelToken.source())
@@ -132,7 +139,7 @@ class AsyncTranslator {
     this.domTranslator.prepareDOM(
       targetLanguage,
       this.onTranslationItemDiscovered.bind(this),
-      this.onSingleBatchDiscoveryCompleted.bind(this)
+      () => this.onSingleBatchDiscoveryCompleted(localCancelToken)
     )
 
     await this.queue.drain()
@@ -152,6 +159,8 @@ class AsyncTranslator {
     this.singleBatchQueued = false
     this.singleBatchDiscoveryCompleted = false
     this.translationFinishedDispatched = false
+    this.crawlerDiscoveryCompleteDispatched = false
+    this.executionFailed = false
 
     if (this.queue !== null) {
       this.queue.kill()
@@ -235,6 +244,9 @@ class AsyncTranslator {
         }
 
         if (err.response && err.response.status === 404) {
+          if (localCancelToken === this.cancelToken) {
+            this.executionFailed = true
+          }
           const err: ITranslationError = {
             ErrorCode: '',
             ErrorMessage: this.uiLocalization.value.alerts.errors.translationSubStatus.resourceNotFound
@@ -280,6 +292,7 @@ class AsyncTranslator {
     }
 
     this.queue.onItemProcessed()
+    this.dispatchCrawlerDiscoveryComplete(localCancelToken)
   }
 
   private getProgress () {
@@ -313,9 +326,25 @@ class AsyncTranslator {
     this.enqueueDiscoveredItems(items, priority)
   }
 
-  private onSingleBatchDiscoveryCompleted () {
+  private onSingleBatchDiscoveryCompleted (localCancelToken: CancelTokenSource) {
     this.singleBatchDiscoveryCompleted = true
     this.flushWholeSiteSingleBatch()
+    this.dispatchCrawlerDiscoveryComplete(localCancelToken)
+  }
+
+  private dispatchCrawlerDiscoveryComplete (localCancelToken: CancelTokenSource) {
+    const isCrawlerMode = this.pluginOptions.translation.mode === TranslationMode.SINGLE_BATCH ||
+      this.pluginOptions.translation.mode === TranslationMode.WORD_COUNT
+    const executionIsCurrent = localCancelToken === this.cancelToken && !localCancelToken.token.reason
+    const processingCompleted = this.singleBatchDiscoveryCompleted && this.itemsTranslated === this.itemsTotal
+
+    if (!isCrawlerMode || !executionIsCurrent || this.executionFailed ||
+      this.crawlerDiscoveryCompleteDispatched || !processingCompleted) {
+      return
+    }
+
+    document.dispatchEvent(new CustomEvent(AsyncTranslator.CRAWLER_DISCOVERY_COMPLETE_EVENT))
+    this.crawlerDiscoveryCompleteDispatched = true
   }
 
   private enqueueWholeSiteSingleBatch (items: Array<TranslationTextRange>) {

@@ -40,6 +40,7 @@ import WebsiteService from './src/js/services/WebsiteService'
 import TranslationCache from './src/js/lib/TranslationCache'
 import { ITranslationError } from './src/js/interfaces/ITranslationError'
 import IWebsiteConfiguration from './src/js/interfaces/services/websiteService/IWebsiteConfiguration'
+import { NavigationObserver } from './src/js/lib/NavigationObserver'
 const pluginVersion = require('./src/js/PluginVersion')
 
 const STORAGE_KEY_AUTOTRANSLATE = 'website-translator-autotranslate-system'
@@ -111,6 +112,7 @@ let selectedSentenceInfo: ISegmentInfo = null
 let domTranslator: DOMTranslation
 let translationHelper:AsyncTranslator
 let logger: Logger = null
+let navigationObserver: NavigationObserver
 
 const allTranslations = new Map<string, IDomTranslation>()
 
@@ -835,6 +837,23 @@ function CancelAndRestore () {
   cancel()
 }
 
+function handleNavigation () {
+  const language = targetLanguage.value
+  const isWordCountMode = pluginOptions.translation.mode === TranslationMode.WORD_COUNT
+  const isWidgetTranslation = language !== pluginOptions.sourceLanguage &&
+    !pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
+
+  if (!isWordCountMode && !isWidgetTranslation) {
+    return
+  }
+
+  logger.debug('SPA navigation detected, restarting translation')
+  allTranslations.clear()
+  translationHelper.translate(language, allTranslations, availableLocales).catch((err: ITranslationError) => {
+    logger.debug(`translation failed after SPA navigation ${err}`)
+  })
+}
+
 function ValidatePluginOptions () {
   if (!pluginOptions.api.clientId) {
     logger.error('Client id not defined')
@@ -973,6 +992,9 @@ async function Initialize () {
     }
 
     pluginInitializationComplete = true
+    if (!navigationObserver) {
+      navigationObserver = new NavigationObserver(handleNavigation)
+    }
   }
   else {
     logger.warn('Plugin is already initialized')
