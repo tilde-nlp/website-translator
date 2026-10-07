@@ -99,6 +99,30 @@ class AsyncTranslator {
     processedTranslations: Map<string, IDomTranslation>,
     availableLocales: string[]
   ) {
+    return await this.startTranslation(targetLanguage, processedTranslations, availableLocales, false)
+  }
+
+  public async translateRoute (
+    targetLanguage:string,
+    processedTranslations: Map<string, IDomTranslation>,
+    availableLocales: string[]
+  ) {
+    this.onNavigation()
+    await new Promise(resolve => setTimeout(resolve, 0))
+    return await this.startTranslation(targetLanguage, processedTranslations, availableLocales, true)
+  }
+
+  public resetRoute () {
+    this.onNavigation()
+    this.cancel()
+  }
+
+  private async startTranslation (
+    targetLanguage:string,
+    processedTranslations: Map<string, IDomTranslation>,
+    availableLocales: string[],
+    preserveCache: boolean
+  ) {
     const translationStart = new Date().getTime()
     this.logger.debug('Scheduling translation')
 
@@ -106,7 +130,9 @@ class AsyncTranslator {
     this.cancel()
 
     this.domTranslator.applySeo(targetLanguage, availableLocales)
-    this.translationCache.clear()
+    if (!preserveCache) {
+      this.translationCache.clear()
+    }
 
     this.itemsTranslated = 0
     this.itemsTotal = 0

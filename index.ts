@@ -858,22 +858,21 @@ function CancelAndRestore () {
 }
 
 function handleNavigation () {
-  translationHelper.onNavigation()
-
   const language = targetLanguage.value
   const isWordCountMode = pluginOptions.translation.mode === TranslationMode.WORD_COUNT
   const isWidgetTranslation = language !== pluginOptions.sourceLanguage &&
     !pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
 
   scheduleSeoRefresh(isWidgetTranslation ? language : null)
+  allTranslations.clear()
 
   if (!isWordCountMode && !isWidgetTranslation) {
+    translationHelper.resetRoute()
     return
   }
 
   logger.debug('SPA navigation detected, restarting translation')
-  allTranslations.clear()
-  translationHelper.translate(language, allTranslations, availableLocales).catch((err: ITranslationError) => {
+  translationHelper.translateRoute(language, allTranslations, availableLocales).catch((err: ITranslationError) => {
     logger.debug(`translation failed after SPA navigation ${err}`)
   })
 }

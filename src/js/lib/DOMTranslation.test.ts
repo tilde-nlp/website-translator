@@ -140,6 +140,37 @@ describe('DOMTranslation dynamic content discovery timing', () => {
     translator.restoreDOM()
   })
 
+  it('discovers content inserted after translation starts', async () => {
+    jest.useRealTimers()
+    const onDiscovered = jest.fn()
+    const translator = new DOMTranslation(
+      createOptions(TranslationMode.SINGLE_BATCH),
+      jest.fn(),
+      jest.fn(),
+      null
+    )
+
+    translator.prepareDOM('lv', onDiscovered)
+    onDiscovered.mockClear()
+
+    const article = document.createElement('article')
+    article.innerHTML = '<h2>Immediate content</h2><p>Inserted after startup.</p>'
+    document.body.appendChild(article)
+    await new Promise(resolve => setTimeout(resolve, 50))
+
+    const discoveredRanges = onDiscovered.mock.calls.reduce<TranslationTextRange[]>(
+      (ranges, call) => ranges.concat(call[0] as TranslationTextRange[]),
+      []
+    )
+    const discoveredText = discoveredRanges
+      .map(range => range.html)
+      .join(' ')
+    expect(discoveredText).toContain('Immediate content')
+    expect(discoveredText).toContain('Inserted after startup.')
+
+    translator.restoreDOM()
+  })
+
   it('removes detached translation state during discovery', () => {
     const translator = new DOMTranslation(
       createOptions(TranslationMode.CHUNKED),

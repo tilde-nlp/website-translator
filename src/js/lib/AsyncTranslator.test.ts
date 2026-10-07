@@ -93,8 +93,11 @@ function createHarness (mode: TranslationMode) {
     cancel: () => translator.cancel(),
     completeDiscovery: () => onDiscoveryCompleted(),
     discover: (ranges: TranslationTextRange[]) => onDiscovered(ranges, TranslationPriority.Text),
+    domTranslator,
     navigate: () => translator.onNavigation(),
     processedTranslations,
+    resetRoute: () => translator.resetRoute(),
+    translateRoute: () => translator.translateRoute('lv', processedTranslations, []),
     service
   }
 }
@@ -263,6 +266,26 @@ describe('AsyncTranslator crawler discovery completion', () => {
     jest.useRealTimers()
   })
 
+  it('flushes and translates small dynamic discoveries after inactivity', async () => {
+    jest.useFakeTimers()
+    const harness = createHarness(TranslationMode.CHUNKED)
+    const range = createRange('Dynamic text')
+    harness.service.translate.mockResolvedValue([{
+      translation: 'Dinamisks teksts',
+      segmentId: 1
+    }])
+
+    harness.discover([range])
+    expect(harness.service.translate).not.toHaveBeenCalled()
+
+    jest.advanceTimersByTime(5000)
+    jest.useRealTimers()
+    await waitFor(() => range.element.textContent === 'Dinamisks teksts')
+
+    expect(harness.service.translate).toHaveBeenCalledTimes(1)
+    expect(range.element.textContent).toBe('Dinamisks teksts')
+  })
+
   it('removes detached processed translation mappings during discovery', () => {
     const harness = createHarness(TranslationMode.CHUNKED)
     const detachedElement = document.createElement('p')
@@ -278,5 +301,41 @@ describe('AsyncTranslator crawler discovery completion', () => {
     harness.discover([])
 
     expect([...harness.processedTranslations.keys()]).toEqual(['connected'])
+  })
+
+  it('restores and reprocesses a new route while reusing cached translations', async () => {
+    const harness = createHarness(TranslationMode.SINGLE_BATCH)
+    const firstRouteRange = createRange('Shared route content')
+    harness.service.translate.mockResolvedValue([{
+      translation: 'Kopīgs maršruta saturs',
+      segmentId: 1
+    }])
+
+    harness.discover([firstRouteRange])
+    harness.completeDiscovery()
+    await waitFor(() => firstRouteRange.element.textContent === 'Kopīgs maršruta saturs')
+    expect(harness.service.translate).toHaveBeenCalledTimes(1)
+
+    firstRouteRange.element.remove()
+    const secondRouteRange = createRange('Shared route content')
+    const routeTranslation = harness.translateRoute()
+    expect(harness.domTranslator.prepareDOM).toHaveBeenCalledTimes(1)
+    await routeTranslation
+    harness.discover([secondRouteRange])
+    harness.completeDiscovery()
+    await waitFor(() => secondRouteRange.element.textContent === 'Kopīgs maršruta saturs')
+
+    expect(harness.domTranslator.restoreDOM).toHaveBeenCalledTimes(2)
+    expect(harness.domTranslator.prepareDOM).toHaveBeenCalledTimes(2)
+    expect(harness.service.translate).toHaveBeenCalledTimes(1)
+  })
+
+  it('invalidates and restores a route when widget translation should not restart', () => {
+    const harness = createHarness(TranslationMode.CHUNKED)
+
+    harness.resetRoute()
+
+    expect(harness.domTranslator.restoreDOM).toHaveBeenCalledTimes(2)
+    expect(harness.domTranslator.prepareDOM).toHaveBeenCalledTimes(1)
   })
 })

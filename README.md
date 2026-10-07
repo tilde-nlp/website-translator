@@ -114,6 +114,20 @@ SPAs can update the parameter without adding history entries, or leave routing e
 
 Use `"none"` only when the host application owns language routing or translated pages should not be indexed separately. When using `"none"` for indexable translated pages, the host application must provide stable localized URLs and the corresponding canonical and `hreflang` metadata. Otherwise, search engines may not discover or correctly associate translated variants.
 
+## SPA route translation lifecycle
+
+The widget applies the same route lifecycle to `history.pushState`, `history.replaceState`, browser back/forward navigation, and hash-based navigation:
+
+1. Invalidate queued, delayed, and in-flight work from the previous route.
+2. Restore translated DOM that remains connected and remove detached translation state.
+3. Reset route-specific discovery and processing state.
+4. Prepare the current DOM for translation and restart dynamic content observation.
+5. Translate content rendered immediately or discovered later by the SPA.
+
+Route navigation uses a **restore and reprocess** policy. The widget does not preserve translated markup on elements that survive navigation because the host framework may reuse or mutate those elements as part of rendering the new route. Restoring source markup first gives the framework and the next discovery pass a consistent DOM.
+
+Translation strings are cached by source content, item type, attribute, and target language. Route changes retain this cache, so unchanged content can be reapplied without another translation API request. Explicit language changes start a fresh translation execution and clear the cache. Source-language and third-party-language routes only invalidate and restore widget state; they do not start widget translation observation.
+
 # Browser support
 
 <!--
