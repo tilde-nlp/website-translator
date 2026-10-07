@@ -53,6 +53,8 @@ class DOMTranslation {
   private logger:Logger
   private pluginOptions: IPluginOptions
   private seoTool:SearchEngineOptimization
+  private seoLanguage: string | null
+  private seoAvailableLocales: string[] | null
 
   private xmlSerializer: XMLSerializer
 
@@ -73,6 +75,8 @@ class DOMTranslation {
     this.onTranslationLeave = onTranslationLeave
 
     this.seoTool = seoTool
+    this.seoLanguage = null
+    this.seoAvailableLocales = null
 
     this.logger = new Logger(pluginOptions.debug, DOMTranslation.name)
     this.pluginOptions = pluginOptions
@@ -346,6 +350,8 @@ class DOMTranslation {
   }
 
   public applySeo (language:string, availableLocales:string[]) {
+    this.seoLanguage = language
+    this.seoAvailableLocales = availableLocales
     this.seoTool.applyLinkedPages(language, availableLocales)
   }
 
@@ -490,6 +496,11 @@ class DOMTranslation {
 
     this.cleanupDisconnectedState()
     this.mutationObserver.observeNewRoots()
+
+    if (this.seoTool && this.seoAvailableLocales) {
+      this.seoTool.applyLinkedPages(this.seoLanguage, this.seoAvailableLocales)
+      this.applyUrlLocalization(this.seoLanguage)
+    }
 
     let translationRoots = []
     if (this.pluginOptions.translation.translateOnlyAllowedTags) {

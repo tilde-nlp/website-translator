@@ -201,4 +201,30 @@ describe('DOMTranslation dynamic content discovery timing', () => {
 
     translator.restoreDOM()
   })
+
+  it('refreshes active SEO state during later discovery passes', () => {
+    const seoTool = {
+      applyLinkedPages: jest.fn(),
+      localizeUrls: jest.fn(),
+      restoreUrlLocalization: jest.fn()
+    }
+    const translator = new DOMTranslation(
+      createOptions(TranslationMode.CHUNKED),
+      jest.fn(),
+      jest.fn(),
+      seoTool as any
+    )
+
+    translator.applySeo('lv', ['en', 'lv'])
+    translator.prepareDOM('lv', jest.fn())
+    seoTool.applyLinkedPages.mockClear()
+    seoTool.localizeUrls.mockClear()
+
+    window.dispatchEvent(new Event('scroll'))
+    jest.advanceTimersByTime(20)
+
+    expect(seoTool.applyLinkedPages).toHaveBeenCalledWith('lv', ['en', 'lv'])
+    expect(seoTool.localizeUrls).toHaveBeenCalled()
+    translator.restoreDOM()
+  })
 })

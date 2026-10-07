@@ -63,17 +63,22 @@ export class SearchEngineOptimization {
     })
 
     links.forEach(link => {
-      const linkUrl = link.getAttribute('href')
+      const cachedLinkTarget = this.cachedLinkTargets.get(link)
+      const linkUrl = currentLocale === null
+        ? link.getAttribute('href')
+        : cachedLinkTarget || link.getAttribute('href')
       const parsedUrl = this.parseUrl(link.ownerDocument, linkUrl)
       let linkTarget:string
 
       if (parsedUrl) {
         if (currentLocale === null) {
-          linkTarget = this.cachedLinkTargets.get(link)
+          linkTarget = cachedLinkTarget
         }
         else {
           linkTarget = this.localizeUrl(parsedUrl, currentLocale)
-          this.cachedLinkTargets.set(link, link.getAttribute('href'))
+          if (!cachedLinkTarget) {
+            this.cachedLinkTargets.set(link, link.getAttribute('href'))
+          }
         }
         if (linkTarget) {
           link.setAttribute('href', linkTarget)
@@ -127,7 +132,10 @@ export class SearchEngineOptimization {
       if (doc.head !== null) {
         const existingLink = doc.head.querySelector(`link[rel="alternate"][hreflang="${locale}"]`)
 
-        if (!existingLink) {
+        if (existingLink) {
+          existingLink.setAttribute('href', localizedUrl)
+        }
+        else {
           link = document.createElement('link')
           link.rel = 'alternate'
           link.hreflang = locale

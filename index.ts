@@ -113,6 +113,7 @@ let domTranslator: DOMTranslation
 let translationHelper:AsyncTranslator
 let logger: Logger = null
 let navigationObserver: NavigationObserver
+let seoRefreshFrameHandle: number = null
 
 const allTranslations = new Map<string, IDomTranslation>()
 
@@ -864,6 +865,8 @@ function handleNavigation () {
   const isWidgetTranslation = language !== pluginOptions.sourceLanguage &&
     !pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
 
+  scheduleSeoRefresh(isWidgetTranslation ? language : null)
+
   if (!isWordCountMode && !isWidgetTranslation) {
     return
   }
@@ -872,6 +875,18 @@ function handleNavigation () {
   allTranslations.clear()
   translationHelper.translate(language, allTranslations, availableLocales).catch((err: ITranslationError) => {
     logger.debug(`translation failed after SPA navigation ${err}`)
+  })
+}
+
+function scheduleSeoRefresh (language: string) {
+  if (seoRefreshFrameHandle !== null) {
+    cancelAnimationFrame(seoRefreshFrameHandle)
+  }
+
+  seoRefreshFrameHandle = requestAnimationFrame(() => {
+    seoRefreshFrameHandle = null
+    domTranslator.applySeo(language, availableLocales)
+    domTranslator.applyUrlLocalization(language)
   })
 }
 
