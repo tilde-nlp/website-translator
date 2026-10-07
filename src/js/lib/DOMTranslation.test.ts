@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { TranslationMode } from '../enums/TranslationMode'
 import { IPluginOptions } from '../interfaces/IPluginOptions'
+import { TranslationTextRange } from '../models/TranslationTextRange'
 import { pluginOptions } from '../models/PluginOptions'
 import { DOMTranslation } from './DOMTranslation'
 
@@ -136,6 +137,68 @@ describe('DOMTranslation dynamic content discovery timing', () => {
     jest.advanceTimersByTime(20)
 
     expect(onDiscovered).toHaveBeenCalledTimes(initialDiscoveryCount)
+    translator.restoreDOM()
+  })
+
+  it('removes detached translation state during discovery', () => {
+    const translator = new DOMTranslation(
+      createOptions(TranslationMode.CHUNKED),
+      jest.fn(),
+      jest.fn(),
+      null
+    )
+    translator.prepareDOM('lv', jest.fn())
+    const container = document.createElement('section')
+    const connectedElement = document.querySelector('p')
+    const textRange = new TranslationTextRange()
+    const connectedRange = new TranslationTextRange()
+    textRange.startMarker = document.createElement('tmt-wtw-txt-s')
+    textRange.endMarker = document.createElement('tmt-wtw-txt-e')
+    connectedRange.startMarker = document.createElement('tmt-wtw-txt-s')
+    connectedRange.endMarker = document.createElement('tmt-wtw-txt-e')
+    container.append(textRange.startMarker, document.createTextNode('Translated'), textRange.endMarker)
+    connectedElement.append(connectedRange.startMarker, connectedRange.endMarker)
+    document.body.appendChild(container)
+
+    const state = translator as any
+    state.translatableElementRanges.push(textRange, connectedRange)
+    state.translatableParentElements.add(container)
+    state.translatableParentElements.add(connectedElement)
+    state.translatableElements.add(container)
+    state.translatableElements.add(connectedElement)
+    state.markedNodesWithId.add(container)
+    state.markedNodesWithId.add(connectedElement)
+    state.translatableAttributeElements.push({
+      attributes: [],
+      element: container
+    }, {
+      attributes: [],
+      element: connectedElement
+    })
+    state.translatedSegments.set(textRange.startMarker, {
+      segmentId: 1,
+      source: 'Original',
+      translation: 'Translated'
+    })
+    state.translatedSegments.set(connectedRange.startMarker, {
+      segmentId: 2,
+      source: 'Connected',
+      translation: 'Connected translation'
+    })
+
+    container.remove()
+    window.dispatchEvent(new Event('scroll'))
+    jest.advanceTimersByTime(20)
+
+    expect(state.translatableElementRanges.every(range => range.startMarker.isConnected && range.endMarker.isConnected)).toBe(true)
+    expect([...state.translatedSegments.keys()].every(marker => marker.isConnected)).toBe(true)
+    expect(state.translatableElementRanges).toContain(connectedRange)
+    expect(state.translatedSegments.has(connectedRange.startMarker)).toBe(true)
+    expect([...state.translatableParentElements].every(node => node.isConnected)).toBe(true)
+    expect([...state.translatableElements].every(element => element.isConnected)).toBe(true)
+    expect([...state.markedNodesWithId].every(element => element.isConnected)).toBe(true)
+    expect(state.translatableAttributeElements.every(range => range.element.isConnected)).toBe(true)
+
     translator.restoreDOM()
   })
 })

@@ -76,6 +76,7 @@ function createHarness (mode: TranslationMode) {
     restoreDOM: jest.fn(),
     setLanguage: jest.fn()
   }
+  const processedTranslations = new Map()
   const translator = new AsyncTranslator(
     service as unknown as WebsiteService,
     options,
@@ -86,13 +87,14 @@ function createHarness (mode: TranslationMode) {
     new BehaviorSubject<ILocalizedLanguage>(localization.en)
   )
 
-  translator.translate('lv', new Map(), [])
+  translator.translate('lv', processedTranslations, [])
 
   return {
     cancel: () => translator.cancel(),
     completeDiscovery: () => onDiscoveryCompleted(),
     discover: (ranges: TranslationTextRange[]) => onDiscovered(ranges, TranslationPriority.Text),
     navigate: () => translator.onNavigation(),
+    processedTranslations,
     service
   }
 }
@@ -259,5 +261,22 @@ describe('AsyncTranslator crawler discovery completion', () => {
     expect(harness.service.translate).not.toHaveBeenCalled()
     expect(range.element.textContent).toBe('Pending text')
     jest.useRealTimers()
+  })
+
+  it('removes detached processed translation mappings during discovery', () => {
+    const harness = createHarness(TranslationMode.CHUNKED)
+    const detachedElement = document.createElement('p')
+    const connectedElement = document.createElement('p')
+    document.body.appendChild(connectedElement)
+    harness.processedTranslations.set('detached', {
+      element: detachedElement
+    })
+    harness.processedTranslations.set('connected', {
+      element: connectedElement
+    })
+
+    harness.discover([])
+
+    expect([...harness.processedTranslations.keys()]).toEqual(['connected'])
   })
 })

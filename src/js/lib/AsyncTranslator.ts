@@ -142,12 +142,15 @@ class AsyncTranslator {
 
     this.domTranslator.prepareDOM(
       targetLanguage,
-      (items, priority) => this.onTranslationItemDiscovered(
-        items,
-        priority,
-        localCancelToken,
-        navigationGeneration
-      ),
+      (items, priority) => {
+        this.cleanupProcessedTranslations(processedTranslations)
+        this.onTranslationItemDiscovered(
+          items,
+          priority,
+          localCancelToken,
+          navigationGeneration
+        )
+      },
       () => this.onSingleBatchDiscoveryCompleted(localCancelToken, navigationGeneration),
       () => this.isExecutionCurrent(localCancelToken, navigationGeneration)
     )
@@ -258,6 +261,7 @@ class AsyncTranslator {
             deduplicatedBatch.sourceIndexToUniqueIndex
           )
 
+          this.cleanupProcessedTranslations(processedTranslations)
           this.processTranslation(batch, expandedTranslations, targetLanguage, processedTranslations)
         }
 
@@ -399,6 +403,14 @@ class AsyncTranslator {
     return navigationGeneration === this.navigationGeneration &&
       localCancelToken === this.cancelToken &&
       !localCancelToken.token.reason
+  }
+
+  private cleanupProcessedTranslations (processedTranslations: Map<string, IDomTranslation>) {
+    for (const [key, translation] of processedTranslations) {
+      if (!translation.element?.isConnected) {
+        processedTranslations.delete(key)
+      }
+    }
   }
 
   private enqueueWholeSiteSingleBatch (items: Array<TranslationTextRange>) {

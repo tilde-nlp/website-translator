@@ -110,6 +110,7 @@ class DOMTranslation {
     this.isExecutionCurrent = null
 
     this.restorePartialDocument()
+    this.clearTranslationState()
   }
 
   /**
@@ -309,6 +310,10 @@ class DOMTranslation {
     translatedHTML:string,
     segmentId:number
   ) {
+    if (!translationRange.startMarker?.isConnected || !translationRange.endMarker?.isConnected) {
+      return
+    }
+
     this.mutationObserver.usingPause(() => {
       this.translatedSegments.set(
         translationRange.startMarker,
@@ -334,6 +339,7 @@ class DOMTranslation {
 
   public restorePartialDocument (rootElement: HTMLElement = null) {
     this.mutationObserver.usingPause(() => {
+      this.cleanupDisconnectedState()
       this.restoreElements(rootElement)
       this.restoreAttributes(rootElement)
     })
@@ -368,6 +374,10 @@ class DOMTranslation {
     attributeName:string,
     translated:string
   ) {
+    if (!element?.isConnected) {
+      return
+    }
+
     this.mutationObserver.usingPause(() => {
       const alreadyTranslated = element.hasAttribute(this.getTranslationOriginalAttribute(attributeName))
 
@@ -464,9 +474,11 @@ class DOMTranslation {
         this.scheduleWatchTranslatableContent()
       }
     }
-    else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-      mutation.addedNodes.forEach(node => this.registerAddedIframeLoads(node))
-      this.mutationObserver.observeNewRoots()
+    else if (mutation.type === 'childList' && (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)) {
+      if (mutation.addedNodes.length > 0) {
+        mutation.addedNodes.forEach(node => this.registerAddedIframeLoads(node))
+        this.mutationObserver.observeNewRoots()
+      }
       this.scheduleWatchTranslatableContent()
     }
   }
@@ -476,6 +488,7 @@ class DOMTranslation {
       return
     }
 
+    this.cleanupDisconnectedState()
     this.mutationObserver.observeNewRoots()
 
     let translationRoots = []
@@ -522,6 +535,60 @@ class DOMTranslation {
         this.onSingleBatchDiscoveryCompleted()
       }
     }, discoveryDelay)
+  }
+
+  private cleanupDisconnectedState () {
+    if (this.translatableElementRanges) {
+      this.translatableElementRanges = this.translatableElementRanges.filter(range =>
+        range.startMarker?.isConnected && range.endMarker?.isConnected
+      )
+    }
+    if (this.translatableAttributeElements) {
+      this.translatableAttributeElements = this.translatableAttributeElements.filter(range => range.element?.isConnected)
+    }
+    if (this.translatedSegments) {
+      for (const marker of this.translatedSegments.keys()) {
+        if (!marker.isConnected) {
+          this.translatedSegments.delete(marker)
+        }
+      }
+    }
+    if (this.translatableParentElements) {
+      this.translatableParentElements = new Set(
+        [...this.translatableParentElements].filter(node => node.isConnected)
+      )
+    }
+    if (this.translatableElements) {
+      this.translatableElements = new Set(
+        [...this.translatableElements].filter(element => element.isConnected)
+      )
+    }
+    if (this.markedNodesWithId) {
+      this.markedNodesWithId = new Set(
+        [...this.markedNodesWithId].filter(element => element.isConnected)
+      )
+    }
+
+    for (const iframe of this.registeredIframeLoadElements) {
+      if (!iframe.isConnected) {
+        iframe.removeEventListener('load', this.onIframeLoad)
+        this.registeredIframeLoadElements.delete(iframe)
+      }
+    }
+    for (const [documentElement, iframe] of this.registredIframes) {
+      if (!documentElement.isConnected || !iframe.isConnected) {
+        this.registredIframes.delete(documentElement)
+      }
+    }
+  }
+
+  private clearTranslationState () {
+    this.translatedSegments?.clear()
+    this.translatableParentElements?.clear()
+    this.translatableAttributeElements = []
+    this.translatableElementRanges = []
+    this.markedNodesWithId?.clear()
+    this.translatableElements?.clear()
   }
 
   private prepareNextTranslationRanges (
