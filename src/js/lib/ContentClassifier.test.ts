@@ -46,6 +46,20 @@ describe('ContentClassifier', () => {
     })
   })
 
+  it('collects content locations across an open shadow root', () => {
+    document.body.innerHTML = '<main><div id="host"></div></main>'
+    const host = document.querySelector('#host') as HTMLElement
+    const shadowRoot = host.attachShadow({ mode: 'open' })
+    const button = document.createElement('button')
+    shadowRoot.appendChild(button)
+
+    expect(classifySegment(itemFor(button), 'g1')).toEqual({
+      id: 'g1',
+      contentLocations: ['MAIN_CONTENT'],
+      elementType: 'BUTTON'
+    })
+  })
+
   it.each([
     ['<nav><span>Text</span></nav>', 'NAVIGATION'],
     ['<div role="banner"><span>Text</span></div>', 'HEADER'],

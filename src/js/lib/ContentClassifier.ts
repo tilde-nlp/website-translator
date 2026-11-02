@@ -37,6 +37,15 @@ function getSeoType (item:ITranslatableItem, element:HTMLElement):SeoType | unde
   }
 }
 
+function getComposedParentElement (element:HTMLElement):HTMLElement | null {
+  if (element.parentElement) {
+    return element.parentElement
+  }
+
+  const root = element.getRootNode()
+  return 'host' in root ? (root as ShadowRoot).host as HTMLElement : null
+}
+
 function getContentLocations (element:HTMLElement):ContentLocation[] {
   const locations = new Set<ContentLocation>()
   let current:HTMLElement | null = element
@@ -53,7 +62,7 @@ function getContentLocations (element:HTMLElement):ContentLocation[] {
     if (tagName === 'MAIN' || role === 'main') locations.add('MAIN_CONTENT')
     if (tagName === 'DIALOG' || role === 'dialog' || role === 'alertdialog') locations.add('DIALOG')
 
-    current = current.parentElement
+    current = getComposedParentElement(current)
   }
 
   if (inputTags.has(element.tagName)) locations.add('FORM')
