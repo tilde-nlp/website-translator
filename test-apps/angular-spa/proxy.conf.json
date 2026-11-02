@@ -1,12 +1,4 @@
 {
-  "/api/websitetranslationservice/translate/website/72aab105-df74-4b1c-b9b4-2f374d6eff29.json": {
-    "target": "https://localhost:44367",
-    "secure": false,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/api/websitetranslationservice/translate/website/72aab105-df74-4b1c-b9b4-2f374d6eff29\\.json": "/translate/website/72aab105-df74-4b1c-b9b4-2f374d6eff29"
-    }
-  },
   "/api": {
     "target": "http://localhost:4300",
     "secure": false,

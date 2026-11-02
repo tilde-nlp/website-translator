@@ -1,5 +1,6 @@
 export const widgetConfig = {
   scriptUrl: '/dist/widget.js',
   apiUrl: '',
-  websiteId: '72aab105-df74-4b1c-b9b4-2f374d6eff29.json'
+  websiteTranslationUrl: 'https://localhost:44367/translate/website',
+  websiteId: '92b699ff-f4c9-4ba5-b841-d73115862778'
 };

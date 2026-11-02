@@ -34,6 +34,11 @@ export interface IPluginOptions{
      */
     url: string,
     /**
+     * Optional direct website translation service Uri, excluding the website id.
+     * @example https://localhost:44367/translate/website
+     */
+    websiteTranslationUrl?: string,
+    /**
      * API version
      * 1 - older version
      * 2 - version with seperate API endpoint for configuration

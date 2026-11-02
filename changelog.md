@@ -4,6 +4,17 @@ All notable changes to the Website Translator Widget are documented here.
 
 These release iterations are published under the npm `beta` dist-tag.
 
+## [8.5.0]
+
+### Added
+
+- Added content classification metadata for grouped translation segments, including page location, element type, and SEO type.
+- Added the optional `api.websiteTranslationUrl` setting for overriding the website translation service endpoint, including for local integration testing.
+
+### Changed
+
+- Included per-segment content metadata in grouped batch translation requests to provide the translation service with additional context.
+
 ## [8.4.0]
 
 ### Added

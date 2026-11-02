@@ -11,6 +11,7 @@ import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
 import IWidgetTokenResponse from '../interfaces/services/websiteService/IWidgetTokenResponse'
 import IWordCountPageReportRequest from '../interfaces/services/websiteService/IWordCountPageReportRequest'
 import { normalizeLanguageCode } from '../Common'
+import { classifySegment } from '../lib/ContentClassifier'
 
 class WebsiteService {
     private pluginOptions:IPluginOptions
@@ -82,8 +83,17 @@ class WebsiteService {
       return `${this.pluginOptions.api.clientId}:${scope}`
     }
 
+    private getWebsiteTranslationUrl () {
+      const configuredUrl = this.pluginOptions.api.websiteTranslationUrl
+      const baseUrl = configuredUrl
+        ? configuredUrl.replace(/\/$/, '')
+        : `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website`
+
+      return `${baseUrl}/${this.pluginOptions.api.clientId}`
+    }
+
     private async requestWidgetToken (scope:string) {
-      const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate/widget-token?scope=${encodeURIComponent(scope)}`
+      const url = `${this.getWebsiteTranslationUrl()}/translate/widget-token?scope=${encodeURIComponent(scope)}`
       const response = await axios.post<IWidgetTokenResponse>(
         url,
         undefined,
@@ -192,7 +202,7 @@ class WebsiteService {
         texts: texts
       }
 
-      const url = `${this.pluginOptions.api.url}/api/websitetranslationservice/translate/website/${this.pluginOptions.api.clientId}/translate/batch`
+      const url = `${this.getWebsiteTranslationUrl()}/translate/batch`
 
       return {
         url,
@@ -269,6 +279,7 @@ class WebsiteService {
 
       const isSeoBatch = batch.every(item => this.isSeoType(item))
       const groupedDocument = this.buildDocumentFromTranslationItems(batch)
+      const segments = batch.map((item, index) => classifySegment(item, `g${index + 1}`))
       const translated = await this.postTranslations([
         {
           text: groupedDocument,
@@ -276,7 +287,8 @@ class WebsiteService {
             seo: isSeoBatch,
             tag: 'BATCH',
             attr: null,
-            refAttr: null
+            refAttr: null,
+            segments
           }
         }
       ], targetLanguage, pageUrl, cancelToken)

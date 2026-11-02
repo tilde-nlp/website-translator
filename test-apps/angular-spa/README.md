@@ -22,7 +22,7 @@ Open `http://localhost:4200`. Angular proxies `/dist/widget.js` to the widget se
 
 Edit `src/app/widget/widget.config.ts` to change the website ID, API URL, or widget script URL. Widget loading and initialization are centralized in `src/app/widget/widget-bootstrap.service.ts`.
 
-The app serves a mock API v3 configuration for website `72aab105-df74-4b1c-b9b4-2f374d6eff29`. It uses English as the source and exposes every other EU official language plus Russian. Translation and token requests are proxied to `https://localhost:44367/translate/website/72aab105-df74-4b1c-b9b4-2f374d6eff29`.
+The app serves a mock API v3 configuration for website `92b699ff-f4c9-4ba5-b841-d73115862778`. It uses English as the source and exposes every other EU official language plus Russian. Translation and token requests are sent directly to `https://localhost:44367/translate/website/92b699ff-f4c9-4ba5-b841-d73115862778`.
 
 ## Validate
 

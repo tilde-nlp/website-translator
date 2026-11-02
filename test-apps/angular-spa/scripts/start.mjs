@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
-const configurationRoute = '/api/configurationservice/configuration/72aab105-df74-4b1c-b9b4-2f374d6eff29.json'
+const configurationRoute = '/api/configurationservice/configuration/92b699ff-f4c9-4ba5-b841-d73115862778'
 const configurationPath = join(appRoot, 'public', 'api', 'configurationservice', 'configuration', 'spa-test-site.json')
 
 const mockApi = createServer(async (request, response) => {
