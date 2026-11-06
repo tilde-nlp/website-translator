@@ -41,6 +41,7 @@ import TranslationCache from './src/js/lib/TranslationCache'
 import { ITranslationError } from './src/js/interfaces/ITranslationError'
 import IWebsiteConfiguration from './src/js/interfaces/services/websiteService/IWebsiteConfiguration'
 import { NavigationObserver } from './src/js/lib/NavigationObserver'
+import { PageVisitAnalytics } from './src/js/lib/PageVisitAnalytics'
 const pluginVersion = require('./src/js/PluginVersion')
 
 const STORAGE_KEY_AUTOTRANSLATE = 'website-translator-autotranslate-system'
@@ -113,6 +114,7 @@ let domTranslator: DOMTranslation
 let translationHelper:AsyncTranslator
 let logger: Logger = null
 let navigationObserver: NavigationObserver
+let pageVisitAnalytics: PageVisitAnalytics
 let seoRefreshFrameHandle: number = null
 
 const allTranslations = new Map<string, IDomTranslation>()
@@ -863,6 +865,7 @@ function handleNavigation () {
   const isWidgetTranslation = language !== pluginOptions.sourceLanguage &&
     !pluginOptions.translation.thirdPartyTranslationLanguages.includes(language)
 
+  pageVisitAnalytics.record(language)
   scheduleSeoRefresh(isWidgetTranslation ? language : null)
   allTranslations.clear()
 
@@ -903,6 +906,9 @@ function ValidatePluginOptions () {
 function changeLanguage (language:string) {
   publicAPI.CurrentLanguage = language
   pluginOptions.currentLanguage = language
+  if (pluginInitializationComplete) {
+    pageVisitAnalytics.record(language)
+  }
 }
 
 /**
@@ -967,6 +973,12 @@ async function Initialize () {
     }
     pluginOptions.sourceLanguage = normalizeLanguageCode(website.srcLang)
     pluginOptions.translation.targetLanguages = website.languages
+    pageVisitAnalytics = new PageVisitAnalytics(
+      pluginOptions.sourceLanguage,
+      websiteService,
+      logger,
+      pluginOptions.translation.mode !== TranslationMode.SINGLE_BATCH
+    )
 
     targetLanguage.next(pluginOptions.currentLanguage || pluginOptions.sourceLanguage)
     uiLocalization.next(localization[targetLanguage.value])
@@ -1027,6 +1039,7 @@ async function Initialize () {
     }
 
     pluginInitializationComplete = true
+    pageVisitAnalytics.record(targetLanguage.value)
     if (!navigationObserver) {
       navigationObserver = new NavigationObserver(handleNavigation)
     }

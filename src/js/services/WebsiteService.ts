@@ -10,6 +10,7 @@ import IWebsiteConfiguration from '../interfaces/services/websiteService/IWebsit
 import IWebsite from '../interfaces/services/websiteService/v1/IWebsite'
 import IWidgetTokenResponse from '../interfaces/services/websiteService/IWidgetTokenResponse'
 import IWordCountPageReportRequest from '../interfaces/services/websiteService/IWordCountPageReportRequest'
+import IPageVisitRequest from '../interfaces/services/websiteService/IPageVisitRequest'
 import { normalizeLanguageCode } from '../Common'
 import { classifySegment } from '../lib/ContentClassifier'
 
@@ -28,6 +29,7 @@ class WebsiteService {
     private static readonly GROUP_TAG_SID_REGEX = /\bsid\s*=\s*["']?([^"'\s>]+)["']?/i
     private static readonly TRANSLATE_BATCH_SCOPE = 'translate:batch'
     private static readonly WORD_COUNT_SCOPE = 'word-count:ingest'
+    private static readonly PAGE_VISITS_SCOPE = 'page-visits:ingest'
     private static readonly TOKEN_REFRESH_SKEW_MS = 30000
 
     async getWebsite () {
@@ -76,6 +78,21 @@ class WebsiteService {
         data,
         WebsiteService.WORD_COUNT_SCOPE,
         cancelToken
+      )
+    }
+
+    async reportPageVisit (uri:string, language:string) {
+      const data:IPageVisitRequest = {
+        uri,
+        language
+      }
+
+      const url = `${this.getWebsiteTranslationUrl()}/page-visits`
+
+      await this.postProtected(
+        url,
+        data,
+        WebsiteService.PAGE_VISITS_SCOPE
       )
     }
 
@@ -145,7 +162,7 @@ class WebsiteService {
       }
     }
 
-    private async postProtected<T> (url:string, data:any, scope:string, cancelToken:CancelToken) {
+    private async postProtected<T> (url:string, data:any, scope:string, cancelToken?:CancelToken) {
       const token = await this.getWidgetToken(scope)
 
       try {
@@ -166,7 +183,7 @@ class WebsiteService {
       url:string,
       data:any,
       token:ICachedWidgetToken,
-      cancelToken:CancelToken
+      cancelToken?:CancelToken
     ) {
       return await axios.post<T>(
         url,

@@ -13,6 +13,7 @@ const cancelToken = {} as CancelToken
 const tokenUrl = 'https://api.example/api/websitetranslationservice/translate/website/website-1/translate/widget-token'
 const batchUrl = 'https://api.example/api/websitetranslationservice/translate/website/website-1/translate/batch'
 const wordCountUrl = 'https://api.example/api/websitetranslationservice/word-count/website-1/pages'
+const pageVisitsUrl = 'https://api.example/api/websitetranslationservice/translate/website/website-1/page-visits'
 
 function createService (websiteTranslationUrl?:string) {
   return new WebsiteService({
@@ -262,6 +263,51 @@ describe('WebsiteService widget tokens', () => {
     )
   })
 
+  it('reports a page visit with the page-visits scope, website ID, token, and origin', async () => {
+    mockedPost
+      .mockResolvedValueOnce(tokenResponse('page-visits-token'))
+      .mockResolvedValueOnce({ status: 204 })
+
+    await createService().reportPageVisit(
+      'https://widget.example/products?campaign=one#details',
+      'lv'
+    )
+
+    expect(mockedPost).toHaveBeenNthCalledWith(
+      1,
+          `${tokenUrl}?scope=page-visits%3Aingest`,
+          undefined,
+          { headers: { 'X-Origin': 'https://widget.example' } }
+    )
+    expect(mockedPost).toHaveBeenNthCalledWith(
+      2,
+      pageVisitsUrl,
+      {
+        uri: 'https://widget.example/products?campaign=one#details',
+        language: 'lv'
+      },
+      {
+        cancelToken: undefined,
+        headers: {
+          Authorization: expect.stringMatching(/^Bearer .+/),
+          'X-Origin': 'https://widget.example'
+        }
+      }
+    )
+  })
+
+  it('does not retry ambiguous page visit failures', async () => {
+    const unavailable = { response: { status: 503 } }
+    mockedPost
+      .mockResolvedValueOnce(tokenResponse('page-visits-token'))
+      .mockRejectedValueOnce(unavailable)
+
+    await expect(
+      createService().reportPageVisit('https://widget.example/products', 'lv')
+    ).rejects.toBe(unavailable)
+
+    expect(mockedPost).toHaveBeenCalledTimes(2)
+  })
   it('caches a token by website and scope while it is valid', async () => {
     mockedPost
       .mockResolvedValueOnce(tokenResponse('cached-token'))

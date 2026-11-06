@@ -4,6 +4,17 @@ All notable changes to the Website Translator Widget are documented here.
 
 These release iterations are published under the npm `beta` dist-tag.
 
+## [8.6.0]
+
+### Added
+
+- Added translated-page visit analytics outside single-batch mode using scoped widget tokens and the registered page origin.
+- Added per-page and per-language deduplication for initial loads, language changes, and SPA navigation.
+
+### Changed
+
+- Page visit analytics failures are handled asynchronously without interrupting widget initialization or translation.
+
 ## [8.5.0]
 
 ### Added
