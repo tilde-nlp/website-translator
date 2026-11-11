@@ -4,6 +4,12 @@ All notable changes to the Website Translator Widget are documented here.
 
 These release iterations are published under the npm `beta` dist-tag.
 
+## [8.6.1]
+
+### Fixed
+
+- Fixed single-batch translation failures by sending SEO and regular DOM classifications in separate requests with request-local group IDs while preserving response application order.
+
 ## [8.6.0]
 
 ### Added
