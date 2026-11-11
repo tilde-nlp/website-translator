@@ -31,15 +31,19 @@ function deferred<T> () {
   }
 }
 
-function createRange (text: string) {
-  const element = document.createElement('p')
+function createRange (
+  text: string,
+  type = TranslatableItemType.ELEMENT,
+  tagName = 'p'
+) {
+  const element = document.createElement(tagName)
   element.textContent = text
   document.body.appendChild(element)
 
   const range = new TranslationTextRange()
   range.element = element
   range.html = text
-  range.type = TranslatableItemType.ELEMENT
+  range.type = type
   range.attributes = []
 
   return range
@@ -179,6 +183,35 @@ describe('AsyncTranslator crawler discovery completion', () => {
     await waitFor(() => onCrawlerComplete.mock.calls.length === 1)
     await new Promise(resolve => setTimeout(resolve, 0))
     expect(onCrawlerComplete).toHaveBeenCalledTimes(1)
+  })
+
+  it('applies mixed SEO and DOM responses in source order in single-batch mode', async () => {
+    const harness = createHarness(TranslationMode.SINGLE_BATCH)
+    const title = createRange('Products', TranslatableItemType.ELEMENT_SEO, 'title')
+    const heading = createRange('Visible heading', TranslatableItemType.ELEMENT, 'h1')
+    harness.service.translate.mockResolvedValue([
+      {
+        translation: 'Translated title',
+        segmentId: 101
+      },
+      {
+        translation: 'Translated heading',
+        segmentId: 201
+      }
+    ])
+
+    harness.discover([title, heading])
+    harness.completeDiscovery()
+
+    await waitFor(() => onCrawlerComplete.mock.calls.length === 1)
+
+    expect(harness.service.translate).toHaveBeenCalledTimes(1)
+    expect(harness.service.translate.mock.calls[0][0].map(item => item.type)).toEqual([
+      TranslatableItemType.ELEMENT_SEO,
+      TranslatableItemType.ELEMENT
+    ])
+    expect(title.element.textContent).toBe('Translated title')
+    expect(heading.element.textContent).toBe('Translated heading')
   })
 
   it('fires in word-count mode only after reporting completes', async () => {

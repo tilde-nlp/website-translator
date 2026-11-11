@@ -239,6 +239,90 @@ describe('WebsiteService widget tokens', () => {
     }))
   })
 
+  it('serializes mixed SEO and DOM content as separate classified requests', async () => {
+    document.head.innerHTML = '<title>Products</title><meta name="description" content="Product description">'
+    document.body.innerHTML = '<main><h1>Visible heading</h1></main>'
+    const title = document.querySelector('title') as HTMLElement
+    const description = document.querySelector('meta[name="description"]') as HTMLElement
+    const heading = document.querySelector('h1') as HTMLElement
+    mockedPost
+      .mockResolvedValueOnce(tokenResponse('translate-token'))
+      .mockResolvedValueOnce({
+        data: [{
+          translation: '<g1 sid="101">Translated title</g1>\n<g2 sid="102">Translated description</g2>'
+        }]
+      })
+      .mockResolvedValueOnce({
+        data: [{
+          translation: '<g1 sid="201">Translated heading</g1>'
+        }]
+      })
+
+    const result = await createService().translate([
+      translatableItem(title, 'Products', TranslatableItemType.ELEMENT_SEO),
+      translatableItem(heading, 'Visible heading'),
+      translatableItem(description, 'Product description', TranslatableItemType.ATTRIBUTE_SEO, 'content', 'description')
+    ], 'lv', '/products', cancelToken)
+
+    expect(mockedPost.mock.calls[1][1]).toEqual({
+      lang: 'lv',
+      URL: '/products',
+      texts: [{
+        text: '<g1>Products</g1>\n<g2>Product description</g2>',
+        meta: {
+          seo: true,
+          tag: 'BATCH',
+          attr: null,
+          refAttr: null,
+          segments: [
+            {
+              id: 'g1',
+              seoType: 'PAGE_TITLE'
+            },
+            {
+              id: 'g2',
+              seoType: 'META_DESCRIPTION'
+            }
+          ]
+        }
+      }]
+    })
+    expect(mockedPost.mock.calls[2][1]).toEqual({
+      lang: 'lv',
+      URL: '/products',
+      texts: [{
+        text: '<g1>Visible heading</g1>',
+        meta: {
+          seo: false,
+          tag: 'BATCH',
+          attr: null,
+          refAttr: null,
+          segments: [
+            {
+              id: 'g1',
+              contentLocations: ['MAIN_CONTENT'],
+              elementType: 'HEADING'
+            }
+          ]
+        }
+      }]
+    })
+    expect(result).toEqual([
+      {
+        segmentId: 101,
+        translation: 'Translated title'
+      },
+      {
+        segmentId: 201,
+        translation: 'Translated heading'
+      },
+      {
+        segmentId: 102,
+        translation: 'Translated description'
+      }
+    ])
+  })
+
   it('requests the word count scope for page reports', async () => {
     mockedPost
       .mockResolvedValueOnce(tokenResponse('word-count-token'))

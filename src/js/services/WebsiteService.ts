@@ -240,9 +240,9 @@ class WebsiteService {
       return result.data
     }
 
-    private buildDocumentFromTranslationItems (translationItems: Array<ITranslatableItem>) {
+    private buildDocumentFromTranslationItems (translationItems: Array<{item: ITranslatableItem, sourceIndex: number}>) {
       return translationItems
-        .map((item, index) => `<g${index + 1}>${item.text}</g${index + 1}>`)
+        .map(({ item }, index) => `<g${index + 1}>${item.text}</g${index + 1}>`)
         .join('\n')
     }
 
@@ -250,7 +250,7 @@ class WebsiteService {
       return new Error(`alignment-broken:${reason}`)
     }
 
-    private parseGroupedDocument (translatedDocument:string, expectedCount:number) {
+    private parseGroupedDocument (translatedDocument:string, expectedIds:number[]) {
       const idToTranslation = new Map<number, {translation: string, segmentId: number}>()
       const regex = new RegExp(WebsiteService.GROUP_TAG_REGEX.source, 'g')
       const matches: RegExpExecArray[] = []
@@ -260,8 +260,8 @@ class WebsiteService {
         matches.push(match)
       }
 
-      if (matches.length !== expectedCount) {
-        throw this.createAlignmentError(`group-count-mismatch:expected-${expectedCount}:actual-${matches.length}`)
+      if (matches.length !== expectedIds.length) {
+        throw this.createAlignmentError(`group-count-mismatch:expected-${expectedIds.length}:actual-${matches.length}`)
       }
 
       for (const match of matches) {
@@ -280,9 +280,9 @@ class WebsiteService {
         })
       }
 
-      for (let index = 1; index <= expectedCount; index++) {
-        if (!idToTranslation.has(index)) {
-          throw this.createAlignmentError(`missing-group:${index}`)
+      for (const id of expectedIds) {
+        if (!idToTranslation.has(id)) {
+          throw this.createAlignmentError(`missing-group:${id}`)
         }
       }
 
@@ -294,41 +294,56 @@ class WebsiteService {
         return []
       }
 
-      const isSeoBatch = batch.every(item => this.isSeoType(item))
-      const groupedDocument = this.buildDocumentFromTranslationItems(batch)
-      const segments = batch.map((item, index) => classifySegment(item, `g${index + 1}`))
-      const translated = await this.postTranslations([
-        {
-          text: groupedDocument,
+      const indexedItems = batch.map((item, sourceIndex) => ({
+        item,
+        sourceIndex
+      }))
+      const documentBatches = [true, false]
+        .map(isSeo => ({
+          isSeo,
+          items: indexedItems.filter(({ item }) => this.isSeoType(item) === isSeo)
+        }))
+        .filter(documentBatch => documentBatch.items.length > 0)
+      const translatedDocuments:Array<ITranslation> = []
+      for (const documentBatch of documentBatches) {
+        const translated = await this.postTranslations([{
+          text: this.buildDocumentFromTranslationItems(documentBatch.items),
           meta: {
-            seo: isSeoBatch,
+            seo: documentBatch.isSeo,
             tag: 'BATCH',
             attr: null,
             refAttr: null,
-            segments
+            segments: documentBatch.items.map(({ item }, index) => classifySegment(item, `g${index + 1}`))
           }
-        }
-      ], targetLanguage, pageUrl, cancelToken)
-
-      const translatedDocument = translated?.[0]?.translation
-      if (typeof translatedDocument !== 'string') {
-        throw this.createAlignmentError('missing-translation-document')
+        }], targetLanguage, pageUrl, cancelToken)
+        translatedDocuments.push(translated?.[0])
       }
 
-      const idToTranslation = this.parseGroupedDocument(translatedDocument, batch.length)
-
-      return batch.map((item, index) => {
-        const translatedItem = idToTranslation.get(index + 1)
-        let translatedText = translatedItem?.translation
-        if (this.isAttributeType(item)) {
-          translatedText = this.stripHtmlToPlainText(translatedText || '')
+      const results:Array<ITranslation> = new Array(batch.length)
+      documentBatches.forEach((documentBatch, documentBatchIndex) => {
+        const translatedDocument = translatedDocuments[documentBatchIndex]?.translation
+        if (typeof translatedDocument !== 'string') {
+          throw this.createAlignmentError(`missing-translation-document:${documentBatchIndex}`)
         }
 
-        return {
-          segmentId: translatedItem?.segmentId || 0,
-          translation: translatedText || ''
-        }
+        const expectedIds = documentBatch.items.map((_, index) => index + 1)
+        const idToTranslation = this.parseGroupedDocument(translatedDocument, expectedIds)
+
+        documentBatch.items.forEach(({ item, sourceIndex }, index) => {
+          const translatedItem = idToTranslation.get(index + 1)
+          let translatedText = translatedItem?.translation
+          if (this.isAttributeType(item)) {
+            translatedText = this.stripHtmlToPlainText(translatedText || '')
+          }
+
+          results[sourceIndex] = {
+            segmentId: translatedItem?.segmentId || 0,
+            translation: translatedText || ''
+          }
+        })
       })
+
+      return results
     }
 }
 export default WebsiteService
